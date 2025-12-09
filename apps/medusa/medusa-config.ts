@@ -8,7 +8,7 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 
 const REDIS_URL = process.env.REDIS_URL;
 const STRIPE_API_KEY = process.env.STRIPE_API_KEY;
-const SENTRY_DSN = process.env.SENTRY_DSN || "";
+const SENTRY_DSN = process.env.SENTRY_DSN || '';
 // const SENTRY_API_TOKEN = process.env.SENTRY_API_TOKEN || ""; // Only needed for webhooks
 const IS_TEST = process.env.NODE_ENV === 'test';
 const IS_DEV = process.env.NODE_ENV === 'development';
@@ -22,7 +22,11 @@ const customModules = [
     resolve: './src/modules/chef-event',
     options: {},
   },
-]
+  {
+    resolve: './src/modules/experience-type',
+    options: {},
+  },
+];
 
 // Temporarily use in-memory modules to avoid Redis authentication issues
 const cacheModule = IS_TEST
@@ -55,21 +59,21 @@ const workflowEngineModule = IS_TEST
     };
 
 const notificationModule = {
-      resolve: "@medusajs/medusa/notification",
-      options: {
-        providers: [
-          {
-            resolve: "./src/modules/resend",
-            id: "resend",
-            options: {
-              channels: ["email"],
-              api_key: process.env.RESEND_API_KEY,
-              from: process.env.RESEND_FROM_EMAIL,
-            },
-          },
-        ],
+  resolve: '@medusajs/medusa/notification',
+  options: {
+    providers: [
+      {
+        resolve: './src/modules/resend',
+        id: 'resend',
+        options: {
+          channels: ['email'],
+          api_key: process.env.RESEND_API_KEY,
+          from: process.env.RESEND_FROM_EMAIL,
+        },
       },
-    };
+    ],
+  },
+};
 
 // Allow switching file storage between local and S3 via env
 // FILE_PROVIDER=local | s3 (default: s3)
@@ -77,24 +81,24 @@ const FILE_PROVIDER = (process.env.FILE_PROVIDER || 's3').toLowerCase();
 const fileModule =
   FILE_PROVIDER === 'local'
     ? {
-        resolve: "@medusajs/medusa/file",
+        resolve: '@medusajs/medusa/file',
         options: {
           providers: [
             {
-              resolve: "@medusajs/medusa/file-local",
-              id: "local",
+              resolve: '@medusajs/medusa/file-local',
+              id: 'local',
               options: {},
             },
           ],
         },
       }
     : {
-        resolve: "@medusajs/medusa/file",
+        resolve: '@medusajs/medusa/file',
         options: {
           providers: [
             {
-              resolve: "./src/modules/file-b2",
-              id: "b2-s3",
+              resolve: './src/modules/file-b2',
+              id: 'b2-s3',
               options: {
                 file_url: process.env.S3_FILE_URL,
                 endpoint: process.env.S3_ENDPOINT,
@@ -111,8 +115,6 @@ const fileModule =
         },
       };
 
-
-
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
@@ -122,7 +124,7 @@ module.exports = defineConfig({
     redisUrl: REDIS_URL,
     redisPrefix: process.env.REDIS_PREFIX,
     // ADD WORKER MODE CONFIGURATION
-    workerMode: process.env.MEDUSA_WORKER_MODE as "shared" | "worker" | "server",
+    workerMode: process.env.MEDUSA_WORKER_MODE as 'shared' | 'worker' | 'server',
     http: {
       storeCors: process.env.STORE_CORS || '',
       adminCors: process.env.ADMIN_CORS || '',

@@ -11,6 +11,7 @@ export const ChefEvent = model
     requestedTime: model.text(), // Format: HH:mm
     partySize: model.number(),
     eventType: model.enum(['plated_dinner', 'buffet_style']),
+    experience_type_id: model.text().nullable(),
     templateProductId: model.text(),
 
     // Location details
@@ -77,6 +78,7 @@ export type ChefEventType = {
   acceptedBy?: string;
   rejectionReason?: string;
   chefNotes?: string;
+  experience_type_id?: string | null;
   // Email management fields
   sendAcceptanceEmail?: boolean;
   emailHistory?: Array<{

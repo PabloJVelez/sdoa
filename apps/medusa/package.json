@@ -25,6 +25,7 @@
     "build:prod": "medusa build && mkdir -p build && cp -r .medusa/client/* build/",
     "build:standalone": "medusa build && cd .medusa/server && npm install",
     "seed": "medusa exec ./src/scripts/seed.ts",
+    "seed:experience-types": "medusa exec ./src/scripts/seed/experience-types.ts",
     "seed:menus": "medusa exec ./src/scripts/seed-menus.ts",
     "start": "medusa start",
     "dev": "medusa develop",

@@ -28,6 +28,7 @@ import type {
 import { seedProducts } from './seed/products';
 import { generateReviewResponse, reviewContents, texasCustomers } from './seed/reviews';
 import { seedMenuProducts, seedMenuEntities } from './seed/menus';
+import { seedExperienceTypes } from './seed/experience-types';
 
 export default async function seedDemoData({ container }: ExecArgs) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
@@ -37,7 +38,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
   const storeModuleService: IStoreModuleService = container.resolve(Modules.STORE);
 
   const paymentModuleService: IPaymentModuleService = container.resolve(Modules.PAYMENT);
-  const menuModuleService = container.resolve("menuModuleService");
+  const menuModuleService = container.resolve('menuModuleService');
 
   const canadianCountries = ['ca'];
   const americanCountries = ['us'];
@@ -454,6 +455,10 @@ export default async function seedDemoData({ container }: ExecArgs) {
 
   logger.info('Seeding menu data...');
 
+  logger.info('Seeding experience types...');
+  const experienceTypes = await seedExperienceTypes({ container, args: [] });
+  logger.info(`Created ${experienceTypes.length} experience types.`);
+
   // Create menu entities first
   const createdMenus = await seedMenuEntities(menuModuleService);
   logger.info(`Created ${createdMenus.length} menus with courses, dishes, and ingredients.`);
@@ -477,7 +482,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
   for (let i = 0; i < createdMenus.length && i < menuProductResult.length; i++) {
     const menu = createdMenus[i];
     const product = menuProductResult[i];
-    
+
     try {
       await remoteLink.create([
         {
@@ -490,9 +495,9 @@ export default async function seedDemoData({ container }: ExecArgs) {
         },
       ]);
       logger.info(`Linked menu "${menu.name}" to product "${product.title}"`);
-          } catch (error) {
-        logger.warn(`Failed to link menu "${menu.name}" to product "${product.title}": ${error}`);
-      }
+    } catch (error) {
+      logger.warn(`Failed to link menu "${menu.name}" to product "${product.title}": ${error}`);
+    }
   }
 
   logger.info('Finished seeding menu data.');
