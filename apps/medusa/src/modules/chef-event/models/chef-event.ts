@@ -10,9 +10,12 @@ export const ChefEvent = model
     requestedDate: model.dateTime(),
     requestedTime: model.text(), // Format: HH:mm
     partySize: model.number(),
-    eventType: model.enum(['plated_dinner', 'buffet_style']),
+    eventType: model.enum(['plated_dinner', 'buffet_style', 'pickup']),
     experience_type_id: model.text().nullable(),
     templateProductId: model.text(),
+    selected_products: model.json().nullable(), // [{ product_id, quantity }]
+    pickup_time_slot: model.text().nullable(),
+    pickup_location: model.text().nullable(),
 
     // Location details
     locationType: model.enum(['customer_location', 'chef_location']),

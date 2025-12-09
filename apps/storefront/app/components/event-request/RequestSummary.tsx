@@ -3,18 +3,27 @@ import { useFormContext } from 'react-hook-form';
 import type { EventRequestFormData } from '@app/routes/request._index';
 import { PRICING_STRUCTURE, getEventTypeDisplayName } from '@libs/constants/pricing';
 import type { StoreMenuDTO } from '@libs/util/server/data/menus.server';
+import type { StoreExperienceType } from '@libs/util/server/data/experience-types.server';
 import clsx from 'clsx';
 import type { FC } from 'react';
 
 export interface RequestSummaryProps {
   className?: string;
   menus: StoreMenuDTO[];
+  experienceTypes: StoreExperienceType[];
   onEditStep: (step: number, section?: string) => void;
   onSubmit: () => void;
   isSubmitting: boolean;
 }
 
-export const RequestSummary: FC<RequestSummaryProps> = ({ className, menus, onEditStep, onSubmit, isSubmitting }) => {
+export const RequestSummary: FC<RequestSummaryProps> = ({
+  className,
+  menus,
+  experienceTypes,
+  onEditStep,
+  onSubmit,
+  isSubmitting,
+}) => {
   const { watch } = useFormContext<EventRequestFormData>();
 
   // Get all form data
@@ -24,6 +33,8 @@ export const RequestSummary: FC<RequestSummaryProps> = ({ className, menus, onEd
     partySize: watch('partySize'),
     requestedDate: watch('requestedDate'),
     requestedTime: watch('requestedTime'),
+    selected_products: watch('selected_products'),
+    experienceTypeId: watch('experienceTypeId'),
     locationAddress: watch('locationAddress'),
     firstName: watch('firstName'),
     lastName: watch('lastName'),
@@ -35,9 +46,13 @@ export const RequestSummary: FC<RequestSummaryProps> = ({ className, menus, onEd
 
   // Get selected menu
   const selectedMenu = formData.menuId ? menus.find((menu) => menu.id === formData.menuId) : null;
+  const selectedExperience = experienceTypes.find(
+    (e) => e.id === formData.experienceTypeId || e.slug === formData.eventType,
+  );
+  const isProductBased = selectedExperience?.is_product_based;
 
   // Calculate pricing
-  const pricePerPerson = formData.eventType ? PRICING_STRUCTURE[formData.eventType] : 0;
+  const pricePerPerson = formData.eventType ? (PRICING_STRUCTURE[formData.eventType] ?? 0) : 0;
   const totalPrice = pricePerPerson * (formData.partySize || 0);
 
   // Format date (parse YYYY-MM-DD as local to avoid UTC offset issues)
@@ -53,39 +68,47 @@ export const RequestSummary: FC<RequestSummaryProps> = ({ className, menus, onEd
     });
   };
 
-  const formatTimeForDisplay = (timeString: string) => {
-    if (!timeString) return '';
-    const [hours, minutes] = timeString.split(':');
-    const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
-  };
+  const formatTimeForDisplay = (timeString: string) => timeString || '';
 
   return (
     <div className={clsx('space-y-6', className)}>
       {/* Header */}
       <div className="text-center">
-        <h3 className="text-lg font-semibold text-primary-900 mb-2">Review Your Event Request</h3>
+        <h3 className="text-lg font-semibold text-primary-900 mb-2">
+          Review Your {isProductBased ? 'Pickup Request' : 'Event Request'}
+        </h3>
         <p className="text-primary-600">Please review all details before submitting your request.</p>
       </div>
 
       {/* Summary sections */}
       <div className="space-y-6">
-        {/* Menu Selection */}
+        {/* Menu / Products */}
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="text-lg font-semibold text-primary-900">Menu Selection</h4>
+            <h4 className="text-lg font-semibold text-primary-900">{isProductBased ? 'Products' : 'Menu Selection'}</h4>
             <Button
               type="button"
               variant="ghost"
-              onClick={() => onEditStep(1, 'menu')}
+              onClick={() => onEditStep(1, isProductBased ? 'products' : 'menu')}
               className="text-accent-600 text-sm"
             >
               Edit
             </Button>
           </div>
-          {selectedMenu ? (
+          {isProductBased ? (
+            formData.selected_products?.length ? (
+              <div className="space-y-2">
+                {formData.selected_products.map((p, idx) => (
+                  <div key={`${p.product_id}-${idx}`} className="flex justify-between text-sm text-primary-800">
+                    <span>Product: {p.product_id}</span>
+                    <span>Qty {p.quantity}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-primary-600">No products selected yet.</p>
+            )
+          ) : selectedMenu ? (
             <div className="space-y-3">
               <div>
                 <h5 className="font-medium text-primary-800">{selectedMenu.name}</h5>
@@ -125,13 +148,16 @@ export const RequestSummary: FC<RequestSummaryProps> = ({ className, menus, onEd
             <div>
               <p className="text-sm font-medium text-primary-700">Experience Type</p>
               <p className="text-primary-900">
-                {formData.eventType ? getEventTypeDisplayName(formData.eventType) : 'Not selected'}
+                {selectedExperience?.name ??
+                  (formData.eventType ? getEventTypeDisplayName(formData.eventType) : 'Not selected')}
               </p>
             </div>
-            <div>
-              <p className="text-sm font-medium text-primary-700">Number of Guests</p>
-              <p className="text-primary-900">{formData.partySize || 0} guests</p>
-            </div>
+            {!isProductBased && (
+              <div>
+                <p className="text-sm font-medium text-primary-700">Number of Guests</p>
+                <p className="text-primary-900">{formData.partySize || 0} guests</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -150,13 +176,15 @@ export const RequestSummary: FC<RequestSummaryProps> = ({ className, menus, onEd
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <p className="text-sm font-medium text-primary-700">Preferred Date</p>
+              <p className="text-sm font-medium text-primary-700">
+                {isProductBased ? 'Pickup Date' : 'Preferred Date'}
+              </p>
               <p className="text-primary-900">
                 {formData.requestedDate ? formatDateForDisplay(formData.requestedDate) : 'Not selected'}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-primary-700">Start Time</p>
+              <p className="text-sm font-medium text-primary-700">{isProductBased ? 'Pickup Time' : 'Start Time'}</p>
               <p className="text-primary-900">
                 {formData.requestedTime ? formatTimeForDisplay(formData.requestedTime) : 'Not selected'}
               </p>
@@ -165,31 +193,58 @@ export const RequestSummary: FC<RequestSummaryProps> = ({ className, menus, onEd
         </div>
 
         {/* Location */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="text-lg font-semibold text-primary-900">Location</h4>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => onEditStep(2, 'location')}
-              className="text-accent-600 text-sm"
-            >
-              Edit
-            </Button>
-          </div>
-          <div className="space-y-3">
-            <div>
-              <p className="text-sm font-medium text-primary-700">Event Location</p>
-              <p className="text-primary-900">Your Location</p>
+        {!isProductBased ? (
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-lg font-semibold text-primary-900">Location</h4>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => onEditStep(2, 'location')}
+                className="text-accent-600 text-sm"
+              >
+                Edit
+              </Button>
             </div>
-            {formData.locationAddress && (
+            <div className="space-y-3">
               <div>
-                <p className="text-sm font-medium text-primary-700">Address</p>
-                <p className="text-primary-900 break-words">{formData.locationAddress}</p>
+                <p className="text-sm font-medium text-primary-700">Event Location</p>
+                <p className="text-primary-900">Your Location</p>
               </div>
-            )}
+              {formData.locationAddress && (
+                <div>
+                  <p className="text-sm font-medium text-primary-700">Address</p>
+                  <p className="text-primary-900 break-words">{formData.locationAddress}</p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-lg font-semibold text-primary-900">Pickup Details</h4>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => onEditStep(2, 'date')}
+                className="text-accent-600 text-sm"
+              >
+                Edit
+              </Button>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-primary-700">Pickup Location</p>
+              <p className="text-primary-900">
+                {selectedExperience?.fixed_location_address ||
+                  formData.locationAddress ||
+                  'Pickup location will be shared'}
+              </p>
+              <p className="text-sm text-primary-600">
+                You’ll receive a confirmation and payment link after acceptance.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Contact Information */}
         <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -258,29 +313,39 @@ export const RequestSummary: FC<RequestSummaryProps> = ({ className, menus, onEd
         )}
 
         {/* Pricing Summary */}
-        {formData.eventType && formData.partySize && (
+        {formData.eventType && (!isProductBased || formData.partySize) && (
           <div className="bg-accent-50 border border-accent-200 rounded-lg p-6">
             <h4 className="text-lg font-semibold text-accent-700 mb-4">Pricing Estimate</h4>
             <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-accent-600">
-                  {getEventTypeDisplayName(formData.eventType)} × {formData.partySize} guests
-                </span>
-                <span className="font-medium text-accent-800">
-                  ${pricePerPerson.toFixed(2)} × {formData.partySize}
-                </span>
-              </div>
-              <div className="border-t border-accent-200 pt-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-accent-700">Total Estimated Cost</span>
-                  <span className="text-2xl font-bold text-accent-800">${totalPrice.toFixed(2)}</span>
-                </div>
-              </div>
+              {!isProductBased ? (
+                <>
+                  <div className="flex justify-between items-center">
+                    <span className="text-accent-600">
+                      {getEventTypeDisplayName(formData.eventType)} × {formData.partySize} guests
+                    </span>
+                    <span className="font-medium text-accent-800">
+                      ${pricePerPerson.toFixed(2)} × {formData.partySize}
+                    </span>
+                  </div>
+                  <div className="border-t border-accent-200 pt-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-semibold text-accent-700">Total Estimated Cost</span>
+                      <span className="text-2xl font-bold text-accent-800">${totalPrice.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <p className="text-accent-700 text-sm">
+                  Pickup orders: pricing will be based on selected products and finalized after acceptance.
+                </p>
+              )}
             </div>
-            <p className="text-sm text-accent-600 mt-3">
-              * Final pricing will be confirmed and may include adjustments for location, special requirements, or menu
-              customizations.
-            </p>
+            {!isProductBased && (
+              <p className="text-sm text-accent-600 mt-3">
+                * Final pricing will be confirmed and may include adjustments for location, special requirements, or
+                menu customizations.
+              </p>
+            )}
           </div>
         )}
       </div>
@@ -310,12 +375,14 @@ export const RequestSummary: FC<RequestSummaryProps> = ({ className, menus, onEd
               </svg>
               Submitting Request...
             </span>
+          ) : isProductBased ? (
+            'Submit Pickup Request'
           ) : (
             'Submit Event Request'
           )}
         </Button>
         <p className="text-sm text-primary-600 mt-3 max-w-md mx-auto">
-          No payment required now - you'll receive a secure payment link after your event is confirmed
+          No payment required now - you'll receive a secure payment link after your request is accepted
         </p>
       </div>
     </div>

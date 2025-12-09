@@ -1,66 +1,38 @@
 import { Button } from '@app/components/common/buttons/Button';
 import { useFormContext } from 'react-hook-form';
 import type { EventRequestFormData } from '@app/routes/request._index';
-import { getEventTypeDisplayName } from '@libs/constants/pricing';
 import clsx from 'clsx';
 import type { FC } from 'react';
 import React from 'react';
+import type { StoreExperienceType } from '@libs/util/server/data/experience-types.server';
 
 export interface EventTypeSelectorProps {
   className?: string;
+  experienceTypes: StoreExperienceType[];
 }
 
-interface ExperienceType {
-  id: 'plated_dinner' | 'buffet_style';
-  name: string;
-  description: string;
-  highlights: string[];
-  idealFor: string;
-  duration: string;
-  icon: string;
-  isMostPopular?: boolean;
-}
-
-const experienceTypes: ExperienceType[] = [
-  {
-    id: 'plated_dinner',
-    name: 'Plated Dinner',
-    description: 'Elegant, restaurant-quality dining with multiple courses',
-    highlights: ['Multi-course menu', 'Restaurant-quality', 'Full-service dining'],
-    idealFor: 'Anniversaries, formal celebrations',
-    duration: '4 hours',
-    icon: '🍽️',
-    isMostPopular: true,
-  },
-  {
-    id: 'buffet_style',
-    name: 'Buffet Style',
-    description: 'Perfect for larger gatherings with variety of dishes',
-    highlights: ['Multiple dishes', 'Self-service style', 'Great for mingling'],
-    idealFor: 'Birthday parties, family gatherings',
-    duration: '2.5 hours',
-    icon: '🥘',
-  },
-];
-
-export const EventTypeSelector: FC<EventTypeSelectorProps> = ({ className }) => {
+export const EventTypeSelector: FC<EventTypeSelectorProps> = ({ className, experienceTypes }) => {
   const { watch, setValue } = useFormContext<EventRequestFormData>();
   const selectedEventType = watch('eventType');
 
   // Set default value to plated_dinner if no selection
   React.useEffect(() => {
-    if (!selectedEventType) {
-      setValue('eventType', 'plated_dinner', { shouldValidate: true });
+    if (!selectedEventType && experienceTypes.length > 0) {
+      setValue('eventType', experienceTypes[0].slug as EventRequestFormData['eventType'], { shouldValidate: true });
+      setValue('experienceTypeId', experienceTypes[0].id, { shouldValidate: false });
+      setValue('experienceTypeSlug', experienceTypes[0].slug, { shouldValidate: false });
     }
-  }, [selectedEventType, setValue]);
+  }, [selectedEventType, setValue, experienceTypes]);
 
-  const handleEventTypeSelect = (eventType: ExperienceType['id']) => {
-    setValue('eventType', eventType, { shouldValidate: true });
+  const handleEventTypeSelect = (experience: StoreExperienceType) => {
+    setValue('eventType', experience.slug as EventRequestFormData['eventType'], { shouldValidate: true });
+    setValue('experienceTypeId', experience.id, { shouldValidate: false });
+    setValue('experienceTypeSlug', experience.slug, { shouldValidate: false });
   };
 
   const selectedExperience = selectedEventType
-    ? experienceTypes.find((e) => e.id === selectedEventType)
-    : experienceTypes.find((e) => e.id === 'plated_dinner');
+    ? experienceTypes.find((e) => e.slug === selectedEventType)
+    : experienceTypes[0];
 
   return (
     <div className={clsx('space-y-6', className)}>
@@ -77,13 +49,16 @@ export const EventTypeSelector: FC<EventTypeSelectorProps> = ({ className }) => 
           <div>
             <label className="block text-sm font-medium text-primary-900 mb-3">Experience Type</label>
             <select
-              value={selectedEventType || 'plated_dinner'}
-              onChange={(e) => handleEventTypeSelect(e.target.value as ExperienceType['id'])}
+              value={selectedEventType || experienceTypes[0]?.slug}
+              onChange={(e) => {
+                const exp = experienceTypes.find((x) => x.slug === e.target.value);
+                if (exp) handleEventTypeSelect(exp);
+              }}
               className="w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 border-gray-300"
             >
               {experienceTypes.map((experience) => (
-                <option key={experience.id} value={experience.id}>
-                  {experience.name} {experience.isMostPopular ? '(Most Popular)' : ''}
+                <option key={experience.id} value={experience.slug}>
+                  {experience.name} {experience.is_featured ? '(Featured)' : ''}
                 </option>
               ))}
             </select>
@@ -93,7 +68,7 @@ export const EventTypeSelector: FC<EventTypeSelectorProps> = ({ className }) => 
           {selectedExperience && (
             <div className="relative bg-white border-2 border-gray-200 rounded-lg p-6 shadow-sm">
               {/* Most Popular Badge */}
-              {selectedExperience.isMostPopular && (
+              {selectedExperience?.is_featured && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
                   <span className="bg-accent-500 text-white px-4 py-1 rounded-full text-sm font-medium shadow-md">
                     Most Popular
@@ -110,7 +85,9 @@ export const EventTypeSelector: FC<EventTypeSelectorProps> = ({ className }) => 
                 {/* Title and Duration */}
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">{selectedExperience.name}</h3>
-                  <p className="text-lg text-gray-600 font-medium">{selectedExperience.duration}</p>
+                  <p className="text-lg text-gray-600 font-medium">
+                    {selectedExperience.duration_display || `${selectedExperience.duration_minutes ?? ''} minutes`}
+                  </p>
                 </div>
 
                 {/* Description */}
@@ -120,9 +97,9 @@ export const EventTypeSelector: FC<EventTypeSelectorProps> = ({ className }) => 
 
                 {/* What's included */}
                 <div className="space-y-4">
-                  <h4 className="font-semibold text-gray-900 text-lg">What's Included:</h4>
+                  <h4 className="font-semibold text-gray-900 text-lg">Highlights:</h4>
                   <ul className="space-y-2">
-                    {selectedExperience.highlights.map((highlight, index) => (
+                    {(selectedExperience.highlights || []).map((highlight, index) => (
                       <li key={index} className="flex items-start text-gray-700">
                         <span className="w-2 h-2 bg-accent-500 rounded-full mt-2 mr-3 flex-shrink-0" />
                         <span className="text-sm">{highlight}</span>
@@ -134,7 +111,7 @@ export const EventTypeSelector: FC<EventTypeSelectorProps> = ({ className }) => 
                 {/* Ideal for */}
                 <div>
                   <h4 className="font-semibold text-gray-900 text-lg mb-2">Ideal For:</h4>
-                  <p className="text-gray-700 text-sm">{selectedExperience.idealFor}</p>
+                  <p className="text-gray-700 text-sm">{selectedExperience.ideal_for}</p>
                 </div>
               </div>
             </div>

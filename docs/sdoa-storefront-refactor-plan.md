@@ -312,47 +312,47 @@ Placeholder images will be used initially. The user will provide final images la
 ### 1.7 Phase 1 Deliverables Checklist
 
 **Code Cleanup:**
-- [ ] Remove `cooking_class` from `libs/constants/pricing.ts`
-- [ ] Remove `cooking_class` from `libs/util/server/data/chef-events.server.ts`
-- [ ] Remove `cooking_class` from `types/chef-events.ts`
-- [ ] Remove `cooking_class` from `app/routes/request._index.tsx` schema
-- [ ] Remove `cooking_class` from `app/components/event-request/EventTypeSelector.tsx`
-- [ ] Remove `cooking_class` from `app/components/chef/ExperienceTypes.tsx`
-- [ ] Remove `cooking_class` from `app/templates/MenuTemplate.tsx`
+- [x] Remove `cooking_class` from `libs/constants/pricing.ts`
+- [x] Remove `cooking_class` from `libs/util/server/data/chef-events.server.ts`
+- [x] Remove `cooking_class` from `types/chef-events.ts`
+- [x] Remove `cooking_class` from `app/routes/request._index.tsx` schema
+- [x] Remove `cooking_class` from `app/components/event-request/EventTypeSelector.tsx`
+- [x] Remove `cooking_class` from `app/components/chef/ExperienceTypes.tsx`
+- [x] Remove `cooking_class` from `app/templates/MenuTemplate.tsx`
 
 **Color Scheme:**
-- [ ] Update `tailwind.config.js` with new color palette
-- [ ] Update header/footer background to charcoal (`#1A1A1A`)
-- [ ] Update accent colors to gold (`#C9A962`)
-- [ ] Update button styles
-- [ ] Update link styles
-- [ ] Verify contrast ratios for accessibility
+- [x] Update `tailwind.config.js` with new color palette
+- [x] Update header/footer background to charcoal/onyx
+- [x] Update accent colors to gold
+- [x] Update button styles
+- [x] Update link styles
+- [x] Verify contrast ratios for accessibility
 
 **Branding & Content:**
-- [ ] Update `chef-config.ts` with SDOA branding
-- [ ] Update homepage hero copy
-- [ ] Update homepage "Featured Menus" section
-- [ ] Update homepage "Culinary Experiences" section
-- [ ] Update homepage testimonials (placeholder text)
-- [ ] Update homepage CTA section
-- [ ] Update navigation labels
-- [ ] Update footer copy
-- [ ] Update about page content
-- [ ] Update how-it-works page
-- [ ] Update `root.tsx` default meta description
-- [ ] Update SEO meta tags on all pages
+- [x] Update `chef-config.ts` with SDOA branding
+- [x] Update homepage hero copy
+- [x] Update homepage "Featured Menus" section
+- [x] Update homepage "Culinary Experiences" section
+- [x] Update homepage testimonials (placeholder text)
+- [x] Update homepage CTA section
+- [x] Update navigation labels
+- [x] Update footer copy
+- [x] Update about page content
+- [x] Update how-it-works page
+- [x] Update `root.tsx` default meta description
+- [x] Update SEO meta tags on all pages
 
 **Images:**
-- [ ] Add placeholder sushi hero image
-- [ ] Add placeholder experience type images
-- [ ] Add placeholder menu images
-- [ ] Create `IMAGE_REPLACEMENTS.md` checklist
+- [x] Add placeholder sushi hero image
+- [x] Add placeholder experience type images
+- [x] Add placeholder menu images
+- [x] Create `IMAGE_REPLACEMENTS.md` checklist
 
 **Testing:**
-- [ ] Verify event request flow works with only `plated_dinner` and `buffet_style`
-- [ ] Verify all pages render without errors
-- [ ] Verify color contrast meets WCAG guidelines
-- [ ] Visual review of all updated pages
+- [x] Verify event request flow works with only `plated_dinner` and `buffet_style`
+- [x] Verify all pages render without errors
+- [x] Verify color contrast meets WCAG guidelines
+- [x] Visual review of all updated pages
 
 ---
 
@@ -611,16 +611,16 @@ experience_type_id: model.text().nullable()
 
 ### 2.6 Phase 2 Deliverables Checklist
 
-- [ ] Create `experience-type` module structure
-- [ ] Define ExperienceType model with all fields
-- [ ] Create module service with custom methods
-- [ ] Register module in `medusa-config.ts`
-- [ ] Create Store API routes (list, get by slug)
-- [ ] Create Admin API routes (CRUD)
-- [ ] Create Admin UI pages (list, create, edit)
-- [ ] Create database migration
-- [ ] Create seed script with initial data
-- [ ] Link chef-event to experience-type
+- [x] Create `experience-type` module structure
+- [x] Define ExperienceType model with all fields
+- [x] Create module service with custom methods
+- [x] Register module in `medusa-config.ts`
+- [x] Create Store API routes (list, get by slug)
+- [x] Create Admin API routes (CRUD)
+- [x] Create Admin UI pages (list, create, edit)
+- [x] Create database migrations (experience_type table; chef_event.experience_type_id; add raw_price_per_unit)
+- [x] Create seed script with initial data (Pickup, Plated, Buffet)
+- [x] Link chef-event to experience-type
 - [ ] Test admin CRUD operations
 - [ ] Test store API endpoints
 

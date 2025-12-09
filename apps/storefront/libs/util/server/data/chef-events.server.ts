@@ -6,8 +6,11 @@ export interface StoreChefEventDTO {
   requestedDate: string;
   requestedTime: string;
   partySize: number;
-  eventType: 'plated_dinner' | 'buffet_style';
+  eventType: 'plated_dinner' | 'buffet_style' | 'pickup';
   templateProductId?: string;
+  selected_products?: Array<{ product_id: string; quantity: number }>;
+  pickup_time_slot?: string | null;
+  pickup_location?: string | null;
   locationType: 'customer_location' | 'chef_location';
   locationAddress: string;
   firstName: string;
@@ -25,8 +28,12 @@ export interface StoreCreateChefEventDTO {
   requestedDate: string;
   requestedTime: string;
   partySize: number;
-  eventType: 'plated_dinner' | 'buffet_style';
+  eventType: 'plated_dinner' | 'buffet_style' | 'pickup';
   templateProductId?: string;
+  selected_products?: Array<{ product_id: string; quantity: number }>;
+  pickup_time_slot?: string | null;
+  pickup_location?: string | null;
+  experience_type_id?: string | null;
   locationType: 'customer_location' | 'chef_location';
   locationAddress: string;
   firstName: string;

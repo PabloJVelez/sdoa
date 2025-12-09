@@ -6,38 +6,36 @@ import type { FC } from 'react';
 
 export interface DateTimeFormProps {
   className?: string;
+  experienceType?: {
+    slug: string;
+    requires_advance_notice: boolean;
+    advance_notice_days: number;
+    time_slot_start?: string | null;
+    time_slot_end?: string | null;
+    time_slot_interval_minutes?: number;
+    available_time_slots?: string[] | null;
+  };
 }
 
-// Time slots available for booking
-const TIME_SLOTS = [
-  '10:00',
-  '10:30',
-  '11:00',
-  '11:30',
-  '12:00',
-  '12:30',
-  '13:00',
-  '13:30',
-  '14:00',
-  '14:30',
-  '15:00',
-  '15:30',
-  '16:00',
-  '16:30',
-  '17:00',
-  '17:30',
-  '18:00',
-  '18:30',
-  '19:00',
-  '19:30',
-  '20:00',
-  '20:30',
-];
+const generateSlots = (start: string | null | undefined, end: string | null | undefined, interval: number) => {
+  if (!start || !end) return [];
+  const [startH, startM] = start.split(':').map(Number);
+  const [endH, endM] = end.split(':').map(Number);
+  const slots: string[] = [];
+  let minutes = startH * 60 + startM;
+  const endMinutes = endH * 60 + endM;
+  while (minutes <= endMinutes) {
+    const h = Math.floor(minutes / 60)
+      .toString()
+      .padStart(2, '0');
+    const m = (minutes % 60).toString().padStart(2, '0');
+    slots.push(`${h}:${m}`);
+    minutes += interval;
+  }
+  return slots;
+};
 
-// Popular time slots for quick selection
-const POPULAR_TIMES = ['12:00', '17:00', '18:00', '19:00'];
-
-export const DateTimeForm: FC<DateTimeFormProps> = ({ className }) => {
+export const DateTimeForm: FC<DateTimeFormProps> = ({ className, experienceType }) => {
   const {
     watch,
     setValue,
@@ -49,7 +47,11 @@ export const DateTimeForm: FC<DateTimeFormProps> = ({ className }) => {
   // Calculate minimum date (7 days from now)
   const getMinDate = () => {
     const today = new Date();
-    today.setDate(today.getDate() + 7);
+    if (experienceType?.requires_advance_notice === false || experienceType?.slug === 'pickup') {
+      return today.toISOString().split('T')[0];
+    }
+    const days = experienceType?.advance_notice_days ?? 7;
+    today.setDate(today.getDate() + days);
     return today.toISOString().split('T')[0];
   };
 
@@ -81,15 +83,8 @@ export const DateTimeForm: FC<DateTimeFormProps> = ({ className }) => {
     });
   };
 
-  // Format time for display
-  const formatTimeForDisplay = (timeString: string) => {
-    if (!timeString) return '';
-    const [hours, minutes] = timeString.split(':');
-    const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
-  };
+  // Format time for display (24h)
+  const formatTimeForDisplay = (timeString: string) => timeString || '';
 
   // Check if selected date is weekend (local)
   const isWeekend = (dateString: string) => {
@@ -111,10 +106,13 @@ export const DateTimeForm: FC<DateTimeFormProps> = ({ className }) => {
     <div className={clsx('space-y-6', className)}>
       {/* Header */}
       <div className="text-center">
-        <h3 className="text-lg font-semibold text-primary-900 mb-2">Select Your Preferred Date & Time</h3>
+        <h3 className="text-lg font-semibold text-primary-900 mb-2">
+          {experienceType?.slug === 'pickup' ? 'Select Your Pickup Date & Time' : 'Select Your Preferred Date & Time'}
+        </h3>
         <p className="text-primary-600">
-          Choose when you'd like the chef to arrive. Typically needs about 2 hours before guests sit down to eat. Events
-          require minimum 7 days advance notice.
+          {experienceType?.slug === 'pickup'
+            ? 'Choose a pickup date and available time slot.'
+            : 'Choose when you would like the chef to arrive. Events typically require advance notice.'}
         </p>
       </div>
 
@@ -155,46 +153,57 @@ export const DateTimeForm: FC<DateTimeFormProps> = ({ className }) => {
       {/* Time Selection */}
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-primary-900 mb-3">Preferred Start Time</label>
+          <label className="block text-sm font-medium text-primary-900 mb-3">
+            {experienceType?.slug === 'pickup' ? 'Pickup Time Slot' : 'Preferred Start Time'}
+          </label>
 
-          {/* Popular times quick selection */}
-          <div className="mb-4">
-            <p className="text-sm text-primary-700 mb-2">Popular times:</p>
-            <div className="flex flex-wrap gap-2">
-              {POPULAR_TIMES.map((time) => (
-                <button
-                  key={time}
-                  type="button"
-                  onClick={() => handleTimeChange(time)}
-                  className={clsx(
-                    'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                    selectedTime === time
-                      ? 'bg-accent-500 text-white'
-                      : 'bg-accent-100 text-accent-700 hover:bg-accent-200',
-                  )}
-                >
-                  {formatTimeForDisplay(time)}
-                </button>
-              ))}
+          {experienceType?.slug === 'pickup' ? (
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                {(experienceType.available_time_slots?.length
+                  ? experienceType.available_time_slots
+                  : generateSlots(
+                      experienceType.time_slot_start,
+                      experienceType.time_slot_end,
+                      experienceType.time_slot_interval_minutes || 30,
+                    )
+                ).map((slot) => (
+                  <button
+                    key={slot}
+                    type="button"
+                    onClick={() => handleTimeChange(slot)}
+                    className={clsx(
+                      'px-3 py-2 rounded-lg text-sm font-medium transition-colors border bg-white',
+                      selectedTime === slot
+                        ? 'border-accent-500 bg-accent-50 shadow-sm'
+                        : 'border-gray-200 hover:border-gray-300',
+                    )}
+                  >
+                    {slot}
+                  </button>
+                ))}
+              </div>
+              {errors.requestedTime && <p className="text-red-600 text-sm">{errors.requestedTime.message}</p>}
             </div>
-          </div>
-
-          {/* Full time dropdown */}
-          <select
-            value={selectedTime || ''}
-            onChange={(e) => handleTimeChange(e.target.value)}
-            className={clsx(
-              'w-full text-lg px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500',
-              errors.requestedTime ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300',
-            )}
-          >
-            <option value="">Select a time...</option>
-            {TIME_SLOTS.map((time) => (
-              <option key={time} value={time}>
-                {formatTimeForDisplay(time)}
-              </option>
-            ))}
-          </select>
+          ) : (
+            <>
+              <select
+                value={selectedTime || ''}
+                onChange={(e) => handleTimeChange(e.target.value)}
+                className={clsx(
+                  'w-full text-lg px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500',
+                  errors.requestedTime ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300',
+                )}
+              >
+                <option value="">Select a time...</option>
+                {generateSlots('10:00', '20:30', 30).map((time) => (
+                  <option key={time} value={time}>
+                    {formatTimeForDisplay(time)}
+                  </option>
+                ))}
+              </select>
+            </>
+          )}
 
           {/* Time display and info */}
           {selectedTime && (

@@ -26,6 +26,7 @@
     "build:standalone": "medusa build && cd .medusa/server && npm install",
     "seed": "medusa exec ./src/scripts/seed.ts",
     "seed:experience-types": "medusa exec ./src/scripts/seed/experience-types.ts",
+    "seed:bento-products": "medusa exec ./src/scripts/seed/bento-products.ts",
     "seed:menus": "medusa exec ./src/scripts/seed-menus.ts",
     "start": "medusa start",
     "dev": "medusa develop",

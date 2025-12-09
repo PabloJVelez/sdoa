@@ -284,4 +284,73 @@ export const seedProducts = ({
       },
     }),
   },
+  // Bento boxes for pickup testing
+  {
+    title: 'Salmon Bento Box',
+    description: 'Premium salmon sashimi, nigiri, and maki assortment with seasonal sides. Ready for pickup.',
+    handle: 'salmon-bento-box',
+    status: ProductStatus.PUBLISHED,
+    shipping_profile_id,
+    thumbnail: 'https://placehold.co/600x400?text=Salmon+Bento',
+    images: [
+      {
+        url: 'https://placehold.co/1200x800?text=Salmon+Bento',
+      },
+    ],
+    options: [
+      {
+        title: 'Portion',
+        values: ['Single'],
+      },
+    ],
+    sales_channels: sales_channels.map(({ id }) => ({ id })),
+    variants: [
+      {
+        title: 'Single',
+        sku: 'BENTO-SALMON-SINGLE',
+        manage_inventory: true,
+        options: {
+          Portion: 'Single',
+        },
+        prices: [
+          { amount: 2200, currency_code: 'usd' },
+          { amount: 3000, currency_code: 'cad' },
+        ],
+      },
+    ],
+  },
+  {
+    title: 'Chef’s Omakase Bento',
+    description: 'Chef-curated omakase bento featuring the best market selections of the day. Pickup only.',
+    handle: 'omakase-bento-box',
+    status: ProductStatus.PUBLISHED,
+    shipping_profile_id,
+    thumbnail: 'https://placehold.co/600x400?text=Omakase+Bento',
+    images: [
+      {
+        url: 'https://placehold.co/1200x800?text=Omakase+Bento',
+      },
+    ],
+    options: [
+      {
+        title: 'Portion',
+        values: ['Single'],
+      },
+    ],
+    sales_channels: sales_channels.map(({ id }) => ({ id })),
+    variants: [
+      {
+        title: 'Single',
+        sku: 'BENTO-OMAKASE-SINGLE',
+        manage_inventory: true,
+        options: {
+          Portion: 'Single',
+        },
+        prices: [
+          { amount: 3500, currency_code: 'usd' },
+          { amount: 4700, currency_code: 'cad' },
+        ],
+      },
+    ],
+  },
 ];

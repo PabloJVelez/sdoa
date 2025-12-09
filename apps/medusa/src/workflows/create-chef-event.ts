@@ -7,9 +7,12 @@ type CreateChefEventWorkflowInput = {
   requestedDate: string;
   requestedTime: string;
   partySize: number;
-  eventType: 'plated_dinner' | 'buffet_style';
+  eventType: 'plated_dinner' | 'buffet_style' | 'pickup';
   experience_type_id?: string | null;
   templateProductId?: string;
+  selected_products?: Array<{ product_id: string; quantity: number }>;
+  pickup_time_slot?: string | null;
+  pickup_location?: string | null;
   locationType: 'customer_location' | 'chef_location';
   locationAddress: string;
   firstName: string;
@@ -29,9 +32,10 @@ const createChefEventStep = createStep(
     const chefEventModuleService = container.resolve(CHEF_EVENT_MODULE);
 
     // Provide default estimated duration based on event type if not provided
-    const defaultDurations = {
+    const defaultDurations: Record<CreateChefEventWorkflowInput['eventType'], number> = {
       plated_dinner: 240, // 4 hours
       buffet_style: 150, // 2.5 hours
+      pickup: 60, // pickup window
     };
 
     const chefEvent = await chefEventModuleService.createChefEvents({
