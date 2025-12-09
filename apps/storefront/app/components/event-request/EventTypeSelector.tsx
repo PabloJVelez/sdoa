@@ -11,7 +11,7 @@ export interface EventTypeSelectorProps {
 }
 
 interface ExperienceType {
-  id: 'cooking_class' | 'plated_dinner' | 'buffet_style';
+  id: 'plated_dinner' | 'buffet_style';
   name: string;
   description: string;
   highlights: string[];
@@ -23,45 +23,24 @@ interface ExperienceType {
 
 const experienceTypes: ExperienceType[] = [
   {
-    id: 'cooking_class',
-    name: 'Cooking Class',
-    description: 'Interactive culinary experience where you learn professional techniques',
-    highlights: [
-      'Hands-on instruction',
-      'Learn techniques',
-      'Interactive experience'
-    ],
-    idealFor: 'Date nights, team building',
-    duration: '3 hours',
-    icon: '👨‍🍳'
-  },
-  {
     id: 'plated_dinner',
     name: 'Plated Dinner',
     description: 'Elegant, restaurant-quality dining with multiple courses',
-    highlights: [
-      'Multi-course menu',
-      'Restaurant-quality',
-      'Full-service dining'
-    ],
+    highlights: ['Multi-course menu', 'Restaurant-quality', 'Full-service dining'],
     idealFor: 'Anniversaries, formal celebrations',
     duration: '4 hours',
     icon: '🍽️',
-    isMostPopular: true
+    isMostPopular: true,
   },
   {
     id: 'buffet_style',
     name: 'Buffet Style',
     description: 'Perfect for larger gatherings with variety of dishes',
-    highlights: [
-      'Multiple dishes',
-      'Self-service style',
-      'Great for mingling'
-    ],
+    highlights: ['Multiple dishes', 'Self-service style', 'Great for mingling'],
     idealFor: 'Birthday parties, family gatherings',
     duration: '2.5 hours',
-    icon: '🥘'
-  }
+    icon: '🥘',
+  },
 ];
 
 export const EventTypeSelector: FC<EventTypeSelectorProps> = ({ className }) => {
@@ -79,20 +58,16 @@ export const EventTypeSelector: FC<EventTypeSelectorProps> = ({ className }) => 
     setValue('eventType', eventType, { shouldValidate: true });
   };
 
-  const selectedExperience = selectedEventType 
-    ? experienceTypes.find(e => e.id === selectedEventType)
-    : experienceTypes.find(e => e.id === 'plated_dinner');
+  const selectedExperience = selectedEventType
+    ? experienceTypes.find((e) => e.id === selectedEventType)
+    : experienceTypes.find((e) => e.id === 'plated_dinner');
 
   return (
     <div className={clsx('space-y-6', className)}>
       {/* Header */}
       <div className="text-center">
-        <h3 className="text-lg font-semibold text-primary-900 mb-2">
-          Select Your Culinary Experience
-        </h3>
-        <p className="text-primary-600">
-          Choose the experience type that best fits your occasion.
-        </p>
+        <h3 className="text-lg font-semibold text-primary-900 mb-2">Select Your Culinary Experience</h3>
+        <p className="text-primary-600">Choose the experience type that best fits your occasion.</p>
       </div>
 
       {/* Experience Type Selector */}
@@ -100,9 +75,7 @@ export const EventTypeSelector: FC<EventTypeSelectorProps> = ({ className }) => 
         <div className="space-y-6">
           {/* Dropdown Selection */}
           <div>
-            <label className="block text-sm font-medium text-primary-900 mb-3">
-              Experience Type
-            </label>
+            <label className="block text-sm font-medium text-primary-900 mb-3">Experience Type</label>
             <select
               value={selectedEventType || 'plated_dinner'}
               onChange={(e) => handleEventTypeSelect(e.target.value as ExperienceType['id'])}
@@ -136,9 +109,7 @@ export const EventTypeSelector: FC<EventTypeSelectorProps> = ({ className }) => 
 
                 {/* Title and Duration */}
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                    {selectedExperience.name}
-                  </h3>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{selectedExperience.name}</h3>
                   <p className="text-lg text-gray-600 font-medium">{selectedExperience.duration}</p>
                 </div>
 
@@ -174,4 +145,4 @@ export const EventTypeSelector: FC<EventTypeSelectorProps> = ({ className }) => 
   );
 };
 
-export default EventTypeSelector; 
+export default EventTypeSelector;

@@ -11,16 +11,16 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
-    { title: 'How It Works - Private Chef' },
+    { title: 'How It Works - Sushi Delivery of Austin' },
     {
       name: 'description',
       content:
-        'Learn how our culinary experience booking process works. From browsing menus to enjoying your event, we make it simple and transparent.',
+        'Learn how our sushi experience booking process works. From ordering bento boxes to booking omakase dinners, we make it simple and transparent.',
     },
-    { property: 'og:title', content: 'How It Works - Private Chef' },
+    { property: 'og:title', content: 'How It Works - Sushi Delivery of Austin' },
     {
       property: 'og:description',
-      content: 'Step-by-step guide to booking your personalized culinary experience.',
+      content: 'Step-by-step guide to ordering sushi or booking your personalized omakase experience.',
     },
     { property: 'og:type', content: 'website' },
     { name: 'keywords', content: 'how it works, booking process, private chef, culinary experience, chef services' },
@@ -149,7 +149,7 @@ const faqItems: FAQItem[] = [
   {
     question: 'How does pricing work?',
     answer:
-      "My pricing is transparent and per-person based: Buffet Style ($99.99), Cooking Class ($119.99), and Plated Dinner ($149.99). There is a service fee of $149.99 per event. I'm happy to discuss the details and work within your budget.",
+      "Our pricing is transparent and varies by experience type. Buffet Style events are $99.99 per person, and Plated Dinner (Omakase) events are $149.99 per person. Bento boxes are priced individually. There is a service fee of $149.99 per event. We're happy to discuss the details and work within your budget.",
   },
   {
     question: 'Can I add more guests after booking?',

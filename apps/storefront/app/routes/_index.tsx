@@ -140,15 +140,12 @@ export default function IndexRoute() {
 
   return (
     <>
-      <link
-        rel="preload"
-        href="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
-        as="image"
-      />
+      <link rel="preload" href="/assets/images/home_test.jpg" as="image" />
 
       <ChefHero
         className="h-[800px] !max-w-full -mt-[calc(var(--mkt-header-height)+3rem)] md:-mt-[calc(var(--mkt-header-height-desktop)+2rem)] pt-[var(--mkt-header-height)] md:pt-[var(--mkt-header-height-desktop)]"
-        description="From exclusive dinners to special events, we craft unique culinary experiences that will wow your guests."
+        description="From artisanal bento boxes to intimate omakase dinners — experience Austin's finest sushi, crafted with passion."
+        image={{ url: '/assets/images/home_test.jpg', alt: 'Assorted sashimi trays' }}
       />
 
       <FeaturedMenusSection menus={menus} />
@@ -214,31 +211,31 @@ export default function IndexRoute() {
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="text-4xl mb-4">⭐⭐⭐⭐⭐</div>
             <p className="text-gray-700 italic mb-4">
-              "The chef created the most incredible anniversary dinner for us. Every course was a masterpiece, and the
-              cooking class was so much fun!"
+              "The omakase experience was absolutely incredible. Every course was a masterpiece, and the chef's
+              attention to detail was remarkable. Best sushi we've had in Austin!"
             </p>
             <div className="font-semibold text-gray-900">— Sarah &amp; Michael K.</div>
-            <div className="text-sm text-gray-600">Plated Dinner Experience</div>
+            <div className="text-sm text-gray-600">Omakase Dinner Experience</div>
           </div>
 
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="text-4xl mb-4">⭐⭐⭐⭐⭐</div>
             <p className="text-gray-700 italic mb-4">
-              "The cooking class was amazing! We learned so much and had a blast. Can't wait to book another
-              experience."
+              "The bento boxes are incredible! Fresh, beautifully presented, and absolutely delicious. Perfect for our
+              office lunch meetings."
             </p>
             <div className="font-semibold text-gray-900">— Jennifer L.</div>
-            <div className="text-sm text-gray-600">Cooking Class Experience</div>
+            <div className="text-sm text-gray-600">Bento Box Pickup</div>
           </div>
 
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="text-4xl mb-4">⭐⭐⭐⭐⭐</div>
             <p className="text-gray-700 italic mb-4">
-              "Perfect for our family gathering! The buffet style worked perfectly for our group and everything was
-              absolutely delicious."
+              "Perfect for our family gathering! The sushi buffet worked beautifully for our group and everything was
+              absolutely delicious. The chef was amazing!"
             </p>
             <div className="font-semibold text-gray-900">— The Rodriguez Family</div>
-            <div className="text-sm text-gray-600">Buffet Style Experience</div>
+            <div className="text-sm text-gray-600">Sushi Buffet Experience</div>
           </div>
         </div>
       </Container>
@@ -260,8 +257,8 @@ export default function IndexRoute() {
             <h4 className="text-xl font-italiana tracking-wider">READY TO CREATE MEMORIES?</h4>
             <h3 className="text-6xl lg:text-7xl font-aboreto">Book Your Experience</h3>
             <p className="text-xl leading-relaxed">
-              Transform your next special occasion into an unforgettable culinary journey. From intimate dinners to
-              group celebrations, every experience is crafted with care.
+              Transform your next special occasion into an unforgettable sushi experience. From artisanal bento boxes to
+              intimate omakase dinners, every dish is crafted with precision and passion.
             </p>
             <ActionList
               actions={[
