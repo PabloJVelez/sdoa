@@ -111,7 +111,7 @@ export const DateTimeForm: FC<DateTimeFormProps> = ({ className, experienceType 
         </h3>
         <p className="text-primary-600">
           {experienceType?.slug === 'pickup'
-            ? 'Choose a pickup date and available time slot.'
+            ? 'Select your preferred pickup time. The chef will confirm or suggest the closest available slot.'
             : 'Choose when you would like the chef to arrive. Events typically require advance notice.'}
         </p>
       </div>
@@ -236,18 +236,6 @@ export const DateTimeForm: FC<DateTimeFormProps> = ({ className, experienceType 
           </div>
         </div>
       )}
-
-      {/* Important scheduling information */}
-      <div className="bg-gray-50 rounded-lg p-4">
-        <h4 className="text-sm font-medium text-gray-900 mb-2">Scheduling Information</h4>
-        <ul className="text-sm text-gray-600 space-y-1">
-          <li>• Minimum 7 days advance notice required</li>
-          <li>• Events can be scheduled up to 6 months in advance</li>
-          <li>• Start times available from 10:00 AM to 8:30 PM</li>
-          <li>• Availability will be confirmed within 24 hours</li>
-          <li>• Alternative dates may be suggested if requested time is unavailable</li>
-        </ul>
-      </div>
 
       {/* Hidden form fields */}
       <input type="hidden" name="requestedDate" value={selectedDate || ''} />

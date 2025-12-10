@@ -17,7 +17,12 @@ export async function seedExperienceTypes({ container }: ExecArgs) {
       description: 'Fresh sushi and bento boxes ready for pickup.',
       short_description: 'Quick & convenient',
       icon: '🥡',
-      highlights: ['Ready in 30 minutes', 'Premium ingredients', 'Eco-friendly packaging'],
+      highlights: [
+        'Chef will review your requested pickup time',
+        'If the exact time is unavailable, a close alternative will be suggested',
+        'Premium ingredients',
+        'Eco-friendly packaging',
+      ],
       ideal_for: 'Quick lunch, Office catering, Dinner at home',
       pricing_type: 'product_based',
       price_per_unit: null,
