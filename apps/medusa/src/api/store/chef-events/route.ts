@@ -12,25 +12,32 @@ const productSelectionSchema = z
   )
   .optional();
 
-const createStoreChefEventSchema = z.object({
-  requestedDate: z.string().datetime(),
-  requestedTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format'),
-  partySize: z.number().min(1, 'Minimum party size is 1').max(200, 'Party size too large'),
-  eventType: z.enum(['plated_dinner', 'buffet_style', 'pickup']),
-  templateProductId: z.string().optional(),
-  selected_products: productSelectionSchema,
-  pickup_time_slot: z.string().optional().nullable(),
-  pickup_location: z.string().optional().nullable(),
-  experience_type_id: z.string().optional().nullable(),
-  locationType: z.enum(['customer_location', 'chef_location']),
-  locationAddress: z.string().min(3, 'Address must be at least 3 characters'),
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
-  email: z.string().email('Valid email is required'),
-  phone: z.string().optional(),
-  notes: z.string().optional(),
-  specialRequirements: z.string().optional(),
-});
+const createStoreChefEventSchema = z
+  .object({
+    requestedDate: z.string().datetime(),
+    requestedTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format'),
+    partySize: z.number().min(1, 'Minimum party size is 1').max(200, 'Party size too large'),
+    eventType: z.enum(['plated_dinner', 'buffet_style', 'pickup']),
+    templateProductId: z.string().optional(),
+    selected_products: productSelectionSchema,
+    pickup_time_slot: z.string().optional().nullable(),
+    pickup_location: z.string().optional().nullable(),
+    experience_type_id: z.string().optional().nullable(),
+    locationType: z.enum(['customer_location', 'chef_location']),
+    locationAddress: z.string().optional(),
+    firstName: z.string().min(1, 'First name is required'),
+    lastName: z.string().min(1, 'Last name is required'),
+    email: z.string().email('Valid email is required'),
+    phone: z.string().optional(),
+    notes: z.string().optional(),
+    specialRequirements: z.string().optional(),
+  })
+  .refine((data) => {
+    if (data.eventType === 'pickup') {
+      return true;
+    }
+    return !!data.locationAddress && data.locationAddress.length >= 3;
+  }, 'Address must be at least 3 characters for events');
 
 // Pricing structure as defined in the business rules
 const PRICING_STRUCTURE = {
@@ -51,10 +58,16 @@ export async function POST(req: MedusaRequest, res: MedusaResponse): Promise<voi
         ? 0 // pricing handled later via product page link
         : pricePerPerson * validatedData.partySize;
 
+    const resolvedLocationAddress =
+      validatedData.eventType === 'pickup' ? validatedData.pickup_location || '' : validatedData.locationAddress || '';
+
     // Create chef event request with calculated pricing and pending status
     const { result } = await createChefEventWorkflow(req.scope).run({
       input: {
         ...validatedData,
+        locationAddress: resolvedLocationAddress,
+        pickup_time_slot:
+          validatedData.eventType === 'pickup' ? validatedData.requestedTime : validatedData.pickup_time_slot,
         status: 'pending', // Always pending for customer requests
         totalPrice,
         depositPaid: false, // No deposit required as per business rules

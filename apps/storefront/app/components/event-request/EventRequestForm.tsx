@@ -25,6 +25,7 @@ import { ContactDetails } from './ContactDetails';
 import { SpecialRequests } from './SpecialRequests';
 import { RequestSummary } from './RequestSummary';
 import { ProductSelector } from './ProductSelector';
+import { PickupLocationDisplay } from './PickupLocationDisplay';
 
 export interface EventRequestFormProps {
   menus: StoreMenuDTO[];
@@ -66,13 +67,22 @@ export const EventRequestForm: FC<EventRequestFormProps> = ({
   const [currentStep, setCurrentStep] = useState(1);
   const actionData = useActionData() as ActionResponse;
 
+  const defaultValues: Partial<EventRequestFormData> = {
+    currentStep: 1,
+    partySize: 4, // Default party size
+    requestedTime: '',
+    requestedDate: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    locationAddress: '',
+    selected_products: [],
+    ...initialValues,
+  };
+
   const form = useRemixForm<EventRequestFormData>({
-    resolver: zodResolver(eventRequestSchema),
-    defaultValues: {
-      currentStep: 1,
-      partySize: 4, // Default party size
-      ...initialValues,
-    },
+    resolver: zodResolver(eventRequestSchema) as any,
+    defaultValues,
     mode: 'onChange', // Validate on change for better UX
   });
 
@@ -142,8 +152,11 @@ export const EventRequestForm: FC<EventRequestFormProps> = ({
           (experience?.max_party_size ? values.partySize <= experience.max_party_size : true) &&
           !errors.partySize
         );
-      case 2:
-        // Date/time, contact, and location required
+      case 2: {
+        const isProductBased = experience?.is_product_based;
+        const locationOk = isProductBased
+          ? true
+          : !!values.locationAddress && values.locationAddress.length >= 10 && !errors.locationAddress;
         return (
           !!values.requestedDate &&
           !!values.requestedTime &&
@@ -156,10 +169,9 @@ export const EventRequestForm: FC<EventRequestFormProps> = ({
           !errors.lastName &&
           !errors.email &&
           (!values.phone || !errors.phone) &&
-          !!values.locationAddress &&
-          values.locationAddress.length >= 10 &&
-          !errors.locationAddress
+          locationOk
         );
+      }
       case 3:
         // Special requests optional but must be valid if provided
         return !errors.specialRequirements && !errors.notes;
@@ -186,7 +198,8 @@ export const EventRequestForm: FC<EventRequestFormProps> = ({
     const step2Date = !!v.requestedDate && !!v.requestedTime && !e.requestedDate && !e.requestedTime;
     const step2Contact =
       !!v.firstName && !!v.lastName && !!v.email && !e.firstName && !e.lastName && !e.email && (!v.phone || !e.phone);
-    const step2Location = !!v.locationAddress && v.locationAddress.length >= 10 && !e.locationAddress;
+    const step2Location =
+      exp?.is_product_based || (!!v.locationAddress && v.locationAddress.length >= 10 && !e.locationAddress);
     return step1 && step2Date && step2Contact && step2Location; // step3 (special requests) is optional
   };
 
@@ -323,13 +336,16 @@ export const EventRequestForm: FC<EventRequestFormProps> = ({
                     children: <ContactDetails />,
                   })}
 
-                  {!isProductBased &&
+                  {isProductBased ? (
+                    <PickupLocationDisplay address={experience?.fixed_location_address || v.locationAddress} />
+                  ) : (
                     renderDisclosure({
                       key: `step2-location-${currentStep}`,
                       defaultOpen: false,
                       header: renderSectionHeader('Event Address', { complete: isLocationComplete }),
                       children: <LocationForm />,
-                    })}
+                    })
+                  )}
                 </>
               );
             })()}
@@ -342,6 +358,7 @@ export const EventRequestForm: FC<EventRequestFormProps> = ({
           <RequestSummary
             menus={menus}
             experienceTypes={experienceTypes}
+            products={products}
             onEditStep={(step: number, section?: string) => {
               setCurrentStep(step);
               // brief timeout to allow render then expand intended section

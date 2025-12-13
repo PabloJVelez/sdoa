@@ -44,24 +44,13 @@ export const eventRequestSchema = z
     // Step 3: Date & Time
     requestedDate: z.string().min(1, 'Please select a date'),
 
-    requestedTime: z
-      .string()
-      .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Please enter a valid time (HH:MM format)')
-      .refine((time) => {
-        const [hours, minutes] = time.split(':').map(Number);
-        // Business hours: 10:00 AM to 8:30 PM
-        const startTime = 10 * 60; // 10:00 AM in minutes
-        const endTime = 20 * 60 + 30; // 8:30 PM in minutes
-        const timeInMinutes = hours * 60 + minutes;
-
-        return timeInMinutes >= startTime && timeInMinutes <= endTime;
-      }, 'Please select a time between 10:00 AM and 8:30 PM'),
+    requestedTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Please enter a valid time (HH:MM format)'),
 
     // Step 4: Party Size
     partySize: z.number().min(1, 'Minimum 1 guest required').max(200, 'Maximum 200 guests allowed'),
 
-    // Step 5: Location (now only customer location)
-    locationAddress: z.string().min(10, 'Please provide a complete address').max(500, 'Address is too long'),
+    // Step 5: Location (customer for events, fixed for pickup)
+    locationAddress: z.string().max(500, 'Address is too long').optional(),
 
     // Step 6: Contact Details
     firstName: z.string().min(1, 'First name is required').max(50, 'First name is too long'),
@@ -115,6 +104,7 @@ export const eventRequestSchema = z
           message: 'Select at least one product',
         });
       }
+      // For pickup, location is fixed/admin-provided; no address required from customer.
       return;
     }
 
@@ -139,6 +129,24 @@ export const eventRequestSchema = z
     }
     if (data.partySize < 2) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['partySize'], message: 'Minimum 2 guests required' });
+    }
+    if (!data.locationAddress || data.locationAddress.length < 10) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['locationAddress'],
+        message: 'Please provide a complete address',
+      });
+    }
+    const [hours, minutes] = data.requestedTime.split(':').map(Number);
+    const startTime = 10 * 60; // 10:00 AM in minutes
+    const endTime = 20 * 60 + 30; // 8:30 PM in minutes
+    const timeInMinutes = hours * 60 + minutes;
+    if (timeInMinutes < startTime || timeInMinutes > endTime) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['requestedTime'],
+        message: 'Please select a time between 10:00 AM and 8:30 PM for events',
+      });
     }
   });
 
@@ -171,7 +179,7 @@ export const action = async (actionArgs: ActionFunctionArgs) => {
   try {
     const { errors, data } = await getValidatedFormData<EventRequestFormData>(
       actionArgs.request,
-      zodResolver(eventRequestSchema),
+      zodResolver(eventRequestSchema) as any,
     );
 
     if (errors) {
@@ -187,10 +195,10 @@ export const action = async (actionArgs: ActionFunctionArgs) => {
       templateProductId: data.menuId,
       selected_products: data.selected_products,
       pickup_time_slot: data.requestedTime,
-      pickup_location: data.locationAddress,
+      pickup_location: data.locationAddress || '',
       experience_type_id: data.experienceTypeId,
       locationType: data.eventType === 'pickup' ? 'chef_location' : 'customer_location',
-      locationAddress: data.locationAddress,
+      locationAddress: data.locationAddress || '',
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,

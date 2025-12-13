@@ -1,9 +1,9 @@
 import { Button } from '@app/components/common/buttons/Button';
 import { useFormContext } from 'react-hook-form';
 import type { EventRequestFormData } from '@app/routes/request._index';
-import { PRICING_STRUCTURE, getEventTypeDisplayName } from '@libs/constants/pricing';
 import type { StoreMenuDTO } from '@libs/util/server/data/menus.server';
 import type { StoreExperienceType } from '@libs/util/server/data/experience-types.server';
+import type { StoreProduct } from '@medusajs/types';
 import clsx from 'clsx';
 import type { FC } from 'react';
 
@@ -11,6 +11,7 @@ export interface RequestSummaryProps {
   className?: string;
   menus: StoreMenuDTO[];
   experienceTypes: StoreExperienceType[];
+  products: StoreProduct[];
   onEditStep: (step: number, section?: string) => void;
   onSubmit: () => void;
   isSubmitting: boolean;
@@ -20,6 +21,7 @@ export const RequestSummary: FC<RequestSummaryProps> = ({
   className,
   menus,
   experienceTypes,
+  products,
   onEditStep,
   onSubmit,
   isSubmitting,
@@ -51,9 +53,27 @@ export const RequestSummary: FC<RequestSummaryProps> = ({
   );
   const isProductBased = selectedExperience?.is_product_based;
 
-  // Calculate pricing
-  const pricePerPerson = formData.eventType ? (PRICING_STRUCTURE[formData.eventType] ?? 0) : 0;
-  const totalPrice = pricePerPerson * (formData.partySize || 0);
+  const formatMoney = (amount: number, currency = 'USD') =>
+    (amount / 100).toLocaleString(undefined, {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 2,
+    });
+
+  const calculatePickupTotal = () => {
+    if (!formData.selected_products?.length) return 0;
+    return formData.selected_products.reduce((acc, item) => {
+      const product = products.find((p) => p.id === item.product_id);
+      const variant = product?.variants?.[0];
+      const price = variant?.prices?.[0]?.amount ?? 0;
+      return acc + price * (item.quantity || 0);
+    }, 0);
+  };
+
+  const calculateEventTotal = () => {
+    const price = selectedExperience?.price_per_unit ?? 0;
+    return price * (formData.partySize || 0);
+  };
 
   // Format date (parse YYYY-MM-DD as local to avoid UTC offset issues)
   const formatDateForDisplay = (dateString: string) => {
@@ -98,12 +118,20 @@ export const RequestSummary: FC<RequestSummaryProps> = ({
           {isProductBased ? (
             formData.selected_products?.length ? (
               <div className="space-y-2">
-                {formData.selected_products.map((p, idx) => (
-                  <div key={`${p.product_id}-${idx}`} className="flex justify-between text-sm text-primary-800">
-                    <span>Product: {p.product_id}</span>
-                    <span>Qty {p.quantity}</span>
-                  </div>
-                ))}
+                {formData.selected_products.map((p, idx) => {
+                  const product = products.find((prod) => prod.id === p.product_id);
+                  const variant = product?.variants?.[0];
+                  const price = variant?.prices?.[0];
+                  return (
+                    <div key={`${p.product_id}-${idx}`} className="flex justify-between text-sm text-primary-800">
+                      <span>{product?.title || 'Product'}</span>
+                      <span>
+                        Qty {p.quantity}
+                        {price ? ` • ${formatMoney(price.amount, price.currency_code.toUpperCase())}` : ''}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <p className="text-primary-600">No products selected yet.</p>
@@ -313,7 +341,7 @@ export const RequestSummary: FC<RequestSummaryProps> = ({
         )}
 
         {/* Pricing Summary */}
-        {formData.eventType && (!isProductBased || formData.partySize) && (
+        {formData.eventType && (!isProductBased || formData.selected_products?.length || formData.partySize) && (
           <div className="bg-accent-50 border border-accent-200 rounded-lg p-6">
             <h4 className="text-lg font-semibold text-accent-700 mb-4">Pricing Estimate</h4>
             <div className="space-y-3">
@@ -321,23 +349,52 @@ export const RequestSummary: FC<RequestSummaryProps> = ({
                 <>
                   <div className="flex justify-between items-center">
                     <span className="text-accent-600">
-                      {getEventTypeDisplayName(formData.eventType)} × {formData.partySize} guests
+                      {selectedExperience?.name || 'Event'} × {formData.partySize} guests
                     </span>
                     <span className="font-medium text-accent-800">
-                      ${pricePerPerson.toFixed(2)} × {formData.partySize}
+                      {formatMoney(selectedExperience?.price_per_unit ?? 0)} × {formData.partySize}
                     </span>
                   </div>
                   <div className="border-t border-accent-200 pt-3">
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-semibold text-accent-700">Total Estimated Cost</span>
-                      <span className="text-2xl font-bold text-accent-800">${totalPrice.toFixed(2)}</span>
+                      <span className="text-2xl font-bold text-accent-800">{formatMoney(calculateEventTotal())}</span>
                     </div>
                   </div>
                 </>
               ) : (
-                <p className="text-accent-700 text-sm">
-                  Pickup orders: pricing will be based on selected products and finalized after acceptance.
-                </p>
+                <>
+                  <div className="space-y-2">
+                    {formData.selected_products?.length ? (
+                      formData.selected_products.map((p, idx) => {
+                        const product = products.find((prod) => prod.id === p.product_id);
+                        const variant = product?.variants?.[0];
+                        const price = variant?.prices?.[0];
+                        return (
+                          <div key={`${p.product_id}-${idx}`} className="flex justify-between text-sm text-primary-800">
+                            <span>{product?.title || 'Product'}</span>
+                            <span>
+                              {price ? formatMoney(price.amount, price.currency_code.toUpperCase()) : '—'} ×{' '}
+                              {p.quantity}
+                            </span>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <p className="text-primary-700 text-sm">No products selected yet.</p>
+                    )}
+                  </div>
+                  <div className="border-t border-accent-200 pt-3 mt-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-semibold text-accent-700">Estimated Subtotal</span>
+                      <span className="text-2xl font-bold text-accent-800">{formatMoney(calculatePickupTotal())}</span>
+                    </div>
+                  </div>
+                  <p className="text-accent-700 text-sm mt-2">
+                    Pickup orders are confirmed after the chef accepts your request. You’ll receive a payment link to
+                    complete checkout.
+                  </p>
+                </>
               )}
             </div>
             {!isProductBased && (
