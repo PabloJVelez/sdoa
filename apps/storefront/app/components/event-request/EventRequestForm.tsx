@@ -388,31 +388,6 @@ export const EventRequestForm: FC<EventRequestFormProps> = ({
               }, 0);
             }}
             onSubmit={() => {
-              // #region agent log
-              const formValuesBefore = form.getValues();
-              fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  location: 'EventRequestForm.tsx:390',
-                  message: 'onSubmit entry - form values before processing',
-                  data: {
-                    formValues: formValuesBefore,
-                    eventType: formValuesBefore.eventType,
-                    isPickup: formValuesBefore.eventType === 'pickup',
-                    selectedProducts: formValuesBefore.selected_products,
-                    requestedDate: formValuesBefore.requestedDate,
-                    requestedTime: formValuesBefore.requestedTime,
-                    experienceTypeId: formValuesBefore.experienceTypeId,
-                  },
-                  timestamp: Date.now(),
-                  sessionId: 'debug-session',
-                  runId: 'post-fix',
-                  hypothesisId: 'A',
-                }),
-              }).catch(() => {});
-              // #endregion
-
               // Update form state with combined date/time before submission
               // remix-hook-form reads from form state, not DOM, so we must update the state
               const formValues = form.getValues();
@@ -425,26 +400,6 @@ export const EventRequestForm: FC<EventRequestFormProps> = ({
               if (originalDateString && formValues.requestedTime) {
                 const dateTime = new Date(`${originalDateString}T${formValues.requestedTime}:00`);
                 combinedDateTime = dateTime.toISOString();
-
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    location: 'EventRequestForm.tsx:422',
-                    message: 'date/time combination - updating form state',
-                    data: {
-                      originalDate: originalDateString,
-                      originalTime: formValues.requestedTime,
-                      combinedDateTime: combinedDateTime,
-                    },
-                    timestamp: Date.now(),
-                    sessionId: 'debug-session',
-                    runId: 'post-fix',
-                    hypothesisId: 'A',
-                  }),
-                }).catch(() => {});
-                // #endregion
 
                 // Update form state with combined datetime
                 form.setValue('requestedDate', combinedDateTime, { shouldValidate: false, shouldDirty: false });
@@ -469,70 +424,8 @@ export const EventRequestForm: FC<EventRequestFormProps> = ({
                 }
               });
 
-              // #region agent log
-              const selectedProductsInput = document.querySelector(
-                'input[name="selected_products"]',
-              ) as HTMLInputElement;
-              fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  location: 'EventRequestForm.tsx:463',
-                  message: 'selected_products hidden input value check',
-                  data: {
-                    hiddenInputValue: selectedProductsInput?.value,
-                    hiddenInputValueParsed: selectedProductsInput
-                      ? JSON.parse(selectedProductsInput.value || '[]')
-                      : null,
-                    formStateValue: formValues.selected_products,
-                  },
-                  timestamp: Date.now(),
-                  sessionId: 'debug-session',
-                  runId: 'post-fix',
-                  hypothesisId: 'B',
-                }),
-              }).catch(() => {});
-              // #endregion
-
-              // #region agent log
-              const formValuesAfter = form.getValues();
-              fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  location: 'EventRequestForm.tsx:455',
-                  message: 'form values after processing - before submit',
-                  data: {
-                    requestedDate: formValuesAfter.requestedDate,
-                    requestedTime: formValuesAfter.requestedTime,
-                    selectedProducts: formValuesAfter.selected_products,
-                    experienceTypeId: formValuesAfter.experienceTypeId,
-                  },
-                  timestamp: Date.now(),
-                  sessionId: 'debug-session',
-                  runId: 'post-fix',
-                  hypothesisId: 'A',
-                }),
-              }).catch(() => {});
-              // #endregion
-
               const form_element = document.querySelector('form') as HTMLFormElement;
               if (form_element) {
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    location: 'EventRequestForm.tsx:472',
-                    message: 'submitting form',
-                    data: { formAction: form_element.action, formMethod: form_element.method },
-                    timestamp: Date.now(),
-                    sessionId: 'debug-session',
-                    runId: 'post-fix',
-                    hypothesisId: 'E',
-                  }),
-                }).catch(() => {});
-                // #endregion
                 form_element.requestSubmit();
               }
             }}

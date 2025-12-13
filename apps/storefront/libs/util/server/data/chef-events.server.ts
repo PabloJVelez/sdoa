@@ -72,10 +72,6 @@ export const createChefEventRequest = async (data: StoreCreateChefEventDTO): Pro
   try {
     const requestUrl = `${baseMedusaConfig.baseUrl}/store/chef-events`;
 
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'chef-events.server.ts:71',message:'createChefEventRequest entry',data:{requestUrl,payload:{...data,selected_products:data.selected_products},isPickup:data.eventType==='pickup',requestedDateType:typeof data.requestedDate,requestedDateValue:data.requestedDate,selectedProductsCount:data.selected_products?.length||0},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-
     const response = await fetch(requestUrl, {
       method: 'POST',
       headers: {
@@ -86,10 +82,6 @@ export const createChefEventRequest = async (data: StoreCreateChefEventDTO): Pro
     });
 
     const responseData = await response.json();
-
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'chef-events.server.ts:84',message:'API response received',data:{status:response.status,statusText:response.statusText,responseData,hasErrors:responseData.errors,errors:responseData.errors},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
 
     if (!response.ok) {
       // Handle validation errors
@@ -107,10 +99,6 @@ export const createChefEventRequest = async (data: StoreCreateChefEventDTO): Pro
 
     return responseData;
   } catch (error) {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'chef-events.server.ts:100',message:'createChefEventRequest error',data:{errorMessage:error instanceof Error?error.message:String(error),errorName:error instanceof Error?error.name:'Unknown',hasErrors:error&&typeof error==='object'&&'errors' in error,errors:error&&typeof error==='object'&&'errors' in error?(error as any).errors:null},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
-
     // Re-throw ChefEventError as-is
     if (error && typeof error === 'object' && 'errors' in error) {
       throw error;

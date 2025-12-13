@@ -38,13 +38,25 @@ const createChefEventStep = createStep(
       pickup: 60, // pickup window
     };
 
-    const chefEvent = await chefEventModuleService.createChefEvents({
+    const parsedDate = new Date(input.requestedDate);
+
+    // Build createData, omitting undefined/null templateProductId to avoid database constraint issues
+    const createData: any = {
       ...input,
-      requestedDate: new Date(input.requestedDate),
+      requestedDate: parsedDate,
       totalPrice: input.totalPrice || 0,
       depositPaid: input.depositPaid || false,
       estimatedDuration: input.estimatedDuration || defaultDurations[input.eventType],
-    });
+    };
+    
+    // Only include templateProductId if it has a value (not null/undefined/empty string)
+    // This prevents database constraint errors when the field is nullable but migration hasn't run yet
+    if (createData.templateProductId === undefined || createData.templateProductId === null || 
+        (typeof createData.templateProductId === 'string' && createData.templateProductId.trim() === '')) {
+      delete createData.templateProductId;
+    }
+
+    const chefEvent = await chefEventModuleService.createChefEvents(createData);
 
     return new StepResponse(chefEvent);
   },

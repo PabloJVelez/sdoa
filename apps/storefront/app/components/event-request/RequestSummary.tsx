@@ -61,9 +61,6 @@ export const RequestSummary: FC<RequestSummaryProps> = ({
     });
 
   const calculatePickupTotal = () => {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RequestSummary.tsx:63',message:'calculatePickupTotal entry',data:{selectedProducts:formData.selected_products,productsCount:products.length},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
     if (!formData.selected_products?.length) return 0;
     const total = formData.selected_products.reduce((acc, item) => {
       const product = products.find((p) => p.id === item.product_id);
@@ -71,22 +68,12 @@ export const RequestSummary: FC<RequestSummaryProps> = ({
       // Get price for USD currency (default)
       const price = variant?.prices?.find((p: any) => p.currency_code === 'usd')?.amount ?? 
                     variant?.prices?.[0]?.amount ?? 0;
-      const allPrices = variant?.prices ?? [];
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RequestSummary.tsx:68',message:'calculatePickupTotal price calculation',data:{productId:item.product_id,productTitle:product?.title,variantId:variant?.id,allPrices:allPrices.map((p:any)=>({amount:p.amount,currency:p.currency_code})),selectedPrice:price,quantity:item.quantity},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
-      // #endregion
       return acc + price * (item.quantity || 0);
     }, 0);
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RequestSummary.tsx:71',message:'calculatePickupTotal result',data:{total},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
     return total;
   };
 
   const calculateEventTotal = () => {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RequestSummary.tsx:73',message:'calculateEventTotal entry',data:{selectedExperience:selectedExperience?.name,pricePerUnit:selectedExperience?.price_per_unit,eventType:formData.eventType,partySize:formData.partySize},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     // Use price_per_unit from experience type, or fallback to default pricing if null
     let price = selectedExperience?.price_per_unit;
     if (price == null && formData.eventType) {
@@ -99,9 +86,6 @@ export const RequestSummary: FC<RequestSummaryProps> = ({
     }
     price = price ?? 0;
     const total = price * (formData.partySize || 0);
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RequestSummary.tsx:82',message:'calculateEventTotal result',data:{price,total,partySize:formData.partySize,usedFallback:!selectedExperience?.price_per_unit},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     return total;
   };
 
@@ -406,9 +390,6 @@ export const RequestSummary: FC<RequestSummaryProps> = ({
                         // Get price for USD currency (default)
                         const price = variant?.prices?.find((pr: any) => pr.currency_code === 'usd') ?? 
                                       variant?.prices?.[0];
-                        // #region agent log
-                        fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RequestSummary.tsx:390',message:'pricing display price lookup',data:{productId:p.product_id,productTitle:product?.title,variantId:variant?.id,allPrices:variant?.prices?.map((pr:any)=>({amount:pr.amount,currency:pr.currency_code})),selectedPrice:price?{amount:price.amount,currency:price.currency_code}:null},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
-                        // #endregion
                         return (
                           <div key={`${p.product_id}-${idx}`} className="flex justify-between text-sm text-primary-800">
                             <span>{product?.title || 'Product'}</span>

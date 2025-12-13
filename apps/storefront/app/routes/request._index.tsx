@@ -157,29 +157,18 @@ export const loader = async (args: LoaderFunctionArgs) => {
     // Fetch menus for menu selector step
     const menusData = await fetchMenus({ limit: 20 });
     const experienceTypes = await fetchExperienceTypes();
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'request._index.tsx:159',message:'experience types fetched',data:{experienceTypes:experienceTypes.map((e:any)=>({id:e.id,name:e.name,slug:e.slug,price_per_unit:e.price_per_unit,pricing_type:e.pricing_type}))},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     // Fetch products with proper fields to include prices and SKUs
     const products = await fetchProducts(args.request, { 
       limit: 50, 
       fields: 'id,title,thumbnail,variants.*,variants.prices.*,variants.sku' 
     });
-    // #region agent log
-    const allProducts = products.products || [];
     // Filter out event products - check both SKU pattern and title pattern
+    const allProducts = products.products || [];
     const filteredProducts = allProducts.filter((p: any) => {
       const hasEventSku = p.variants?.some((v: any) => v.sku?.startsWith('EVENT-'));
       const hasEventTitle = p.title?.includes('Plated Dinner -') || p.title?.includes('Buffet Style -');
       return !hasEventSku && !hasEventTitle;
     });
-    const eventProducts = allProducts.filter((p: any) => {
-      const hasEventSku = p.variants?.some((v: any) => v.sku?.startsWith('EVENT-'));
-      const hasEventTitle = p.title?.includes('Plated Dinner -') || p.title?.includes('Buffet Style -');
-      return hasEventSku || hasEventTitle;
-    });
-    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'request._index.tsx:160',message:'loader products fetched and filtered',data:{totalProducts:allProducts.length,eventProductsCount:eventProducts.length,eventProductTitles:eventProducts.map((p:any)=>p.title),filteredProductsCount:filteredProducts.length,filteredProductTitles:filteredProducts.map((p:any)=>p.title)},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     return {
       menus: menusData.menus || [],
       experienceTypes,
@@ -199,19 +188,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
 export const action = async (actionArgs: ActionFunctionArgs) => {
   try {
-    // #region agent log
-    const rawBody = await actionArgs.request.clone().text();
-    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'request._index.tsx:200',message:'action entry - raw request body',data:{rawBody,contentType:actionArgs.request.headers.get('content-type')},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-    
     const { errors, data } = await getValidatedFormData<EventRequestFormData>(
       actionArgs.request,
       zodResolver(eventRequestSchema) as any,
     );
-
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'request._index.tsx:207',message:'validation result',data:{hasErrors:!!errors,errors:errors,validatedData:{...data,selected_products:data.selected_products},eventType:data.eventType,isPickup:data.eventType==='pickup',requestedDate:data.requestedDate,requestedTime:data.requestedTime,experienceTypeId:data.experienceTypeId},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
 
     if (errors) {
       return { errors, status: 400 };
@@ -237,24 +217,12 @@ export const action = async (actionArgs: ActionFunctionArgs) => {
       specialRequirements: data.specialRequirements,
     };
 
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'request._index.tsx:230',message:'payload before API call',data:{payload,selectedProductsCount:payload.selected_products?.length||0,selectedProducts:payload.selected_products,requestedDateType:typeof payload.requestedDate,requestedDateValue:payload.requestedDate,isPickup:payload.eventType==='pickup'},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-
     // Create the chef event request
     const response = await createChefEventRequest(payload);
-
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'request._index.tsx:234',message:'API call success',data:{eventId:response.chefEvent.id,status:response.chefEvent.status,eventType:response.chefEvent.eventType},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
 
     const successUrl = `/request/success?eventId=${response.chefEvent.id}`;
     return redirect(successUrl);
   } catch (error) {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'request._index.tsx:240',message:'action error',data:{errorMessage:error instanceof Error?error.message:String(error),errorName:error instanceof Error?error.name:'Unknown',hasErrors:error&&typeof error==='object'&&'errors' in error,errors:error&&typeof error==='object'&&'errors' in error?(error as any).errors:null},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
-    
     console.error('Failed to create chef event request:', error);
 
     if (error instanceof Error) {

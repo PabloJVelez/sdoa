@@ -12,7 +12,7 @@ export const ChefEvent = model
     partySize: model.number(),
     eventType: model.enum(['plated_dinner', 'buffet_style', 'pickup']),
     experience_type_id: model.text().nullable(),
-    templateProductId: model.text(),
+    templateProductId: model.text().nullable(), // Optional for pickup events
     selected_products: model.json().nullable(), // [{ product_id, quantity }]
     pickup_time_slot: model.text().nullable(),
     pickup_location: model.text().nullable(),
