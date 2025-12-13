@@ -16,30 +16,53 @@ import { eventTypeOptions } from "../schemas"
 
 interface ChefEventCalendarProps {
   onCreateEvent: () => void
+  orderTypeFilter?: "all" | "events" | "pickup"
 }
 
 // no MonthPicker; we'll use RBC's default toolbar
 
-export const ChefEventCalendar = ({ onCreateEvent }: ChefEventCalendarProps) => {
+export const ChefEventCalendar = ({ onCreateEvent, orderTypeFilter = "all" }: ChefEventCalendarProps) => {
   const navigate = useNavigate()
 
   // RBC state
   const [view, setView] = useState<View>(Views.MONTH)
   const [date, setDate] = useState<Date>(new Date())
 
-  // Keep your existing filters; add range later if/when supported
-  const { data, isLoading } = useAdminListChefEvents({
+  // Build query - filter by eventType for pickup, otherwise fetch all
+  const query: any = {
     q: "",
     status: "",
-    eventType: "",
     locationType: "",
     limit: 1000,
     offset: 0,
-  })
+  }
+
+  if (orderTypeFilter === "pickup") {
+    query.eventType = "pickup"
+  } else {
+    // For "all" or "events", fetch all and filter client-side
+    query.eventType = ""
+  }
+
+  const { data, isLoading } = useAdminListChefEvents(query)
+  
+  // Filter events client-side based on order type
+  const filteredEvents = useMemo(() => {
+    if (!data?.chefEvents) return []
+    if (orderTypeFilter === "events") {
+      // "events" filter - exclude pickup (only show plated_dinner and buffet_style)
+      return data.chefEvents.filter((event: any) => event.eventType !== "pickup")
+    } else if (orderTypeFilter === "pickup") {
+      // "pickup" filter - only show pickup
+      return data.chefEvents.filter((event: any) => event.eventType === "pickup")
+    }
+    // "all" - show everything
+    return data.chefEvents
+  }, [data?.chefEvents, orderTypeFilter])
 
   const events: RBCEvent[] = useMemo(
-    () => (data?.chefEvents ?? []).map(chefEventToRbc),
-    [data?.chefEvents]
+    () => filteredEvents.map(chefEventToRbc),
+    [filteredEvents]
   )
 
   // keyboard shortcuts parity

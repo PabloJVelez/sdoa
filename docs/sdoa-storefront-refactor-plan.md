@@ -832,7 +832,7 @@ Add visual differentiation for pickup vs event orders:
 - [x] Update chef event creation to handle product-based orders
 - [x] Update admin UI to show selected products
 - [x] Add "Pickup" / "Event" badges in admin list
-- [ ] Add filter/tabs in admin for order type (optional enhancement)
+- [x] Add filter/tabs in admin for order type
 
 **Testing:**
 - [ ] Test complete pickup flow end-to-end
