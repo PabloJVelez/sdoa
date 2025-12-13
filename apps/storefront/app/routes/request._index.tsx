@@ -199,17 +199,25 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
 export const action = async (actionArgs: ActionFunctionArgs) => {
   try {
+    // #region agent log
+    const rawBody = await actionArgs.request.clone().text();
+    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'request._index.tsx:200',message:'action entry - raw request body',data:{rawBody,contentType:actionArgs.request.headers.get('content-type')},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+    
     const { errors, data } = await getValidatedFormData<EventRequestFormData>(
       actionArgs.request,
       zodResolver(eventRequestSchema) as any,
     );
 
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'request._index.tsx:207',message:'validation result',data:{hasErrors:!!errors,errors:errors,validatedData:{...data,selected_products:data.selected_products},eventType:data.eventType,isPickup:data.eventType==='pickup',requestedDate:data.requestedDate,requestedTime:data.requestedTime,experienceTypeId:data.experienceTypeId},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
+
     if (errors) {
       return { errors, status: 400 };
     }
 
-    // Create the chef event request
-    const response = await createChefEventRequest({
+    const payload = {
       requestedDate: data.requestedDate,
       requestedTime: data.requestedTime,
       partySize: data.partySize,
@@ -227,11 +235,26 @@ export const action = async (actionArgs: ActionFunctionArgs) => {
       phone: data.phone,
       notes: data.notes,
       specialRequirements: data.specialRequirements,
-    });
+    };
+
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'request._index.tsx:230',message:'payload before API call',data:{payload,selectedProductsCount:payload.selected_products?.length||0,selectedProducts:payload.selected_products,requestedDateType:typeof payload.requestedDate,requestedDateValue:payload.requestedDate,isPickup:payload.eventType==='pickup'},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+
+    // Create the chef event request
+    const response = await createChefEventRequest(payload);
+
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'request._index.tsx:234',message:'API call success',data:{eventId:response.chefEvent.id,status:response.chefEvent.status,eventType:response.chefEvent.eventType},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
 
     const successUrl = `/request/success?eventId=${response.chefEvent.id}`;
     return redirect(successUrl);
   } catch (error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'request._index.tsx:240',message:'action error',data:{errorMessage:error instanceof Error?error.message:String(error),errorName:error instanceof Error?error.name:'Unknown',hasErrors:error&&typeof error==='object'&&'errors' in error,errors:error&&typeof error==='object'&&'errors' in error?(error as any).errors:null},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
+    
     console.error('Failed to create chef event request:', error);
 
     if (error instanceof Error) {

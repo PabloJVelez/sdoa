@@ -101,7 +101,9 @@ export const ChefEventForm = ({
   }, [initialData, reset])
 
   const watchedStatus = watch("status")
+  const watchedEventType = watch("eventType")
   const currentStatus = initialData?.status
+  const isPickup = watchedEventType === 'pickup' || initialData?.eventType === 'pickup'
 
   const handleFormSubmit = async (data: any) => {
     // Validate status transition if editing
@@ -175,20 +177,22 @@ export const ChefEventForm = ({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="partySize">Party Size *</Label>
-              <Input
-                id="partySize"
-                type="number"
-                min="1"
-                max="50"
-                {...register("partySize", { valueAsNumber: true })}
-              />
-              {errors.partySize && (
-                <p className="text-red-500 text-sm mt-1">{errors.partySize.message}</p>
-              )}
-            </div>
-            <div>
+            {!isPickup && (
+              <div>
+                <Label htmlFor="partySize">Party Size *</Label>
+                <Input
+                  id="partySize"
+                  type="number"
+                  min="1"
+                  max="50"
+                  {...register("partySize", { valueAsNumber: true })}
+                />
+                {errors.partySize && (
+                  <p className="text-red-500 text-sm mt-1">{errors.partySize.message}</p>
+                )}
+              </div>
+            )}
+            <div className={isPickup ? "col-span-2" : ""}>
               <Label htmlFor="eventType">Event Type *</Label>
               <Select
                 value={watch("eventType")}
@@ -212,34 +216,36 @@ export const ChefEventForm = ({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="templateProductId">Menu Template</Label>
-              <Select
-                value={watch("templateProductId") || undefined}
-                onValueChange={(value) => setValue("templateProductId", value === "none" ? "" : value)}
-              >
-                <Select.Trigger>
-                  <Select.Value placeholder={menusLoading ? "Loading menus..." : "Select menu template"} />
-                </Select.Trigger>
-                <Select.Content>
-                  <Select.Item value="none">No template</Select.Item>
-                  {menusLoading ? (
-                    <Select.Item value="loading" disabled>Loading menus...</Select.Item>
-                  ) : menusError ? (
-                    <Select.Item value="error" disabled>Error loading menus</Select.Item>
-                  ) : menus.length === 0 ? (
-                    <Select.Item value="empty" disabled>No menus available</Select.Item>
-                  ) : (
-                    menus.map(menu => (
-                      <Select.Item key={menu.id} value={menu.id}>
-                        {menu.name}
-                      </Select.Item>
-                    ))
-                  )}
-                </Select.Content>
-              </Select>
-            </div>
-            <div>
+            {!isPickup && (
+              <div>
+                <Label htmlFor="templateProductId">Menu Template</Label>
+                <Select
+                  value={watch("templateProductId") || undefined}
+                  onValueChange={(value) => setValue("templateProductId", value === "none" ? "" : value)}
+                >
+                  <Select.Trigger>
+                    <Select.Value placeholder={menusLoading ? "Loading menus..." : "Select menu template"} />
+                  </Select.Trigger>
+                  <Select.Content>
+                    <Select.Item value="none">No template</Select.Item>
+                    {menusLoading ? (
+                      <Select.Item value="loading" disabled>Loading menus...</Select.Item>
+                    ) : menusError ? (
+                      <Select.Item value="error" disabled>Error loading menus</Select.Item>
+                    ) : menus.length === 0 ? (
+                      <Select.Item value="empty" disabled>No menus available</Select.Item>
+                    ) : (
+                      menus.map(menu => (
+                        <Select.Item key={menu.id} value={menu.id}>
+                          {menu.name}
+                        </Select.Item>
+                      ))
+                    )}
+                  </Select.Content>
+                </Select>
+              </div>
+            )}
+            <div className={isPickup ? "col-span-2" : ""}>
               <Label htmlFor="estimatedDuration">Duration (minutes)</Label>
               <Input
                 id="estimatedDuration"
@@ -307,35 +313,42 @@ export const ChefEventForm = ({
 
         {/* Location Tab */}
         <Tabs.Content value="location" className="space-y-4 pt-6">
-          <div>
-            <Label htmlFor="locationType">Location Type *</Label>
-            <Select
-              value={watch("locationType")}
-              onValueChange={(value) => setValue("locationType", value as any)}
-            >
-              <Select.Trigger>
-                <Select.Value placeholder="Select location type" />
-              </Select.Trigger>
-              <Select.Content>
-                {locationTypeOptions.map(option => (
-                  <Select.Item key={option.value} value={option.value}>
-                    {option.label}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select>
-            {errors.locationType && (
-              <p className="text-red-500 text-sm mt-1">{errors.locationType.message}</p>
-            )}
-          </div>
+          {!isPickup && (
+            <div>
+              <Label htmlFor="locationType">Location Type *</Label>
+              <Select
+                value={watch("locationType")}
+                onValueChange={(value) => setValue("locationType", value as any)}
+              >
+                <Select.Trigger>
+                  <Select.Value placeholder="Select location type" />
+                </Select.Trigger>
+                <Select.Content>
+                  {locationTypeOptions.map(option => (
+                    <Select.Item key={option.value} value={option.value}>
+                      {option.label}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select>
+              {errors.locationType && (
+                <p className="text-red-500 text-sm mt-1">{errors.locationType.message}</p>
+              )}
+            </div>
+          )}
 
           <div>
-            <Label htmlFor="locationAddress">Address *</Label>
+            <Label htmlFor="locationAddress">{isPickup ? "Pickup Location" : "Address *"}</Label>
             <Textarea
               id="locationAddress"
               {...register("locationAddress")}
               rows={3}
+              readOnly={isPickup}
+              className={isPickup ? "bg-gray-50" : ""}
             />
+            {isPickup && (
+              <p className="text-sm text-gray-500 mt-1">Pickup location is set by the system and cannot be changed.</p>
+            )}
             {errors.locationAddress && (
               <p className="text-red-500 text-sm mt-1">{errors.locationAddress.message}</p>
             )}

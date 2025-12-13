@@ -7,10 +7,14 @@ export interface AdminChefEventDTO {
   requestedDate: Date
   requestedTime: string
   partySize: number
-  eventType: 'cooking_class' | 'plated_dinner' | 'buffet_style'
+  eventType: 'plated_dinner' | 'buffet_style' | 'pickup'
   templateProductId?: string
+  experience_type_id?: string
+  selected_products?: Array<{ product_id: string; quantity: number }>
+  pickup_time_slot?: string
+  pickup_location?: string
   locationType: 'customer_location' | 'chef_location'
-  locationAddress: string
+  locationAddress?: string
   firstName: string
   lastName: string
   email: string
@@ -46,10 +50,14 @@ export interface AdminCreateChefEventDTO {
   requestedDate: string
   requestedTime: string
   partySize: number
-  eventType: 'cooking_class' | 'plated_dinner' | 'buffet_style'
+  eventType: 'plated_dinner' | 'buffet_style' | 'pickup'
   templateProductId?: string
+  experience_type_id?: string
+  selected_products?: Array<{ product_id: string; quantity: number }>
+  pickup_time_slot?: string
+  pickup_location?: string
   locationType: 'customer_location' | 'chef_location'
-  locationAddress: string
+  locationAddress?: string
   firstName: string
   lastName: string
   email: string
@@ -66,8 +74,12 @@ export interface AdminUpdateChefEventDTO {
   requestedDate?: string
   requestedTime?: string
   partySize?: number
-  eventType?: 'cooking_class' | 'plated_dinner' | 'buffet_style'
+  eventType?: 'plated_dinner' | 'buffet_style' | 'pickup'
   templateProductId?: string
+  experience_type_id?: string
+  selected_products?: Array<{ product_id: string; quantity: number }>
+  pickup_time_slot?: string
+  pickup_location?: string
   locationType?: 'customer_location' | 'chef_location'
   locationAddress?: string
   firstName?: string

@@ -25,6 +25,9 @@ export const EventTypeSelector: FC<EventTypeSelectorProps> = ({ className, exper
   }, [selectedEventType, setValue, experienceTypes]);
 
   const handleEventTypeSelect = (experience: StoreExperienceType) => {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'EventTypeSelector.tsx:27',message:'handleEventTypeSelect',data:{experienceId:experience.id,experienceSlug:experience.slug,experienceName:experience.name,isProductBased:experience.is_product_based},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
     setValue('eventType', experience.slug as EventRequestFormData['eventType'], { shouldValidate: true });
     setValue('experienceTypeId', experience.id, { shouldValidate: false });
     setValue('experienceTypeSlug', experience.slug, { shouldValidate: false });
