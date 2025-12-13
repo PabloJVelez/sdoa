@@ -810,29 +810,29 @@ Add visual differentiation for pickup vs event orders:
 ### 3.8 Phase 3 Deliverables Checklist
 
 **New Components:**
-- [ ] Create `ProductSelector` component
-- [ ] Create `PickupLocationDisplay` component
-- [ ] Create `TimeSlotSelector` component
-- [ ] Create `PickupOrderSummary` component
+- [x] Create `ProductSelector` component
+- [x] Create `PickupLocationDisplay` component
+- [x] Create `TimeSlotSelector` component (integrated in `DateTimeForm`)
+- [x] Create `PickupOrderSummary` component (handled by `RequestSummary`)
 
 **Form Updates:**
-- [ ] Update `EventRequestForm` with conditional rendering
-- [ ] Create dynamic form schema based on experience type
-- [ ] Update pricing calculation logic (per-item vs per-person)
-- [ ] Implement time slot selection for pickup
+- [x] Update `EventRequestForm` with conditional rendering
+- [x] Create dynamic form schema based on experience type
+- [x] Update pricing calculation logic (per-item vs per-person)
+- [x] Implement time slot selection for pickup
 
 **Backend Setup:**
-- [ ] Create "Pickup Items" collection in Medusa Admin
-- [ ] Add sample bento box products with inventory
-- [ ] Add `PICKUP_COLLECTION_ID` to environment config
-- [ ] Create `fetchPickupProducts()` function
+- [x] Create "Pickup Items" collection in Medusa Admin (using products)
+- [x] Add sample bento box products with inventory (`seed:bento-products`)
+- [x] Add `PICKUP_COLLECTION_ID` to environment config (optional - using all products for now)
+- [x] Create `fetchPickupProducts()` function (using `fetchProducts`)
 
 **Chef Event Updates:**
-- [ ] Add `selected_products` JSON field to chef event model
-- [ ] Update chef event creation to handle product-based orders
-- [ ] Update admin UI to show selected products
-- [ ] Add "Pickup" / "Event" badges in admin list
-- [ ] Add filter/tabs in admin for order type
+- [x] Add `selected_products` JSON field to chef event model
+- [x] Update chef event creation to handle product-based orders
+- [x] Update admin UI to show selected products
+- [x] Add "Pickup" / "Event" badges in admin list
+- [ ] Add filter/tabs in admin for order type (optional enhancement)
 
 **Testing:**
 - [ ] Test complete pickup flow end-to-end
@@ -954,11 +954,11 @@ type EventType = string  // Or derive from API response
 
 ### 4.5 Phase 4 Deliverables Checklist
 
-- [ ] Create `experience-types.server.ts` with fetch functions
-- [ ] Update homepage loader to fetch experience types
-- [ ] Update request page loader to fetch experience types
-- [ ] Update `ExperienceTypes` component to use API data
-- [ ] Update `EventTypeSelector` to use API data
+- [x] Create `experience-types.server.ts` with fetch functions
+- [x] Update homepage loader to fetch experience types
+- [x] Update request page loader to fetch experience types
+- [x] Update `ExperienceTypes` component to use API data
+- [x] Update `EventTypeSelector` to use API data (already done)
 - [ ] Update `MenuTemplate` to use API data
 - [ ] Remove `libs/constants/pricing.ts` or deprecate
 - [ ] Update all pricing calculations to use API data

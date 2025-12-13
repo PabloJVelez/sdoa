@@ -5,58 +5,41 @@ import { Accordion } from 'radix-ui';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import type { FC } from 'react';
+import type { StoreExperienceType } from '@libs/util/server/data/experience-types.server';
 
 export interface ExperienceTypesProps {
   className?: string;
   title?: string;
   description?: string;
+  experienceTypes?: StoreExperienceType[];
 }
 
 interface ExperienceType {
   id: string;
   name: string;
-  price: string;
   description: string;
-  highlights: string[];
   icon: string;
   idealFor: string;
   duration: string;
+  slug: string;
+  pricingType: 'per_person' | 'per_item' | 'product_based';
+  isProductBased: boolean;
 }
 
-const experienceTypes: ExperienceType[] = [
-  {
-    id: 'plated_dinner',
-    name: 'Plated Dinner',
-    price: '$149.99',
-    description:
-      'An elegant, restaurant-quality dining experience with multiple courses served individually. Perfect for special occasions.',
-    highlights: [
-      'Multi-course tasting menu',
-      'Restaurant-quality presentation',
-      'Full-service dining',
-      'Premium ingredients',
-    ],
-    icon: '/assets/images/plated_dinner.jpg',
-    idealFor: 'Anniversaries, proposals, formal celebrations',
-    duration: '4 hours',
-  },
-  {
-    id: 'buffet_style',
-    name: 'Buffet Style',
-    price: '$99.99',
-    description:
-      'Perfect for larger gatherings and casual entertaining. A variety of dishes served buffet-style, allowing guests to mingle and enjoy at their own pace.',
-    highlights: [
-      'Multiple dishes and appetizers',
-      'Self-service dining style',
-      'Great for mingling',
-      'Flexible timing',
-    ],
-    icon: '/assets/images/buffet.jpg',
-    idealFor: 'Birthday parties, family gatherings, casual celebrations',
-    duration: '2.5 hours',
-  },
-];
+// Transform API data to component format
+const transformExperienceType = (et: StoreExperienceType): ExperienceType => {
+  return {
+    id: et.id,
+    slug: et.slug,
+    name: et.name,
+    description: et.description || '',
+    icon: et.image_url || et.icon || '/assets/images/default-experience.jpg',
+    idealFor: et.ideal_for || '',
+    duration: et.duration_display || `${Math.round((et.duration_minutes || 0) / 60)} hours`,
+    pricingType: et.pricing_type,
+    isProductBased: et.is_product_based,
+  };
+};
 
 interface ExperienceCardProps {
   experience: ExperienceType;
@@ -98,24 +81,17 @@ const ExperienceCard: FC<ExperienceCardProps> = ({ experience, className, featur
         </div>
 
         <div>
-          <h3 className="text-xl font-semibold text-primary-900 mb-1">{experience.name}</h3>
-          <div className="text-3xl font-bold text-accent-500 mb-1">{experience.price}</div>
-          <p className="text-sm text-primary-600">per person</p>
+          <h3 className="text-xl font-semibold text-primary-900 mb-2">{experience.name}</h3>
+          <p className="text-xs text-primary-600">
+            {experience.pricingType === 'product_based'
+              ? 'Priced per item'
+              : experience.pricingType === 'per_item'
+                ? 'Priced per item'
+                : 'Priced per person'}
+          </p>
         </div>
 
         <p className="text-primary-700 leading-relaxed text-sm flex-grow">{experience.description}</p>
-
-        <div className="space-y-3">
-          <h4 className="font-semibold text-primary-900 text-sm">What's Included:</h4>
-          <ul className="space-y-1">
-            {experience.highlights.map((highlight, index) => (
-              <li key={index} className="flex items-center text-xs text-primary-700">
-                <span className="w-1 h-1 bg-accent-500 rounded-full mr-2 flex-shrink-0" />
-                {highlight}
-              </li>
-            ))}
-          </ul>
-        </div>
 
         <div className="space-y-1 pt-3 border-t border-accent-100">
           <div className="flex justify-between items-center text-xs">
@@ -131,11 +107,11 @@ const ExperienceCard: FC<ExperienceCardProps> = ({ experience, className, featur
           <ActionList
             actions={[
               {
-                label: 'Request This Experience',
-                url: `/request?type=${experience.id}`,
+                label: experience.isProductBased ? 'Request Pickup' : 'Request This Experience',
+                url: `/request?type=${experience.slug}`,
               },
             ]}
-            className=""
+            className="justify-center"
           />
         </div>
       </div>
@@ -204,14 +180,20 @@ const ExperienceAccordionItem: FC<ExperienceAccordionItemProps> = ({ experience,
               </h3>
             </div>
 
-            {/* Row 2: Duration • Price (left), caret on right */}
+            {/* Row 2: Duration (left), caret on right */}
             <div className="flex items-center justify-between">
               <span className="flex items-baseline gap-2 text-primary-700 whitespace-nowrap">
                 <span className="text-base md:text-xl">{experience.duration}</span>
                 <span aria-hidden className="text-primary-400">
                   •
                 </span>
-                <span className="text-xl md:text-[30px] font-extrabold text-accent-600">{experience.price}</span>
+                <span className="text-sm text-primary-600">
+                  {experience.pricingType === 'product_based'
+                    ? 'Priced per item'
+                    : experience.pricingType === 'per_item'
+                      ? 'Priced per item'
+                      : 'Priced per person'}
+                </span>
               </span>
               <ChevronDownIcon className="h-5 w-5 md:h-6 md:w-6 text-primary-400 transition-transform duration-300 ease-[cubic-bezier(0.87,0,0.13,1)] flex-shrink-0 transform-gpu group-data-[state=open]:rotate-180 group-data-[state=open]:text-accent-600" />
             </div>
@@ -222,18 +204,6 @@ const ExperienceAccordionItem: FC<ExperienceAccordionItemProps> = ({ experience,
       <Accordion.Content className="px-6 pb-6 bg-white/60 border-t border-white/40 data-[state=closed]:animate-slideUp data-[state=open]:animate-slideDown overflow-hidden transition-opacity duration-300 ease-[cubic-bezier(0.87,0,0.13,1)] motion-reduce:transition-none data-[state=open]:opacity-100 data-[state=closed]:opacity-0 will-change-[height,opacity]">
         <div className="space-y-5 pt-4">
           <p className="text-primary-700 leading-relaxed text-lg">{experience.description}</p>
-
-          <div className="space-y-3">
-            <h4 className="font-semibold text-primary-900 text-lg">What's Included:</h4>
-            <ul className="space-y-1.5">
-              {experience.highlights.map((highlight, index) => (
-                <li key={index} className="flex items-center text-base text-primary-700">
-                  <span className="w-1.5 h-1.5 bg-accent-500 rounded-full mr-3 flex-shrink-0" />
-                  {highlight}
-                </li>
-              ))}
-            </ul>
-          </div>
 
           <div className="space-y-2 pt-3 border-t border-white/40">
             <div className="flex justify-between items-center text-lg">
@@ -249,11 +219,11 @@ const ExperienceAccordionItem: FC<ExperienceAccordionItemProps> = ({ experience,
             <ActionList
               actions={[
                 {
-                  label: 'Request This Experience',
-                  url: `/request?type=${experience.id}`,
+                  label: experience.isProductBased ? 'Request Pickup' : 'Request This Experience',
+                  url: `/request?type=${experience.slug}`,
                 },
               ]}
-              className=""
+              className="justify-center"
             />
           </div>
         </div>
@@ -265,8 +235,18 @@ const ExperienceAccordionItem: FC<ExperienceAccordionItemProps> = ({ experience,
 export const ExperienceTypes: FC<ExperienceTypesProps> = ({
   className,
   title = 'Culinary Experiences',
-  description = 'Each experience is carefully crafted to match the occasion. All prices are per person with no hidden fees or deposits required.',
+  description = 'Each experience is carefully crafted to match the occasion. Pricing varies by experience type.',
+  experienceTypes: apiExperienceTypes = [],
 }) => {
+  // Filter to only active experience types (include all active types, including pickup)
+  const eventExperienceTypes = apiExperienceTypes
+    .filter((et) => et.is_active)
+    .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+    .map(transformExperienceType);
+
+  // Fallback to empty array if no experience types
+  const displayTypes = eventExperienceTypes.length > 0 ? eventExperienceTypes : [];
+
   return (
     <Container className={clsx('py-12 lg:py-16', className)}>
       <div className="text-center mb-8 lg:mb-12">
@@ -274,32 +254,54 @@ export const ExperienceTypes: FC<ExperienceTypesProps> = ({
         {/* Desktop copy stays the same */}
         <p className="hidden lg:block text-base text-primary-600 max-w-2xl mx-auto leading-relaxed">{description}</p>
         {/* Mobile-friendly helper line to match design intent */}
-        <p className="lg:hidden text-primary-600 text-xl">Tap to explore • All prices per person</p>
+        <p className="lg:hidden text-primary-600 text-xl">Tap to explore</p>
       </div>
 
-      {/* Desktop Grid Layout */}
-      <div className="hidden lg:grid lg:grid-cols-3 gap-6 lg:gap-8">
-        {experienceTypes.map((experience, index) => (
-          <ExperienceCard
-            key={experience.id}
-            experience={experience}
-            featured={index === 1} // Make cooking class featured (middle option)
-          />
-        ))}
-      </div>
+      {displayTypes.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-primary-600">No experience types available at this time.</p>
+        </div>
+      ) : (
+        <>
+          {/* Desktop Grid Layout */}
+          <div className="hidden lg:grid lg:grid-cols-3 gap-6 lg:gap-8">
+            {displayTypes.map((experience, index) => {
+              const originalApiType = apiExperienceTypes.find(
+                (et) => et.id === experience.id || et.slug === experience.slug,
+              );
+              const isFeatured = originalApiType?.is_featured || false;
+              // Find the first featured experience type to ensure only one is featured
+              const firstFeaturedIndex = displayTypes.findIndex((exp) => {
+                const apiType = apiExperienceTypes.find((et) => et.id === exp.id || et.slug === exp.slug);
+                return apiType?.is_featured || false;
+              });
+              const shouldShowFeatured = isFeatured && index === firstFeaturedIndex;
+              return <ExperienceCard key={experience.id} experience={experience} featured={shouldShowFeatured} />;
+            })}
+          </div>
 
-      {/* Mobile Accordion Layout */}
-      <div className="lg:hidden pt-2">
-        <Accordion.Root type="single" collapsible className="space-y-6">
-          {experienceTypes.map((experience, index) => (
-            <ExperienceAccordionItem
-              key={experience.id}
-              experience={experience}
-              featured={index === 1} // Make cooking class featured (middle option)
-            />
-          ))}
-        </Accordion.Root>
-      </div>
+          {/* Mobile Accordion Layout */}
+          <div className="lg:hidden pt-2">
+            <Accordion.Root type="single" collapsible className="space-y-6">
+              {displayTypes.map((experience, index) => {
+                const originalApiType = apiExperienceTypes.find(
+                  (et) => et.id === experience.id || et.slug === experience.slug,
+                );
+                const isFeatured = originalApiType?.is_featured || false;
+                // Find the first featured experience type to ensure only one is featured
+                const firstFeaturedIndex = displayTypes.findIndex((exp) => {
+                  const apiType = apiExperienceTypes.find((et) => et.id === exp.id || et.slug === exp.slug);
+                  return apiType?.is_featured || false;
+                });
+                const shouldShowFeatured = isFeatured && index === firstFeaturedIndex;
+                return (
+                  <ExperienceAccordionItem key={experience.id} experience={experience} featured={shouldShowFeatured} />
+                );
+              })}
+            </Accordion.Root>
+          </div>
+        </>
+      )}
 
       {/* Helper CTA — copy tweaked for mobile only */}
       <div className="text-center mt-10 lg:mt-12">
