@@ -157,11 +157,33 @@ export const loader = async (args: LoaderFunctionArgs) => {
     // Fetch menus for menu selector step
     const menusData = await fetchMenus({ limit: 20 });
     const experienceTypes = await fetchExperienceTypes();
-    const products = await fetchProducts(args.request, { limit: 50, fields: 'id,title,thumbnail,prices,variants' });
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'request._index.tsx:159',message:'experience types fetched',data:{experienceTypes:experienceTypes.map((e:any)=>({id:e.id,name:e.name,slug:e.slug,price_per_unit:e.price_per_unit,pricing_type:e.pricing_type}))},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+    // Fetch products with proper fields to include prices and SKUs
+    const products = await fetchProducts(args.request, { 
+      limit: 50, 
+      fields: 'id,title,thumbnail,variants.*,variants.prices.*,variants.sku' 
+    });
+    // #region agent log
+    const allProducts = products.products || [];
+    // Filter out event products - check both SKU pattern and title pattern
+    const filteredProducts = allProducts.filter((p: any) => {
+      const hasEventSku = p.variants?.some((v: any) => v.sku?.startsWith('EVENT-'));
+      const hasEventTitle = p.title?.includes('Plated Dinner -') || p.title?.includes('Buffet Style -');
+      return !hasEventSku && !hasEventTitle;
+    });
+    const eventProducts = allProducts.filter((p: any) => {
+      const hasEventSku = p.variants?.some((v: any) => v.sku?.startsWith('EVENT-'));
+      const hasEventTitle = p.title?.includes('Plated Dinner -') || p.title?.includes('Buffet Style -');
+      return hasEventSku || hasEventTitle;
+    });
+    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'request._index.tsx:160',message:'loader products fetched and filtered',data:{totalProducts:allProducts.length,eventProductsCount:eventProducts.length,eventProductTitles:eventProducts.map((p:any)=>p.title),filteredProductsCount:filteredProducts.length,filteredProductTitles:filteredProducts.map((p:any)=>p.title)},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
     return {
       menus: menusData.menus || [],
       experienceTypes,
-      products: products.products || [],
+      products: filteredProducts,
       success: true,
     };
   } catch (error) {

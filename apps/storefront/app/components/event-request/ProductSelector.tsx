@@ -35,7 +35,13 @@ export const ProductSelector = ({ products, currencyCode = 'usd' }: ProductSelec
   const isSelected = (productId: string) => selected.some((p) => p.product_id === productId);
 
   const getPrice = (product: StoreProduct) => {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ProductSelector.tsx:37',message:'getPrice entry',data:{productId:product.id,productTitle:product.title,currencyCode,variantsCount:product.variants?.length,firstVariantPrices:product.variants?.[0]?.prices?.map(p=>({amount:p.amount,currency:p.currency_code}))},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+    // #endregion
     const price = product.variants?.[0]?.prices?.find((p) => p.currency_code === currencyCode);
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/d5974850-2a8e-400f-94b8-c1dc9368bb2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ProductSelector.tsx:39',message:'getPrice price lookup',data:{productId:product.id,foundPrice:price?{amount:price.amount,currency:price.currency_code}:null,allPrices:product.variants?.[0]?.prices?.map(p=>({amount:p.amount,currency:p.currency_code}))},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+    // #endregion
     if (!price) return 'N/A';
     const formatted = (price.amount / 100).toLocaleString(undefined, {
       style: 'currency',
