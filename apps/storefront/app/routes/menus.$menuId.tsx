@@ -2,6 +2,7 @@ import { Breadcrumbs } from '@app/components/common/breadcrumbs';
 import { Container } from '@app/components/common/container';
 import { MenuTemplate } from '@app/templates/MenuTemplate';
 import { fetchMenuById } from '@libs/util/server/data/menus.server';
+import { fetchExperienceTypes } from '@libs/util/server/data/experience-types.server';
 import { getMergedPageMeta } from '@libs/util/page';
 import { type LoaderFunctionArgs, type MetaFunction, redirect } from 'react-router';
 import { useLoaderData } from 'react-router';
@@ -15,13 +16,21 @@ export const loader = async (args: LoaderFunctionArgs) => {
       throw redirect('/menus');
     }
 
-    const { menu } = await fetchMenuById(menuId);
+    const [menuResult, experienceTypes] = await Promise.all([
+      fetchMenuById(menuId),
+      fetchExperienceTypes().catch((err) => {
+        console.error('Failed to fetch experience types:', err);
+        return [];
+      }),
+    ]);
+
+    const { menu } = menuResult;
 
     if (!menu) {
       throw redirect('/404');
     }
 
-    return { menu, success: true };
+    return { menu, experienceTypes, success: true };
   } catch (error) {
     console.error('Failed to load menu:', error);
     throw redirect('/404');
@@ -81,7 +90,7 @@ export const meta: MetaFunction<MenuPageLoaderData> = ({ data, location }) => {
 };
 
 export default function MenuDetailRoute() {
-  const { menu } = useLoaderData<MenuPageLoaderData>();
+  const { menu, experienceTypes } = useLoaderData<MenuPageLoaderData>();
 
   if (!menu) return null;
 
@@ -110,7 +119,7 @@ export default function MenuDetailRoute() {
         <Breadcrumbs breadcrumbs={breadcrumbs} />
       </div>
 
-      <MenuTemplate menu={menu} />
+      <MenuTemplate menu={menu} experienceTypes={experienceTypes} />
     </Container>
   );
 }

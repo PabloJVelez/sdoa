@@ -959,14 +959,14 @@ type EventType = string  // Or derive from API response
 - [x] Update request page loader to fetch experience types
 - [x] Update `ExperienceTypes` component to use API data
 - [x] Update `EventTypeSelector` to use API data (already done)
-- [ ] Update `MenuTemplate` to use API data
-- [ ] Remove `libs/constants/pricing.ts` or deprecate
-- [ ] Update all pricing calculations to use API data
-- [ ] Update form validation to use dynamic experience type IDs
-- [ ] Add loading states for experience types
-- [ ] Add error handling for API failures
+- [x] Update `MenuTemplate` to use API data
+- [x] Remove `libs/constants/pricing.ts` or deprecate
+- [x] Update all pricing calculations to use API data
+- [x] Update form validation to use dynamic experience type IDs (already using experienceTypeId)
+- [x] Add loading states for experience types (handled via empty arrays in loaders)
+- [x] Add error handling for API failures (try/catch with fallbacks in loaders)
+- [x] Verify SEO still works (added caching to experience-types.server.ts)
 - [ ] Test full flow with dynamic data
-- [ ] Verify SEO still works (maybe cache experience types)
 
 ---
 

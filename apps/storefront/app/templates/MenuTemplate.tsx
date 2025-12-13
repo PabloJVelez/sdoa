@@ -2,38 +2,15 @@ import { ActionList } from '@app/components/common/actions-list/ActionList';
 import { Image } from '@app/components/common/images/Image';
 import { Container } from '@app/components/common/container/Container';
 import type { StoreMenuDTO } from '@libs/util/server/data/menus.server';
+import type { StoreExperienceType } from '@libs/util/server/data/experience-types.server';
 import clsx from 'clsx';
 import type { FC } from 'react';
 
 export interface MenuTemplateProps {
   menu: StoreMenuDTO;
   className?: string;
+  experienceTypes?: StoreExperienceType[];
 }
-
-interface ExperienceType {
-  id: string;
-  name: string;
-  price: string;
-  description: string;
-  duration: string;
-}
-
-const experienceTypes: ExperienceType[] = [
-  {
-    id: 'plated_dinner',
-    name: 'Plated Dinner',
-    price: '$149.99',
-    description: 'Elegant multi-course dining experience',
-    duration: '4 hours',
-  },
-  {
-    id: 'buffet_style',
-    name: 'Buffet Style',
-    price: '$99.99',
-    description: 'Perfect for larger groups with dishes served buffet-style',
-    duration: '2.5 hours',
-  },
-];
 
 interface CourseProps {
   course: StoreMenuDTO['courses'][0];
@@ -93,52 +70,72 @@ const DishCard: FC<DishProps> = ({ dish }) => {
   );
 };
 
-const PricingSection: FC<{ menuName: string }> = ({ menuName }) => {
+const PricingSection: FC<{ menuName: string; experienceTypes: StoreExperienceType[] }> = ({ menuName, experienceTypes }) => {
+  // Filter to only active, non-product-based experience types (events only, not pickup)
+  const eventExperienceTypes = experienceTypes
+    .filter((et) => et.is_active && !et.is_product_based)
+    .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+
+  if (eventExperienceTypes.length === 0) {
+    return null;
+  }
+
   return (
     <div className="bg-gray-50 rounded-2xl p-8 mb-12">
       <h3 className="text-2xl font-semibold text-gray-900 mb-6 text-center">Choose Your Experience with {menuName}</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {experienceTypes.map((experience, index) => (
-          <div
-            key={experience.id}
-            className={clsx(
-              'bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow',
-              index === 1 && 'ring-2 ring-blue-500', // Highlight cooking class
-            )}
-          >
-            {index === 1 && (
-              <div className="text-center mb-4">
-                <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">Most Popular</span>
-              </div>
-            )}
+        {eventExperienceTypes.map((experience, index) => {
+          const isFeatured = experience.is_featured || false;
+          const duration = experience.duration_display || `${Math.round((experience.duration_minutes || 0) / 60)} hours`;
+          const pricingNote =
+            experience.pricing_type === 'product_based'
+              ? 'Priced per item'
+              : experience.pricing_type === 'per_item'
+                ? 'Priced per item'
+                : 'Priced per person';
 
-            <div className="text-center">
-              <h4 className="text-xl font-semibold text-gray-900 mb-2">{experience.name}</h4>
-              <div className="text-3xl font-bold text-blue-600 mb-2">{experience.price}</div>
-              <p className="text-sm text-gray-600 mb-4">per person</p>
-              <p className="text-gray-700 text-sm mb-4 leading-relaxed">{experience.description}</p>
-              <div className="text-sm text-gray-600 mb-6">
-                Duration: <span className="font-medium">{experience.duration}</span>
-              </div>
+          return (
+            <div
+              key={experience.id}
+              className={clsx(
+                'bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow',
+                isFeatured && 'ring-2 ring-blue-500',
+              )}
+            >
+              {isFeatured && (
+                <div className="text-center mb-4">
+                  <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">Most Popular</span>
+                </div>
+              )}
 
-              <ActionList
-                actions={[
-                  {
-                    label: 'Request This Experience',
-                    url: `/request?type=${experience.id}&menu=${menuName}`,
-                  },
-                ]}
-              />
+              <div className="text-center">
+                <h4 className="text-xl font-semibold text-gray-900 mb-2">{experience.name}</h4>
+                <p className="text-xs text-gray-600 mb-4">{pricingNote}</p>
+                <p className="text-gray-700 text-sm mb-4 leading-relaxed">{experience.description}</p>
+                <div className="text-sm text-gray-600 mb-6">
+                  Duration: <span className="font-medium">{duration}</span>
+                </div>
+
+                <ActionList
+                  actions={[
+                    {
+                      label: 'Request This Experience',
+                      url: `/request?type=${experience.slug}&menu=${encodeURIComponent(menuName)}`,
+                    },
+                  ]}
+                  className="justify-center"
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
 };
 
-export const MenuTemplate: FC<MenuTemplateProps> = ({ menu, className }) => {
+export const MenuTemplate: FC<MenuTemplateProps> = ({ menu, className, experienceTypes = [] }) => {
   const courseCount = menu.courses?.length || 0;
   const totalDishes = menu.courses?.reduce((acc, course) => acc + (course.dishes?.length || 0), 0) || 0;
 
@@ -201,7 +198,7 @@ export const MenuTemplate: FC<MenuTemplateProps> = ({ menu, className }) => {
       </div>
 
       {/* Pricing Section */}
-      <PricingSection menuName={menu.name} />
+      <PricingSection menuName={menu.name} experienceTypes={experienceTypes} />
 
       {/* Menu Courses */}
       <div className="max-w-6xl mx-auto">

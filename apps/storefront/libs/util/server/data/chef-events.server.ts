@@ -58,14 +58,8 @@ export interface ChefEventError {
   }>;
 }
 
-// Import pricing structure from shared constants
-import { PRICING_STRUCTURE } from '@libs/constants/pricing';
-export { PRICING_STRUCTURE };
-
-// Calculate total price for an event
-export const calculateEventPrice = (eventType: keyof typeof PRICING_STRUCTURE, partySize: number): number => {
-  return PRICING_STRUCTURE[eventType] * partySize;
-};
+// Note: Pricing is now calculated using experience types from the API
+// See RequestSummary component for pricing calculation logic
 
 // Create a chef event request
 export const createChefEventRequest = async (data: StoreCreateChefEventDTO): Promise<StoreChefEventResponse> => {

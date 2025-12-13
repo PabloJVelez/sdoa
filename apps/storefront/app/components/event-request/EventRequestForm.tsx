@@ -294,7 +294,7 @@ export const EventRequestForm: FC<EventRequestFormProps> = ({
                       key: `step1-guests-${currentStep}`,
                       defaultOpen: false,
                       header: renderSectionHeader('Number of Guests', { complete: isPartySizeComplete }),
-                      children: <PartySizeSelector />,
+                      children: <PartySizeSelector experienceTypes={experienceTypes} />,
                     })}
                 </>
               );

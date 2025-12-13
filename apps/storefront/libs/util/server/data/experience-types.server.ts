@@ -1,4 +1,6 @@
-import { baseMedusaConfig } from '../client.server';
+import cachified from '@epic-web/cachified';
+import { baseMedusaConfig, sdkCache } from '../client.server';
+import { MILLIS } from '../cache-builder.server';
 
 export interface StoreExperienceType {
   id: string;
@@ -31,20 +33,58 @@ export interface StoreExperienceType {
 }
 
 export const fetchExperienceTypes = async (): Promise<StoreExperienceType[]> => {
-  const requestUrl = `${baseMedusaConfig.baseUrl}/store/experience-types`;
+  return await cachified({
+    key: 'experience-types-list',
+    cache: sdkCache,
+    staleWhileRevalidate: MILLIS.ONE_HOUR,
+    ttl: MILLIS.TEN_SECONDS,
+    async getFreshValue() {
+      const requestUrl = `${baseMedusaConfig.baseUrl}/store/experience-types`;
 
-  const response = await fetch(requestUrl, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-publishable-api-key': baseMedusaConfig.publishableKey || '',
+      const response = await fetch(requestUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-publishable-api-key': baseMedusaConfig.publishableKey || '',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch experience types: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.experience_types || [];
     },
   });
+};
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch experience types: ${response.statusText}`);
-  }
+export const retrieveExperienceTypeBySlug = async (slug: string): Promise<StoreExperienceType | null> => {
+  return await cachified({
+    key: `experience-type-by-slug-${slug}`,
+    cache: sdkCache,
+    staleWhileRevalidate: MILLIS.ONE_HOUR,
+    ttl: MILLIS.TEN_SECONDS,
+    async getFreshValue() {
+      const requestUrl = `${baseMedusaConfig.baseUrl}/store/experience-types/${slug}`;
 
-  const data = await response.json();
-  return data.experience_types || [];
+      const response = await fetch(requestUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-publishable-api-key': baseMedusaConfig.publishableKey || '',
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null;
+        }
+        throw new Error(`Failed to fetch experience type: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.experience_type || null;
+    },
+  });
 };

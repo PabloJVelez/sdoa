@@ -191,7 +191,9 @@ export const RequestSummary: FC<RequestSummaryProps> = ({
               <p className="text-sm font-medium text-primary-700">Experience Type</p>
               <p className="text-primary-900">
                 {selectedExperience?.name ??
-                  (formData.eventType ? getEventTypeDisplayName(formData.eventType) : 'Not selected')}
+                  (formData.eventType
+                    ? formData.eventType.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+                    : 'Not selected')}
               </p>
             </div>
             {!isProductBased && (
