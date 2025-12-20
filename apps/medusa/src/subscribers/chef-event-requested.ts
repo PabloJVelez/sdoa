@@ -95,10 +95,10 @@ export default async function chefEventRequestedHandler({
     await notificationService.createNotifications({
       to: chefEvent.email,
       channel: "email",
-      template: "chef-event-requested", // Updated template name for Resend
-              data: {
-          ...emailData,
-          emailType: "customer_confirmation",
+      template: "chef-event-requested",
+      data: {
+        ...emailData,
+        emailType: "customer_confirmation",
         requestReference: chefEvent.id.slice(0, 8).toUpperCase(),
         chefContact: {
           email: "support@chefvelez.com",

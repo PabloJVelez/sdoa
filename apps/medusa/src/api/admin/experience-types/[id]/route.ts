@@ -33,16 +33,20 @@ const updateSchema = z.object({
 });
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
-  const svc = req.scope.resolve(EXPERIENCE_TYPE_MODULE) as ExperienceTypeModuleService;
+  const experienceTypeModuleService = req.scope.resolve(EXPERIENCE_TYPE_MODULE) as ExperienceTypeModuleService;
   const id = req.params.id;
+  const experienceType = await experienceTypeModuleService.retrieveExperienceType(id);
 
-  const experienceType = await (svc as any).retrieveExperienceType(id);
+  if (!experienceType) {
+    res.status(404).json({ message: 'Experience type not found' });
+    return;
+  }
 
   res.status(200).json({ experience_type: experienceType });
 }
 
 export async function PUT(req: MedusaRequest, res: MedusaResponse) {
-  const svc = req.scope.resolve(EXPERIENCE_TYPE_MODULE) as ExperienceTypeModuleService;
+  const experienceTypeModuleService = req.scope.resolve(EXPERIENCE_TYPE_MODULE) as ExperienceTypeModuleService;
   const id = req.params.id;
 
   const parsed = updateSchema.safeParse(req.body);
@@ -50,7 +54,7 @@ export async function PUT(req: MedusaRequest, res: MedusaResponse) {
     return res.status(400).json({ message: 'Validation error', errors: parsed.error.issues });
   }
 
-  const experienceType = await (svc as any).updateExperienceTypes({
+  const experienceType = await experienceTypeModuleService.updateExperienceTypes({
     id,
     ...(parsed.data as any),
   });
@@ -59,10 +63,10 @@ export async function PUT(req: MedusaRequest, res: MedusaResponse) {
 }
 
 export async function DELETE(req: MedusaRequest, res: MedusaResponse) {
-  const svc = req.scope.resolve(EXPERIENCE_TYPE_MODULE) as ExperienceTypeModuleService;
+  const experienceTypeModuleService = req.scope.resolve(EXPERIENCE_TYPE_MODULE) as ExperienceTypeModuleService;
   const id = req.params.id;
 
-  await (svc as any).deleteExperienceTypes(id);
+  await experienceTypeModuleService.deleteExperienceTypes(id);
 
   res.status(200).json({ id, deleted: true });
 }

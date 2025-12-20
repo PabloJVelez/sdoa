@@ -8,6 +8,7 @@ import {
   ProviderSendNotificationResultsDTO,
 } from "@medusajs/framework/types"
 import { Resend, CreateEmailOptions } from "resend"
+import { render } from "@react-email/render"
 
 type ResendOptions = {
   api_key: string
@@ -132,9 +133,30 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
         html: template,
       }
     } else {
+      let reactComponent
+      try {
+        reactComponent = template(notification.data)
+      } catch (templateError) {
+        throw new MedusaError(
+          MedusaError.Types.UNEXPECTED_STATE,
+          `Failed to render email template: ${templateError instanceof Error ? templateError.message : String(templateError)}`
+        )
+      }
+      
+      // Pre-render React component to HTML to avoid Resend SDK's internal rendering
+      let htmlContent: string
+      try {
+        htmlContent = await render(reactComponent)
+      } catch (renderError) {
+        throw new MedusaError(
+          MedusaError.Types.UNEXPECTED_STATE,
+          `Failed to render React component to HTML: ${renderError instanceof Error ? renderError.message : String(renderError)}`
+        )
+      }
+      
       emailOptions = {
         ...commonOptions,
-        react: template(notification.data),
+        html: htmlContent,
       }
     }
 
@@ -143,10 +165,17 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
     if (error || !data) {
       if (error) {
         this.logger.error("Failed to send email", error)
+        throw new MedusaError(
+          MedusaError.Types.UNEXPECTED_STATE,
+          `Failed to send email via Resend: ${error.message || 'Unknown error'}`
+        )
       } else {
         this.logger.error("Failed to send email: unknown error")
+        throw new MedusaError(
+          MedusaError.Types.UNEXPECTED_STATE,
+          "Failed to send email via Resend: No data returned and no error provided"
+        )
       }
-      return {}
     }
 
     return { id: data.id }

@@ -16,7 +16,7 @@ const productSelectionSchema = z
 
 const createStoreChefEventSchema = z
   .object({
-    requestedDate: z.string().datetime(),
+    requestedDate: z.string().min(1, 'Date is required'),
     requestedTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format'),
     partySize: z.number().min(1, 'Minimum party size is 1').max(200, 'Party size too large'),
     eventType: z.enum(['plated_dinner', 'buffet_style', 'pickup']),
@@ -34,12 +34,27 @@ const createStoreChefEventSchema = z
     notes: z.string().optional(),
     specialRequirements: z.string().optional(),
   })
-  .refine((data) => {
+  .superRefine((data, ctx) => {
     if (data.eventType === 'pickup') {
-      return true;
+      // Pickup events require selected_products
+      if (!data.selected_products || data.selected_products.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['selected_products'],
+          message: 'At least one product must be selected for pickup events',
+        });
+      }
+    } else {
+      // Non-pickup events require locationAddress
+      if (!data.locationAddress || data.locationAddress.length < 3) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['locationAddress'],
+          message: 'Address must be at least 3 characters for events',
+        });
+      }
     }
-    return !!data.locationAddress && data.locationAddress.length >= 3;
-  }, 'Address must be at least 3 characters for events');
+  });
 
 // Fallback pricing structure (used only if experience type not found or has no price)
 const FALLBACK_PRICING = {
@@ -124,7 +139,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse): Promise<voi
       input: workflowInput,
     });
 
-    res.status(200).json({
+    res.status(201).json({
       chefEvent: result.chefEvent,
       message: 'Event request submitted successfully. You will receive a response within 24-48 hours.',
     });
