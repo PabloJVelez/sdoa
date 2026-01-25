@@ -16,10 +16,10 @@ export const chefEventSchema = z.object({
     "Time must be in HH:MM format"
   ),
   partySize: z.number().min(1, "Party size must be at least 1").max(50, "Party size cannot exceed 50"),
-  eventType: z.enum(['cooking_class', 'plated_dinner', 'buffet_style']),
+  eventType: z.enum(['plated_dinner', 'buffet_style', 'pickup']),
   templateProductId: z.string().optional(),
   locationType: z.enum(['customer_location', 'chef_location']),
-  locationAddress: z.string().min(1, "Location address is required"),
+  locationAddress: z.string().optional(),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
@@ -51,7 +51,7 @@ export const validateStatusTransition = (from: string, to: string) => {
 
 // Helper functions for form validation
 export const eventTypeOptions = [
-  { value: 'cooking_class', label: 'Cooking Class' },
+  { value: 'pickup', label: 'Pickup' },
   { value: 'plated_dinner', label: 'Plated Dinner' },
   { value: 'buffet_style', label: 'Buffet Style' }
 ]

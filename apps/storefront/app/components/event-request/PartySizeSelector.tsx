@@ -1,29 +1,37 @@
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import type { EventRequestFormData } from '@app/routes/request._index';
-import { PRICING_STRUCTURE, getEventTypeDisplayName } from '@libs/constants/pricing';
+import type { StoreExperienceType } from '@libs/util/server/data/experience-types.server';
 import clsx from 'clsx';
 import type { FC } from 'react';
 
 export interface PartySizeSelectorProps {
   className?: string;
+  experienceTypes?: StoreExperienceType[];
 }
 
 const PARTY_SIZE_PRESETS = [2, 4, 6, 8, 10, 12];
 const MIN_PARTY_SIZE = 2;
 const MAX_PARTY_SIZE = 50;
 
-export const PartySizeSelector: FC<PartySizeSelectorProps> = ({ className }) => {
+export const PartySizeSelector: FC<PartySizeSelectorProps> = ({ className, experienceTypes = [] }) => {
   const { watch, setValue, formState: { errors } } = useFormContext<EventRequestFormData>();
   const partySize = watch('partySize') || 4;
   const eventType = watch('eventType');
+  const experienceTypeId = watch('experienceTypeId');
   
   const [inputValue, setInputValue] = useState(partySize.toString());
 
-  // Calculate pricing based on selected event type
+  // Find the selected experience type
+  const selectedExperience = experienceTypes.find(
+    (e) => e.id === experienceTypeId || e.slug === eventType,
+  );
+
+  // Calculate pricing based on selected experience type
   const getPrice = () => {
-    if (!eventType) return null;
-    return PRICING_STRUCTURE[eventType];
+    if (!selectedExperience || selectedExperience.is_product_based) return null;
+    // price_per_unit is in cents, convert to dollars
+    return selectedExperience.price_per_unit ? selectedExperience.price_per_unit / 100 : null;
   };
 
   const price = getPrice();
@@ -57,7 +65,7 @@ export const PartySizeSelector: FC<PartySizeSelectorProps> = ({ className }) => 
   };
 
   const getEventTypeName = () => {
-    return eventType ? getEventTypeDisplayName(eventType) : 'Selected Experience';
+    return selectedExperience?.name || (eventType ? eventType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Selected Experience');
   };
 
   return (

@@ -16,30 +16,53 @@ import { eventTypeOptions } from "../schemas"
 
 interface ChefEventCalendarProps {
   onCreateEvent: () => void
+  orderTypeFilter?: "all" | "events" | "pickup"
 }
 
 // no MonthPicker; we'll use RBC's default toolbar
 
-export const ChefEventCalendar = ({ onCreateEvent }: ChefEventCalendarProps) => {
+export const ChefEventCalendar = ({ onCreateEvent, orderTypeFilter = "all" }: ChefEventCalendarProps) => {
   const navigate = useNavigate()
 
   // RBC state
   const [view, setView] = useState<View>(Views.MONTH)
   const [date, setDate] = useState<Date>(new Date())
 
-  // Keep your existing filters; add range later if/when supported
-  const { data, isLoading } = useAdminListChefEvents({
+  // Build query - filter by eventType for pickup, otherwise fetch all
+  const query: any = {
     q: "",
     status: "",
-    eventType: "",
     locationType: "",
     limit: 1000,
     offset: 0,
-  })
+  }
+
+  if (orderTypeFilter === "pickup") {
+    query.eventType = "pickup"
+  } else {
+    // For "all" or "events", fetch all and filter client-side
+    query.eventType = ""
+  }
+
+  const { data, isLoading } = useAdminListChefEvents(query)
+  
+  // Filter events client-side based on order type
+  const filteredEvents = useMemo(() => {
+    if (!data?.chefEvents) return []
+    if (orderTypeFilter === "events") {
+      // "events" filter - exclude pickup (only show plated_dinner and buffet_style)
+      return data.chefEvents.filter((event: any) => event.eventType !== "pickup")
+    } else if (orderTypeFilter === "pickup") {
+      // "pickup" filter - only show pickup
+      return data.chefEvents.filter((event: any) => event.eventType === "pickup")
+    }
+    // "all" - show everything
+    return data.chefEvents
+  }, [data?.chefEvents, orderTypeFilter])
 
   const events: RBCEvent[] = useMemo(
-    () => (data?.chefEvents ?? []).map(chefEventToRbc),
-    [data?.chefEvents]
+    () => filteredEvents.map(chefEventToRbc),
+    [filteredEvents]
   )
 
   // keyboard shortcuts parity
@@ -62,10 +85,12 @@ export const ChefEventCalendar = ({ onCreateEvent }: ChefEventCalendarProps) => 
       // Custom month event: dot + time/name + type subtitle
       month: {
         event: ({ event }: { event: RBCEvent }) => {
+          const eventType = (event.resource as any)?.eventType as string | undefined
           const typeLabel = event.resource
-            ? eventTypeOptions.find((o) => o.value === (event.resource as any).eventType)?.label
+            ? eventTypeOptions.find((o) => o.value === eventType)?.label
             : undefined
           const status = (event.resource as any)?.status as string | undefined
+          const isPickup = eventType === 'pickup'
           const color = status === "confirmed"
             ? "#16a34a" // green-600
             : status === "cancelled"
@@ -76,9 +101,16 @@ export const ChefEventCalendar = ({ onCreateEvent }: ChefEventCalendarProps) => 
           return (
             <div className="flex items-start gap-1">
               <span className="mt-[6px] inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
-              <div className="min-w-0 leading-tight">
-                <div className="truncate text-xs text-[var(--fg-base)]">{event.title}</div>
-                {typeLabel && (
+              <div className="min-w-0 leading-tight flex-1">
+                <div className="flex items-center gap-1">
+                  <span className="truncate text-xs text-[var(--fg-base)]">{event.title}</span>
+                  {isPickup && (
+                    <span className="inline-flex items-center px-1 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800 flex-shrink-0">
+                      Pickup
+                    </span>
+                  )}
+                </div>
+                {typeLabel && !isPickup && (
                   <div className="truncate text-[11px] text-[var(--fg-muted)]">{typeLabel}</div>
                 )}
               </div>

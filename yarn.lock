@@ -13394,6 +13394,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-email/render@npm:^1.1.2":
+  version: 1.4.0
+  resolution: "@react-email/render@npm:1.4.0"
+  dependencies:
+    html-to-text: "npm:^9.0.5"
+    prettier: "npm:^3.5.3"
+    react-promise-suspense: "npm:^0.3.4"
+  peerDependencies:
+    react: ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^18.0 || ^19.0 || ^19.0.0-rc
+  checksum: 10c0/9c4572daa621d463e4095d79f5788148d906dd5df4f97422a99bf76a444a260faa7ec823ff1589183fe54edafbde2f9c4fa3b65576d6d1beffd19dec8b431d77
+  languageName: node
+  linkType: hard
+
 "@react-email/row@npm:0.0.12":
   version: 0.0.12
   resolution: "@react-email/row@npm:0.0.12"
@@ -27772,6 +27786,7 @@ __metadata:
     "@opentelemetry/semantic-conventions": "npm:^1.37.0"
     "@react-email/components": "npm:^0.3.2"
     "@react-email/preview-server": "npm:4.2.4"
+    "@react-email/render": "npm:^1.1.2"
     "@sentry/node": "npm:^10.11.0"
     "@sentry/opentelemetry-node": "npm:7.114.0"
     "@stdlib/number-float64-base-normalize": "npm:0.0.8"

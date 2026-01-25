@@ -12,7 +12,8 @@ export const Hero: FC<{
   className?: string;
   backgroundClassName?: string;
   actionsClassName?: string;
-}> = ({ title, content, actions, image, className, backgroundClassName, actionsClassName }) => {
+  textClassName?: string;
+}> = ({ title, content, actions, image, className, backgroundClassName, actionsClassName, textClassName }) => {
   return (
     <>
       {image?.url && <link rel="preload" href={image?.url} as="image" />}
@@ -26,7 +27,7 @@ export const Hero: FC<{
             backgroundImage: `url(${image?.url})`,
           }}
         />
-        <div className="overflow-hidden z-10 w-full text-white">
+        <div className={clsx('overflow-hidden z-10 w-full', textClassName ?? 'text-white')}>
           <div className="inline-grid gap-6 w-full">
             {title && <div className="break-words">{title}</div>}
             {typeof content === 'string' ? <div className="text-lg w-full">{content}</div> : content}

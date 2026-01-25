@@ -4,7 +4,6 @@ import type {
   StoreCreateChefEventDTO,
   StoreChefEventResponse,
   ChefEventError,
-  PRICING_STRUCTURE,
 } from '@libs/util/server/data/chef-events.server';
 
 // Re-export for external use
@@ -15,12 +14,9 @@ export type {
   ChefEventError,
 };
 
-// Export pricing structure
-export { PRICING_STRUCTURE } from '@libs/util/server/data/chef-events.server';
-
 // Event type information for UI display
 export interface EventTypeInfo {
-  id: keyof typeof PRICING_STRUCTURE;
+  id: string;
   name: string;
   description: string;
   price: number;
@@ -66,7 +62,7 @@ export interface StepValidation {
 export interface EventTypeCardProps {
   eventType: EventTypeInfo;
   selected?: boolean;
-  onSelect?: (eventType: keyof typeof PRICING_STRUCTURE) => void;
+  onSelect?: (eventType: string) => void;
   partySize?: number;
   showPricing?: boolean;
 }
@@ -87,7 +83,7 @@ export interface PartySizeSelectorProps {
   onChange?: (size: number) => void;
   min?: number;
   max?: number;
-  eventType?: keyof typeof PRICING_STRUCTURE;
+  eventType?: string;
   showPricing?: boolean;
 }
 
@@ -136,7 +132,7 @@ export interface EventRequestSuccessProps {
 
 // Pricing calculation utilities
 export interface PricingBreakdown {
-  eventType: keyof typeof PRICING_STRUCTURE;
+  eventType: string;
   pricePerPerson: number;
   partySize: number;
   subtotal: number;

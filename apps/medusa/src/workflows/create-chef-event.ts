@@ -1,70 +1,81 @@
-import { 
-  createStep,
-  createWorkflow,
-  StepResponse,
-  WorkflowResponse
-} from "@medusajs/workflows-sdk"
-import { emitEventStep } from "@medusajs/medusa/core-flows"
-import { CHEF_EVENT_MODULE } from "../modules/chef-event"
+import { createStep, createWorkflow, StepResponse, WorkflowResponse } from '@medusajs/workflows-sdk';
+import { emitEventStep } from '@medusajs/medusa/core-flows';
+import { CHEF_EVENT_MODULE } from '../modules/chef-event';
 
 type CreateChefEventWorkflowInput = {
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
-  requestedDate: string
-  requestedTime: string
-  partySize: number
-  eventType: 'cooking_class' | 'plated_dinner' | 'buffet_style'
-  templateProductId?: string
-  locationType: 'customer_location' | 'chef_location'
-  locationAddress: string
-  firstName: string
-  lastName: string
-  email: string
-  phone?: string
-  notes?: string
-  totalPrice?: number
-  depositPaid?: boolean
-  specialRequirements?: string
-  estimatedDuration?: number
-}
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  requestedDate: string;
+  requestedTime: string;
+  partySize: number;
+  eventType: 'plated_dinner' | 'buffet_style' | 'pickup';
+  experience_type_id?: string | null;
+  templateProductId?: string;
+  selected_products?: Array<{ product_id: string; quantity: number }>;
+  pickup_time_slot?: string | null;
+  pickup_location?: string | null;
+  locationType: 'customer_location' | 'chef_location';
+  locationAddress: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  notes?: string;
+  totalPrice?: number;
+  depositPaid?: boolean;
+  specialRequirements?: string;
+  estimatedDuration?: number;
+};
 
 const createChefEventStep = createStep(
-  "create-chef-event-step",
+  'create-chef-event-step',
   async (input: CreateChefEventWorkflowInput, { container }: { container: any }) => {
-    const chefEventModuleService = container.resolve(CHEF_EVENT_MODULE)
-    
+    const chefEventModuleService = container.resolve(CHEF_EVENT_MODULE);
+
     // Provide default estimated duration based on event type if not provided
-    const defaultDurations = {
-      'cooking_class': 180, // 3 hours
-      'plated_dinner': 240, // 4 hours  
-      'buffet_style': 150   // 2.5 hours
-    }
-    
-    const chefEvent = await chefEventModuleService.createChefEvents({
+    const defaultDurations: Record<CreateChefEventWorkflowInput['eventType'], number> = {
+      plated_dinner: 240, // 4 hours
+      buffet_style: 150, // 2.5 hours
+      pickup: 60, // pickup window
+    };
+
+    const parsedDate = new Date(input.requestedDate);
+
+    // Build createData, omitting undefined/null templateProductId to avoid database constraint issues
+    const createData: any = {
       ...input,
-      requestedDate: new Date(input.requestedDate),
+      requestedDate: parsedDate,
       totalPrice: input.totalPrice || 0,
       depositPaid: input.depositPaid || false,
-      estimatedDuration: input.estimatedDuration || defaultDurations[input.eventType]
-    })
+      estimatedDuration: input.estimatedDuration || defaultDurations[input.eventType],
+    };
     
-    return new StepResponse(chefEvent)
-  }
-)
+    // Only include templateProductId if it has a value (not null/undefined/empty string)
+    // This prevents database constraint errors when the field is nullable but migration hasn't run yet
+    if (createData.templateProductId === undefined || createData.templateProductId === null || 
+        (typeof createData.templateProductId === 'string' && createData.templateProductId.trim() === '')) {
+      delete createData.templateProductId;
+    }
+
+    const chefEvent = await chefEventModuleService.createChefEvents(createData);
+
+    return new StepResponse(chefEvent);
+  },
+);
 
 export const createChefEventWorkflow = createWorkflow(
-  "create-chef-event-workflow",
+  'create-chef-event-workflow',
   function (input: CreateChefEventWorkflowInput) {
-    const chefEvent = createChefEventStep(input)
-    
+    const chefEvent = createChefEventStep(input);
+
     emitEventStep({
-      eventName: "chef-event.requested",
+      eventName: 'chef-event.requested',
       data: {
-        chefEventId: chefEvent.id
-      }
-    })
-    
+        chefEventId: chefEvent.id,
+      },
+    });
+
     return new WorkflowResponse({
-      chefEvent
-    })
-  }
-) 
+      chefEvent,
+    });
+  },
+);

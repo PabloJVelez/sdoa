@@ -6,8 +6,11 @@ export interface StoreChefEventDTO {
   requestedDate: string;
   requestedTime: string;
   partySize: number;
-  eventType: 'cooking_class' | 'plated_dinner' | 'buffet_style';
+  eventType: 'plated_dinner' | 'buffet_style' | 'pickup';
   templateProductId?: string;
+  selected_products?: Array<{ product_id: string; quantity: number }>;
+  pickup_time_slot?: string | null;
+  pickup_location?: string | null;
   locationType: 'customer_location' | 'chef_location';
   locationAddress: string;
   firstName: string;
@@ -25,8 +28,12 @@ export interface StoreCreateChefEventDTO {
   requestedDate: string;
   requestedTime: string;
   partySize: number;
-  eventType: 'cooking_class' | 'plated_dinner' | 'buffet_style';
+  eventType: 'plated_dinner' | 'buffet_style' | 'pickup';
   templateProductId?: string;
+  selected_products?: Array<{ product_id: string; quantity: number }>;
+  pickup_time_slot?: string | null;
+  pickup_location?: string | null;
+  experience_type_id?: string | null;
   locationType: 'customer_location' | 'chef_location';
   locationAddress: string;
   firstName: string;
@@ -51,22 +58,11 @@ export interface ChefEventError {
   }>;
 }
 
-// Import pricing structure from shared constants
-import { PRICING_STRUCTURE } from '@libs/constants/pricing';
-export { PRICING_STRUCTURE };
-
-// Calculate total price for an event
-export const calculateEventPrice = (
-  eventType: keyof typeof PRICING_STRUCTURE,
-  partySize: number
-): number => {
-  return PRICING_STRUCTURE[eventType] * partySize;
-};
+// Note: Pricing is now calculated using experience types from the API
+// See RequestSummary component for pricing calculation logic
 
 // Create a chef event request
-export const createChefEventRequest = async (
-  data: StoreCreateChefEventDTO
-): Promise<StoreChefEventResponse> => {
+export const createChefEventRequest = async (data: StoreCreateChefEventDTO): Promise<StoreChefEventResponse> => {
   try {
     const requestUrl = `${baseMedusaConfig.baseUrl}/store/chef-events`;
 
@@ -104,9 +100,9 @@ export const createChefEventRequest = async (
 
     // Wrap other errors
     throw new Error(
-      error instanceof Error 
+      error instanceof Error
         ? `Failed to create chef event request: ${error.message}`
-        : 'Failed to create chef event request: Unknown error'
+        : 'Failed to create chef event request: Unknown error',
     );
   }
 };
@@ -135,7 +131,7 @@ export const validateEventRequest = (data: StoreCreateChefEventDTO): string[] =>
     const eventDate = new Date(data.requestedDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     if (eventDate < today) {
       errors.push('Event date cannot be in the past');
     }
@@ -164,4 +160,4 @@ export const validateEventRequest = (data: StoreCreateChefEventDTO): string[] =>
   }
 
   return errors;
-}; 
+};
