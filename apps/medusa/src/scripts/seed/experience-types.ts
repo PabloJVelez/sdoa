@@ -17,6 +17,7 @@ export async function seedExperienceTypes({ container }: ExecArgs) {
       description: 'Fresh sushi and bento boxes ready for pickup.',
       short_description: 'Quick & convenient',
       icon: '🥡',
+      image_url: '/assets/images/book_sdoa_experience.jpg',
       highlights: [
         'Chef will review your requested pickup time',
         'If the exact time is unavailable, a close alternative will be suggested',
@@ -46,6 +47,7 @@ export async function seedExperienceTypes({ container }: ExecArgs) {
       description: 'Elegant omakase-style dining with multiple courses served individually.',
       short_description: 'Restaurant-quality at home',
       icon: '🍽️',
+      image_url: '/assets/images/meet_sdoa.jpg',
       highlights: [
         'Multi-course omakase menu',
         'Premium fish selection',
@@ -72,6 +74,7 @@ export async function seedExperienceTypes({ container }: ExecArgs) {
       description: 'A variety of sushi and Japanese dishes served buffet-style.',
       short_description: 'Perfect for groups',
       icon: '🥘',
+      image_url: '/assets/images/home_test.jpg',
       highlights: ['Sushi platters', 'Hot & cold dishes', 'Self-service style', 'Great for mingling'],
       ideal_for: 'Birthday parties, family gatherings, corporate events',
       pricing_type: 'per_person',

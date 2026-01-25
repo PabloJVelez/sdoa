@@ -18,14 +18,11 @@ import { getChefConfig } from '@libs/config/chef/chef-config';
 const chefConfig = getChefConfig();
 
 export const loader = async (_args: LoaderFunctionArgs) => {
-  let menus: any[] = [];
+  let menus: StoreMenuDTO[] = [];
   let experienceTypes: StoreExperienceType[] = [];
 
   try {
-    // Add timeout to prevent hanging requests
-    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Request timeout')), 10000));
-
-    const [menusPromise, experienceTypesPromise] = await Promise.all([
+    const [menusData, experienceTypesData] = await Promise.all([
       fetchMenus({ limit: 3 }),
       fetchExperienceTypes().catch((err) => {
         console.error('Failed to fetch experience types:', err);
@@ -33,42 +30,33 @@ export const loader = async (_args: LoaderFunctionArgs) => {
       }),
     ]);
 
-    const menusData: any = await Promise.race([menusPromise, timeoutPromise]);
-    experienceTypes = await Promise.race([experienceTypesPromise, timeoutPromise]);
+    experienceTypes = experienceTypesData ?? [];
 
     // Trim to a safe, serializable snapshot to avoid circular/BigInt/etc.
-    menus = (menusData?.menus ?? []).map((m: any) => {
-      const menu = {
+    menus = (menusData?.menus ?? []).map((m: StoreMenuDTO): StoreMenuDTO => {
+      return {
         id: String(m.id),
         name: String(m.name),
         thumbnail: m.thumbnail ?? null,
-        created_at: m.created_at ? new Date(m.created_at).toISOString() : null,
-        updated_at: m.updated_at ? new Date(m.updated_at).toISOString() : null,
-        // Include courses with dishes for MenuListItem component
+        created_at: m.created_at ? new Date(m.created_at).toISOString() : '',
+        updated_at: m.updated_at ? new Date(m.updated_at).toISOString() : '',
         courses: Array.isArray(m.courses)
-          ? m.courses.slice(0, 2).map((c: any) => ({
+          ? m.courses.slice(0, 2).map((c) => ({
               id: String(c.id),
               name: String(c.name),
               dishes: Array.isArray(c.dishes)
-                ? c.dishes.slice(0, 3).map((d: any) => ({
+                ? c.dishes.slice(0, 3).map((d) => ({
                     id: String(d.id),
                     name: String(d.name),
-                    description: d.description || '',
+                    description: d.description ?? '',
+                    ingredients: [],
                   }))
                 : [],
             }))
           : [],
         images: Array.isArray(m.images) ? m.images : [],
       };
-
-      // Debug log for first menu to understand structure
-      if (menus.length === 0) {
-      }
-
-      return menu;
     });
-
-    // Lightweight server log (shows up in server console)
   } catch (error: any) {
     // Log full server-side error details but don't fail the page
     console.error('Index loader failed to fetch menus:', {
@@ -78,6 +66,16 @@ export const loader = async (_args: LoaderFunctionArgs) => {
     });
 
     // Provide sample menu data as fallback for deployment
+    const fallbackDish = (
+      id: string,
+      name: string,
+      description: string,
+    ): StoreMenuDTO['courses'][number]['dishes'][number] => ({
+      id,
+      name,
+      description,
+      ingredients: [],
+    });
     menus = [
       {
         id: 'sample-menu-1',
@@ -90,16 +88,16 @@ export const loader = async (_args: LoaderFunctionArgs) => {
             id: 'course-1',
             name: 'Appetizer',
             dishes: [
-              { id: 'dish-1', name: 'French Onion Soup', description: 'Rich and savory' },
-              { id: 'dish-2', name: 'Escargot', description: 'Traditional preparation' },
+              fallbackDish('dish-1', 'French Onion Soup', 'Rich and savory'),
+              fallbackDish('dish-2', 'Escargot', 'Traditional preparation'),
             ],
           },
           {
             id: 'course-2',
             name: 'Main Course',
             dishes: [
-              { id: 'dish-3', name: 'Coq au Vin', description: 'Classic French dish' },
-              { id: 'dish-4', name: 'Beef Bourguignon', description: 'Slow-cooked perfection' },
+              fallbackDish('dish-3', 'Coq au Vin', 'Classic French dish'),
+              fallbackDish('dish-4', 'Beef Bourguignon', 'Slow-cooked perfection'),
             ],
           },
         ],
@@ -108,15 +106,7 @@ export const loader = async (_args: LoaderFunctionArgs) => {
     ];
   }
 
-  return data(
-    { menus, experienceTypes },
-    {
-      headers: {
-        // cheap way to confirm what the route delivered (visible in browser devtools)
-        'X-Index-Debug': `menus=${menus.length},experienceTypes=${experienceTypes.length}`,
-      },
-    },
-  );
+  return data({ menus, experienceTypes });
 };
 
 export const meta: MetaFunction<typeof loader> = () => {
@@ -164,16 +154,16 @@ export default function IndexRoute() {
       <Container className="py-12 lg:py-24">
         {/* Mobile: show section title above the image with subtle underline */}
         <div className="lg:hidden text-center mb-6 pt-4">
-          <h2 className="text-5xl font-italiana text-primary-900">Meet Your Chef</h2>
+          <h2 className="text-5xl font-italiana text-primary-900">The Face Behind SDOA</h2>
           <div className="w-16 mx-auto mt-3 border-t-2 border-blue-500" />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="relative order-1 lg:order-1">
             <Image
-              src="/assets/images/chef_experience.jpg"
+              src="/assets/images/meet_sdoa.jpg"
               loading="lazy"
-              alt="Professional chef preparing a culinary experience"
-              className="rounded-2xl shadow-lg w-full h-[500px] object-cover"
+              alt="The face behind Sushi Delivery of Austin"
+              className="rounded-2xl shadow-lg w-full h-[500px] object-cover object-top"
               height={500}
               width={600}
             />
@@ -183,24 +173,33 @@ export default function IndexRoute() {
           <div className="order-2 lg:order-2 text-center lg:text-left space-y-6">
             <div className="space-y-4">
               <h2 className="hidden lg:block text-5xl md:text-6xl lg:text-7xl font-italiana text-primary-900">
-                Meet Your Chef
+                The Face Behind SDOA
               </h2>
               <p className="text-2xl md:text-3xl lg:text-4xl font-italiana text-accent-600">
-                {chefConfig.bio.subtitle}
+                Passion, Precision & Fresh Fish
               </p>
             </div>
 
-            {/* Biography paragraphs */}
+            {/* About SDOA paragraphs */}
             <div className="space-y-4 text-primary-700">
-              {chefConfig.bio.long.map((paragraph, index) => (
-                <p key={index} className={index === 0 ? 'text-lg leading-relaxed' : 'text-base leading-relaxed'}>
-                  {paragraph}
-                </p>
-              ))}
+              <p className="text-lg leading-relaxed">
+                Sushi Delivery of Austin was born from a simple belief: that exceptional sushi shouldn't be confined to
+                restaurant walls. What started as a passion project has grown into Austin's premier private sushi
+                experience.
+              </p>
+              <p className="text-base leading-relaxed">
+                Every roll, every slice of sashimi, every bento box is crafted with the same meticulous attention to
+                detail you'd expect from a high-end omakase counter — but delivered directly to your home or prepared
+                fresh in your kitchen.
+              </p>
+              <p className="text-base leading-relaxed">
+                From intimate dinners for two to celebrations with friends and family, SDOA brings the artistry of
+                Japanese cuisine to your most meaningful moments.
+              </p>
             </div>
 
             <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-              {chefConfig.credentials.highlights.map((highlight, index) => (
+              {['Fresh Daily Ingredients', 'Austin-Based', 'Private Experiences'].map((highlight, index) => (
                 <div key={index} className="bg-accent-100 px-4 py-2 rounded-full">
                   <span className="text-sm font-medium text-accent-700">{highlight}</span>
                 </div>
@@ -253,8 +252,8 @@ export default function IndexRoute() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div className="relative order-1 lg:order-1">
             <Image
-              src="/assets/images/chef_book_experience.jpg"
-              alt="Guests enjoying a culinary experience"
+              src="/assets/images/book_sdoa_experience.jpg"
+              alt="Beautiful sushi platters ready for your event"
               className="rounded-2xl shadow-lg w-full h-[500px] object-cover lg:rounded-3xl lg:w-auto lg:h-auto"
               width={600}
               height={400}

@@ -39,7 +39,7 @@ export const seedBentoProducts = ({
       {
         title: 'Single',
         sku: 'BENTO-SALMON-SINGLE',
-        manage_inventory: true,
+        manage_inventory: false,
         options: {
           Portion: 'Single',
         },
@@ -73,7 +73,7 @@ export const seedBentoProducts = ({
       {
         title: 'Single',
         sku: 'BENTO-OMAKASE-SINGLE',
-        manage_inventory: true,
+        manage_inventory: false,
         options: {
           Portion: 'Single',
         },

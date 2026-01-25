@@ -28,12 +28,23 @@ interface ExperienceType {
 
 // Transform API data to component format
 const transformExperienceType = (et: StoreExperienceType): ExperienceType => {
+  // Helper to check if a URL is valid/usable
+  const isValidImageUrl = (url: string | null | undefined): url is string => {
+    if (!url || typeof url !== 'string') return false;
+    const trimmed = url.trim();
+    // Must be non-empty and either a local path or valid URL
+    return trimmed.length > 0 && (trimmed.startsWith('/') || trimmed.startsWith('http'));
+  };
+
+  const defaultImage = '/assets/images/plated_dinner.jpg';
+  const imageUrl = isValidImageUrl(et.image_url) ? et.image_url : isValidImageUrl(et.icon) ? et.icon : defaultImage;
+
   return {
     id: et.id,
     slug: et.slug,
     name: et.name,
     description: et.description || '',
-    icon: et.image_url || et.icon || '/assets/images/default-experience.jpg',
+    icon: imageUrl,
     idealFor: et.ideal_for || '',
     duration: et.duration_display || `${Math.round((et.duration_minutes || 0) / 60)} hours`,
     pricingType: et.pricing_type,
@@ -76,7 +87,7 @@ const ExperienceCard: FC<ExperienceCardProps> = ({ experience, className, featur
             width={400}
             height={128}
             className="w-full h-full object-cover"
-            fallbackSrc={['/assets/images/chef_experience.jpg', '/assets/images/chef_book_experience.jpg']}
+            fallbackSrc={['/assets/images/plated_dinner.jpg']}
           />
         </div>
 
@@ -169,7 +180,7 @@ const ExperienceAccordionItem: FC<ExperienceAccordionItemProps> = ({ experience,
                 width={200}
                 height={160}
                 className="w-full h-full object-cover"
-                fallbackSrc={['/assets/images/chef_experience.jpg', '/assets/images/chef_book_experience.jpg']}
+                fallbackSrc={['/assets/images/plated_dinner.jpg']}
               />
             </div>
 

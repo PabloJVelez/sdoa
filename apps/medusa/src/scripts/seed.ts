@@ -1,8 +1,5 @@
-import { createProductReviewResponsesWorkflow } from '@lambdacurry/medusa-product-reviews/workflows/create-product-review-responses';
-import { createProductReviewsWorkflow } from '@lambdacurry/medusa-product-reviews/workflows/create-product-reviews';
 import {
   createApiKeysWorkflow,
-  createOrderWorkflow,
   createProductCategoriesWorkflow,
   createProductTagsWorkflow,
   createProductsWorkflow,
@@ -25,9 +22,8 @@ import type {
   ISalesChannelModuleService,
   IStoreModuleService,
 } from '@medusajs/types';
-import { seedProducts } from './seed/products';
-import { generateReviewResponse, reviewContents, texasCustomers } from './seed/reviews';
-import { seedMenuProducts, seedMenuEntities } from './seed/menus';
+import { seedBentoProducts } from './seed/bento-products';
+import { seedSushiMenuProducts, seedSushiMenuEntities } from './seed/sushi-menus';
 import { seedExperienceTypes } from './seed/experience-types';
 
 export default async function seedDemoData({ container }: ExecArgs) {
@@ -134,7 +130,6 @@ export default async function seedDemoData({ container }: ExecArgs) {
       ],
     },
   });
-  // const europeanStockLocation = stockLocationResult[0];
   const americanStockLocation = stockLocationResult[0];
 
   await remoteLink.create([
@@ -205,16 +200,8 @@ export default async function seedDemoData({ container }: ExecArgs) {
     input: {
       collections: [
         {
-          title: 'Light Roasts',
-          handle: 'light-roasts',
-        },
-        {
-          title: 'Medium Roasts',
-          handle: 'medium-roasts',
-        },
-        {
-          title: 'Dark Roasts',
-          handle: 'dark-roasts',
+          title: 'Bento Boxes',
+          handle: 'bento-boxes',
         },
         {
           title: 'Chef Experiences',
@@ -395,11 +382,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
     input: {
       product_categories: [
         {
-          name: 'Blends',
-          is_active: true,
-        },
-        {
-          name: 'Single Origin',
+          name: 'Bento Boxes',
           is_active: true,
         },
         {
@@ -414,22 +397,16 @@ export default async function seedDemoData({ container }: ExecArgs) {
     input: {
       product_tags: [
         {
-          value: 'Ethiopia',
+          value: 'Sushi',
         },
         {
-          value: 'Colombia',
+          value: 'Omakase',
         },
         {
           value: 'Best Sellers',
         },
         {
-          value: 'Brazil',
-        },
-        {
-          value: 'Africa',
-        },
-        {
-          value: 'Latin America',
+          value: 'Premium',
         },
         {
           value: 'Chef Experience',
@@ -437,36 +414,45 @@ export default async function seedDemoData({ container }: ExecArgs) {
         {
           value: 'Limited Availability',
         },
+        {
+          value: 'Pickup',
+        },
+        {
+          value: 'Bento',
+        },
       ],
     },
   });
 
-  const { result: productResult } = await createProductsWorkflow(container).run({
+  // Seed bento products
+  logger.info('Seeding bento products...');
+  const bentoProductsInput = seedBentoProducts({
+    sales_channels: [{ id: defaultSalesChannel[0].id }],
+    shipping_profile_id: shippingProfile.id,
+  });
+
+  const { result: bentoProductResult } = await createProductsWorkflow(container).run({
     input: {
-      products: seedProducts({
-        collections: collectionsResult,
-        tags: productTagsResult,
-        categories: categoryResult,
-        sales_channels: [{ id: defaultSalesChannel[0].id }],
-        shipping_profile_id: shippingProfile.id,
-      }),
+      products: bentoProductsInput,
     },
   });
 
-  logger.info('Seeding menu data...');
+  logger.info(`Created ${bentoProductResult.length} bento products.`);
 
   logger.info('Seeding experience types...');
   const experienceTypes = await seedExperienceTypes({ container, args: [] });
   logger.info(`Created ${experienceTypes.length} experience types.`);
 
-  // Create menu entities first
-  const createdMenus = await seedMenuEntities(menuModuleService);
-  logger.info(`Created ${createdMenus.length} menus with courses, dishes, and ingredients.`);
+  // Create sushi menu entities first
+  logger.info('Seeding sushi menu entities...');
+  const createdMenus = await seedSushiMenuEntities(menuModuleService);
+  logger.info(`Created ${createdMenus.length} sushi menus with courses, dishes, and ingredients.`);
 
-  // Create products for chef experiences (menu tickets)
+  // Create products for chef experiences (sushi menu tickets)
+  logger.info('Seeding sushi menu experience products...');
   const { result: menuProductResult } = await createProductsWorkflow(container).run({
     input: {
-      products: seedMenuProducts({
+      products: seedSushiMenuProducts({
         collections: collectionsResult,
         tags: productTagsResult,
         categories: categoryResult,
@@ -501,96 +487,6 @@ export default async function seedDemoData({ container }: ExecArgs) {
   }
 
   logger.info('Finished seeding menu data.');
-
-  for (const product of productResult) {
-    const firstVariant = product.variants[0];
-
-    // Determine a random number of reviews between 5 and 10 for this product
-    const numReviews = Math.floor(Math.random() * 6) + 5; // Random number between 5 and 10
-
-    // Shuffle the customers array to get random customers for each product
-    const shuffledCustomers = [...texasCustomers].sort(() => 0.5 - Math.random());
-    const selectedCustomers = shuffledCustomers.slice(0, numReviews);
-
-    // Shuffle the review contents to get random reviews
-    const shuffledReviews = [...reviewContents].sort(() => 0.5 - Math.random());
-    const selectedReviews = shuffledReviews.slice(0, numReviews);
-
-    // Create multiple orders for each product with different customers
-    const orders = [];
-    for (const customer of selectedCustomers) {
-      const { result: order } = await createOrderWorkflow(container).run({
-        input: {
-          email: customer.email,
-          shipping_address: {
-            first_name: customer.first_name,
-            last_name: customer.last_name,
-            phone: customer.phone,
-            city: customer.city,
-            country_code: 'US',
-            province: 'TX',
-            address_1: customer.address_1,
-            postal_code: customer.postal_code,
-          },
-          items: [
-            {
-              variant_id: firstVariant.id,
-              product_id: product.id,
-              quantity: 1,
-              title: product.title,
-              thumbnail: product.thumbnail ?? undefined,
-              unit_price: 18.0,
-            },
-          ],
-          transactions: [
-            {
-              amount: 18.0,
-              currency_code: 'usd',
-            },
-          ],
-          region_id: usRegion.id,
-          sales_channel_id: defaultSalesChannel[0].id,
-        },
-      });
-
-      orders.push(order);
-    }
-
-    // Create product reviews for each order
-    const productReviews = [];
-    for (let i = 0; i < orders.length; i++) {
-      const order = orders[i];
-      const customer = selectedCustomers[i];
-      const review = selectedReviews[i];
-
-      productReviews.push({
-        product_id: product.id,
-        order_id: order.id,
-        order_line_item_id: order.items?.[0]?.id,
-        rating: review.rating,
-        content: review.content,
-        first_name: customer.first_name,
-        name: `${customer.first_name} ${customer.last_name}`,
-        email: customer.email,
-        images: review.images,
-      });
-    }
-
-    const { result: productReviewsResult } = await createProductReviewsWorkflow(container).run({
-      input: {
-        productReviews: productReviews,
-      },
-    });
-
-    await createProductReviewResponsesWorkflow(container).run({
-      input: {
-        responses: productReviewsResult.map((review) => ({
-          product_review_id: review.id,
-          content: generateReviewResponse(review),
-        })),
-      },
-    });
-  }
 
   logger.info('Finished seeding product data.');
   logger.info(`PUBLISHABLE API KEY: ${publishableApiKey.token}`);
