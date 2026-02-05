@@ -1,4 +1,5 @@
 import { cachified } from '@epic-web/cachified';
+import { MILLIS } from '../cache-builder.server';
 import { sdkCache, baseMedusaConfig } from '../client.server';
 
 export interface StoreIngredientDTO {
@@ -96,7 +97,8 @@ export const fetchMenus = async ({
   return cachified({
     key: cacheKey,
     cache: sdkCache,
-    ttl: 1000 * 60 * 30,
+    staleWhileRevalidate: MILLIS.ONE_HOUR,
+    ttl: MILLIS.TEN_SECONDS,
     getFreshValue: fetcher,
   });
 };
@@ -131,7 +133,8 @@ export const fetchMenuById = async (id: string, bypassCache = process.env.NODE_E
   return cachified({
     key: cacheKey,
     cache: sdkCache,
-    ttl: 1000 * 60 * 30,
+    staleWhileRevalidate: MILLIS.ONE_HOUR,
+    ttl: MILLIS.TEN_SECONDS,
     getFreshValue: fetcher,
   });
 };
