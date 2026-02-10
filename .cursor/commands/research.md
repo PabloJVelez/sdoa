@@ -1,0 +1,1 @@
+../../.devagent/core/commands/research.md

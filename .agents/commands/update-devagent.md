@@ -1,0 +1,1 @@
+../../.cursor/commands/update-devagent.md

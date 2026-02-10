@@ -1,0 +1,1 @@
+../../.cursor/commands/clarify-task.md

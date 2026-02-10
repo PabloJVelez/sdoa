@@ -1,0 +1,1 @@
+../../.cursor/commands/update-product-mission.md

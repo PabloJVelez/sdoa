@@ -1,0 +1,1 @@
+../../.cursor/commands/new-worktree.md

@@ -1,0 +1,1 @@
+../../.cursor/commands/compare-prs.md
