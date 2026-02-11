@@ -1,0 +1,1 @@
+../../.devagent/core/commands/update-constitution.md

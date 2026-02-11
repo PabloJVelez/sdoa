@@ -1,0 +1,1 @@
+../../.cursor/commands/verify-plugins.md

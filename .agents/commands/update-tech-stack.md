@@ -1,0 +1,1 @@
+../../.cursor/commands/update-tech-stack.md

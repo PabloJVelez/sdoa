@@ -1,0 +1,1 @@
+../../.devagent/core/commands/review-pr.md
