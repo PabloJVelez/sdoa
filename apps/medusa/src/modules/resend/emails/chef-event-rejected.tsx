@@ -14,7 +14,7 @@ import {
   Button,
 } from "@react-email/components"
 
-type ChefEventRejectedEmailProps = {
+export type ChefEventRejectedEmailProps = {
   customer: {
     first_name: string
     last_name: string
@@ -248,4 +248,37 @@ function ChefEventRejectedEmailComponent({
 
 export const chefEventRejectedEmail = (props: ChefEventRejectedEmailProps) => (
   <ChefEventRejectedEmailComponent {...props} />
-) 
+)
+
+ChefEventRejectedEmailComponent.PreviewProps = {
+  customer: {
+    first_name: "Jordan",
+    last_name: "Smith",
+    email: "jordan.smith@example.com",
+    phone: "(555) 123-4567",
+  },
+  booking: {
+    date: "Saturday, March 22, 2025",
+    time: "6:00 PM",
+    menu: "Chef's Tasting Menu",
+    event_type: "Dinner Party",
+    location_type: "Private Residence",
+    location_address: "456 Elm St, Austin, TX 78701",
+    party_size: 8,
+    notes: "Outdoor seating preferred.",
+  },
+  rejection: {
+    reason: "Schedule conflict",
+    chefNotes: "Unfortunately I have another commitment that weekend. I'd love to work with you on a different date.",
+  },
+  chef: {
+    name: "Chef Luis Velez",
+    email: "chef@example.com",
+    phone: "(555) 987-6543",
+  },
+  requestReference: "CE-2025-001",
+  rejectionDate: "March 1, 2025",
+  emailType: "customer_rejection",
+} as ChefEventRejectedEmailProps
+
+export default ChefEventRejectedEmailComponent 

@@ -13,7 +13,7 @@ import {
   Button,
 } from "@react-email/components"
 
-type EventDetailsResendEmailProps = {
+export type EventDetailsResendEmailProps = {
   customer: {
     first_name: string
     last_name: string
@@ -251,3 +251,41 @@ function EventDetailsResendEmailComponent({
 export const eventDetailsResendEmail = (props: EventDetailsResendEmailProps) => (
   <EventDetailsResendEmailComponent {...props} />
 )
+
+EventDetailsResendEmailComponent.PreviewProps = {
+  customer: {
+    first_name: "Jordan",
+    last_name: "Smith",
+    email: "jordan.smith@example.com",
+    phone: "(555) 123-4567",
+  },
+  booking: {
+    date: "Saturday, March 22, 2025",
+    time: "6:00 PM",
+    event_type: "Dinner Party",
+    location_type: "Private Residence",
+    location_address: "456 Elm St, Austin, TX 78701",
+    party_size: 8,
+    notes: "Outdoor seating preferred.",
+  },
+  event: {
+    status: "confirmed",
+    total_price: "1200.00",
+    price_per_person: "150.00",
+  },
+  product: {
+    id: "prod_01",
+    handle: "dinner-party-experience",
+    title: "Private Dinner Party Experience",
+    purchase_url: "https://example.com/products/dinner-party-experience",
+  },
+  chef: {
+    name: "Chef Luis Velez",
+    email: "chef@example.com",
+    phone: "(555) 987-6543",
+  },
+  requestReference: "CE-2025-001",
+  emailType: "event_details_resend",
+} as EventDetailsResendEmailProps
+
+export default EventDetailsResendEmailComponent
