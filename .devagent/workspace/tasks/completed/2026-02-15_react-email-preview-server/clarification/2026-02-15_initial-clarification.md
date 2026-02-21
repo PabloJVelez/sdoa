@@ -5,7 +5,7 @@
 - Date: 2026-02-15
 - Mode: Task Clarification
 - Status: Complete
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-02-15_react-email-preview-server/`
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-02-15_react-email-preview-server/`
 - Notes: Research already completed; reference project (medusa2-chefV) confirmed single-directory approach. Clarification session filling remaining gaps for plan readiness.
 
 ## Task Overview

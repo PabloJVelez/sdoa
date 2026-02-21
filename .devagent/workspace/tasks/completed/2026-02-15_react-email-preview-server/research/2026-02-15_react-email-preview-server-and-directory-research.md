@@ -3,8 +3,8 @@
 - Mode: Task
 - Requested By: PabloJVelez
 - Last Updated: 2026-02-15
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-02-15_react-email-preview-server/`
-- Storage Path: `.devagent/workspace/tasks/active/2026-02-15_react-email-preview-server/research/2026-02-15_react-email-preview-server-and-directory-research.md`
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-02-15_react-email-preview-server/`
+- Storage Path: `.devagent/workspace/tasks/completed/2026-02-15_react-email-preview-server/research/2026-02-15_react-email-preview-server-and-directory-research.md`
 - Notes: Problem statement inferred from task AGENTS.md (no explicit input). Reference project (medusa2-chefV) was later confirmed by user: single directory, same path as this repo; implementation approach documented below. Implementation must be done via the task workflow (e.g. create-plan → implement-plan), not ad-hoc.
 
 ## Inferred Problem Statement

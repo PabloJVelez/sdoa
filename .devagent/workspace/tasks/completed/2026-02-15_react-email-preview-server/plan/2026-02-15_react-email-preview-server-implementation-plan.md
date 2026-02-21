@@ -3,7 +3,7 @@
 - Owner: PabloJVelez
 - Last Updated: 2026-02-15
 - Status: Draft
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-02-15_react-email-preview-server/`
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-02-15_react-email-preview-server/`
 - Stakeholders: PabloJVelez (Owner, Decision Maker)
 - Notes: Plan derived from research and clarification packets; implementation via implement-plan workflow.
 
