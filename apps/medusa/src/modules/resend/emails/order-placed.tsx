@@ -15,7 +15,7 @@ import {
 } from "@react-email/components"
 import { BigNumberValue, CustomerDTO, OrderDTO } from "@medusajs/framework/types"
 
-type OrderPlacedEmailProps = {
+export type OrderPlacedEmailProps = {
   order: OrderDTO & {
     customer: CustomerDTO
   }
@@ -166,4 +166,37 @@ function OrderPlacedEmailComponent({ order, email_banner }: OrderPlacedEmailProp
 
 export const orderPlacedEmail = (props: OrderPlacedEmailProps) => (
   <OrderPlacedEmailComponent {...props} />
-) 
+)
+
+OrderPlacedEmailComponent.PreviewProps = {
+  order: {
+    id: "order_01",
+    display_id: 1001,
+    currency_code: "usd",
+    customer: {
+      id: "cus_01",
+      email: "jordan.smith@example.com",
+      first_name: "Jordan",
+      last_name: "Smith",
+    },
+    shipping_address: {
+      first_name: "Jordan",
+      last_name: "Smith",
+    },
+    items: [
+      {
+        id: "item_01",
+        product_title: "Private Dinner Party Experience",
+        variant_title: "Standard",
+        thumbnail: "https://placehold.co/120x120",
+        total: 120000,
+      },
+    ],
+    item_total: 120000,
+    shipping_methods: [],
+    tax_total: 0,
+    total: 120000,
+  },
+} as unknown as OrderPlacedEmailProps
+
+export default OrderPlacedEmailComponent 

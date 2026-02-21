@@ -25,11 +25,13 @@ This project uses React Email for transactional emails (e.g. in `apps/medusa/src
 - [2026-02-15] Event: Research completed. Preview server requires `export default` per template (current templates use named exports only); `dev:email` script already correct. Research packet: research/2026-02-15_react-email-preview-server-and-directory-research.md.
 - [2026-02-15] Event: Clarification completed. Follow reference project (no file moves); include -p 3001 and dev:all with concurrently; done = preview works + Resend unchanged. Packet: clarification/2026-02-15_initial-clarification.md.
 - [2026-02-15] Event: Implementation plan created. Two tasks: (1) package.json scripts + concurrently, (2) five email templates with export type, PreviewProps, export default. Plan: plan/2026-02-15_react-email-preview-server-implementation-plan.md.
+- [2026-02-15] Event: Task 1 completed. Added dev:email -p 3001, dev:all with concurrently, and concurrently devDependency. File: apps/medusa/package.json.
+- [2026-02-15] Event: Task 2 completed. Added export type, PreviewProps, and export default to all five email templates (chef-event-accepted, chef-event-rejected, chef-event-requested, event-details-resend, order-placed); named exports unchanged. Files: apps/medusa/src/modules/resend/emails/*.tsx. Note: yarn typecheck still reports pre-existing errors in admin modules (root.tsx, chef-event-form, EmailManagementSection); no errors in modified email files.
 
 ## Implementation Checklist
 - [x] Research: Identify preview-server setup and email directory structure in branched-from project (scripts, config, entry points, folder layout).
 - [x] Plan: Define steps per clarification (export type + PreviewProps + default in each template; dev:email -p 3001; dev:all + concurrently).
-- [ ] Implement: Execute tasks from plan (Task 1: package.json; Task 2: five email templates). See plan/2026-02-15_react-email-preview-server-implementation-plan.md.
+- [x] Implement: Execute tasks from plan (Task 1: package.json; Task 2: five email templates). See plan/2026-02-15_react-email-preview-server-implementation-plan.md.
 
 ## Open Questions
 - (None yet.)

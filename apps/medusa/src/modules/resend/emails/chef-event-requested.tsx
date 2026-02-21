@@ -14,7 +14,7 @@ import {
   Button,
 } from "@react-email/components"
 
-type ChefEventRequestedEmailProps = {
+export type ChefEventRequestedEmailProps = {
   customer: {
     first_name: string
     last_name: string
@@ -277,4 +277,36 @@ function ChefEventRequestedEmailComponent({
 
 export const chefEventRequestedEmail = (props: ChefEventRequestedEmailProps) => (
   <ChefEventRequestedEmailComponent {...props} />
-) 
+)
+
+ChefEventRequestedEmailComponent.PreviewProps = {
+  customer: {
+    first_name: "Jordan",
+    last_name: "Smith",
+    email: "jordan.smith@example.com",
+    phone: "(555) 123-4567",
+  },
+  booking: {
+    date: "Saturday, March 22, 2025",
+    time: "6:00 PM",
+    menu: "Chef's Tasting Menu",
+    event_type: "Dinner Party",
+    location_type: "Private Residence",
+    location_address: "456 Elm St, Austin, TX 78701",
+    party_size: 8,
+    notes: "Outdoor seating preferred.",
+  },
+  event: {
+    status: "pending",
+    total_price: "1200.00",
+    conflict: false,
+  },
+  requestReference: "CE-2025-001",
+  chefContact: {
+    email: "chef@example.com",
+    phone: "(555) 987-6543",
+  },
+  emailType: "customer_confirmation",
+} as ChefEventRequestedEmailProps
+
+export default ChefEventRequestedEmailComponent 
