@@ -8,7 +8,8 @@ import type {
   AdminChefEventsResponse,
   AdminAcceptChefEventDTO,
   AdminRejectChefEventDTO,
-  AdminResendEventEmailDTO
+  AdminResendEventEmailDTO,
+  AdminSendReceiptDTO
 } from '../../sdk/admin/admin-chef-events'
 
 const QUERY_KEY = ['chef-events']
@@ -105,6 +106,22 @@ export const useAdminResendEventEmailMutation = () => {
       return await sdk.admin.chefEvents.resendEmail(chefEventId, data)
     },
     onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY })
+      queryClient.invalidateQueries({ queryKey: [...QUERY_KEY, variables.chefEventId] })
+    },
+  })
+}
+
+/**
+ * Hook for sending receipt email to host with optional tip
+ */
+export const useAdminSendReceiptMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ chefEventId, ...data }: { chefEventId: string } & AdminSendReceiptDTO) => {
+      return await sdk.admin.chefEvents.sendReceipt(chefEventId, data)
+    },
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
       queryClient.invalidateQueries({ queryKey: [...QUERY_KEY, variables.chefEventId] })
     },
