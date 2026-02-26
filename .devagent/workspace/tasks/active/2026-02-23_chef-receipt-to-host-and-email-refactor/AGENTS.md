@@ -23,12 +23,23 @@ This project contains emails that get sent out during the event flow; the emails
 - [2026-02-23] Event: Task hub created. Scope: add chef-send-receipt-to-host feature (with optional tip) and refactor existing event emails to receipt-style display; reference plan, research, and clarification from medusa2-chefV attached in task request.
 - [2026-02-23] Event: Clarification completed. Scope: all five existing emails + new receipt use receipt-style layout (reference ReceiptEmailComponent: header, Bill To/meta, line items, totals, thank-you, footer). Order: receipt feature first, then refactor. Assume parity with medusa2-chefV. Packet: `clarification/2026-02-23_initial-clarification.md`.
 - [2026-02-23] Event: Implementation plan created. Eleven tasks: 1 model+migration (tip fields), 2 GET availableTickets, 3 send-receipt workflow, 4 receipt subscriber, 5 receipt template, 6 send-receipt API route, 7 SDK+hook, 8 Resend registration, 9 admin UI (button+tip modal), 10 shared receipt layout/styles, 11 refactor five emails. Plan: `plan/2026-02-23_chef-receipt-and-email-refactor-implementation-plan.md`.
+- [2026-02-23] Event: Task 1 completed: added tipAmount/tipMethod to chef event model, `Migration20260223120000_add_tip_fields.ts`, and AdminChefEventDTO. `apps/medusa/src/modules/chef-event/models/chef-event.ts`, `apps/medusa/src/modules/chef-event/migrations/`, `apps/medusa/src/sdk/admin/admin-chef-events.ts`.
+- [2026-02-23] Event: Task 2 completed: GET admin/chef-events/[id] returns availableTickets when productId set (inventory sum stocked − reserved). `apps/medusa/src/api/admin/chef-events/[id]/route.ts`, SDK DTO.
+- [2026-02-23] Event: Task 3 completed: send-receipt workflow (update emailHistory + tip, emit chef-event.receipt). `apps/medusa/src/workflows/send-receipt.ts`.
+- [2026-02-23] Event: Task 4 completed: receipt subscriber chef-event.receipt, builds payload, sends via notification template receipt. `apps/medusa/src/subscribers/chef-event-receipt.ts`.
+- [2026-02-23] Event: Task 5 completed: receipt email template (ReceiptEmailProps, layout, gratuity line). `apps/medusa/src/modules/resend/emails/receipt.tsx`.
+- [2026-02-23] Event: Task 6 completed: POST admin/chef-events/[id]/send-receipt with validation (tip amount/method). `apps/medusa/src/api/admin/chef-events/[id]/send-receipt/route.ts`.
+- [2026-02-23] Event: Task 7 completed: AdminSendReceiptDTO, sendReceipt(id, data), useAdminSendReceiptMutation. `apps/medusa/src/sdk/admin/admin-chef-events.ts`, `apps/medusa/src/admin/hooks/chef-events.ts`.
+- [2026-02-23] Event: Task 8 completed: RECEIPT template and getTemplateSubject in Resend service. `apps/medusa/src/modules/resend/service.ts`.
+- [2026-02-23] Event: Task 9 completed: Send Receipt button and tip modal on chef event detail (hasEventTakenPlace || availableTickets === 0, warning if receipt already sent). `apps/medusa/src/admin/routes/chef-events/[id]/page.tsx`.
+- [2026-02-23] Event: Task 10 completed: receipt-styles.ts and ReceiptLayout in receipt-layout.tsx; receipt.tsx refactored to use them. `apps/medusa/src/modules/resend/emails/receipt-styles.ts`, `receipt-layout.tsx`, `receipt.tsx`.
+- [2026-02-23] Event: Task 11 completed: chef-event-accepted, chef-event-rejected, chef-event-requested, event-details-resend, order-placed refactored to ReceiptLayout and receipt-styles. `apps/medusa/src/modules/resend/emails/*.tsx`.
 
 ## Implementation Checklist
 - [ ] Research: Confirm payment-reminder and chef-event patterns in this codebase (API route, workflow, subscriber, emails, admin UI).
 - [ ] Research: Inventory existing emails in `apps/medusa/src/modules/resend/emails` and identify refactor scope for receipt-style layout.
 - [x] Plan: Create implementation plan (tip fields on chef event, send-receipt workflow, subscriber, receipt template, API route, SDK/hooks, admin UI, template registration; plus email refactor tasks).
-- [ ] Implement: Execute plan tasks in sequence (Tasks 1–9 receipt feature, then 10–11 email refactor). See `plan/2026-02-23_chef-receipt-and-email-refactor-implementation-plan.md`.
+- [x] Implement: Execute plan tasks in sequence (Tasks 1–9 receipt feature, then 10–11 email refactor). See `plan/2026-02-23_chef-receipt-and-email-refactor-implementation-plan.md`.
 - [ ] Test: Verify receipt send with/without tip, button enablement, email history; verify refactored emails render correctly.
 
 ## Open Questions
@@ -43,5 +54,5 @@ This project contains emails that get sent out during the event flow; the emails
 - Product/memory: No matching files in `.devagent/workspace/product/` or `.devagent/workspace/memory/` as of 2026-02-23.
 
 ## Next Steps
-- **Implement:** Execute tasks 1–11 from `plan/2026-02-23_chef-receipt-and-email-refactor-implementation-plan.md` in order; track progress in this AGENTS.md.
+- **Test:** Verify receipt send with/without tip, button enablement, email history; verify refactored emails render in preview and in existing flows.
 - **Review plan:** Share plan with stakeholders if needed; adjust tasks only if scope or assumptions change.

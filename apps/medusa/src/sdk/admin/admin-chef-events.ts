@@ -41,6 +41,9 @@ export interface AdminChefEventDTO {
   }>
   lastEmailSentAt?: Date
   customEmailRecipients?: string[]
+  tipAmount?: number | null
+  tipMethod?: string | null
+  availableTickets?: number
   createdAt: Date
   updatedAt: Date
 }
@@ -131,6 +134,13 @@ export interface AdminResendEventEmailDTO {
   recipients: string[]
   notes?: string
   emailType?: "event_details_resend" | "custom_message"
+}
+
+export interface AdminSendReceiptDTO {
+  recipients?: string[]
+  notes?: string
+  tipAmount?: number
+  tipMethod?: string
 }
 
 export class AdminChefEventsResource {
@@ -241,6 +251,23 @@ export class AdminChefEventsResource {
       method: 'POST',
       body: data,
     })
+    return response
+  }
+
+  /**
+   * Send receipt email to host (and optional recipients) with optional tip
+   * @param id - Chef event ID
+   * @param data - Receipt payload (recipients, notes, tipAmount, tipMethod)
+   * @returns Send receipt result
+   */
+  async sendReceipt(id: string, data: AdminSendReceiptDTO = {}) {
+    const response = await this.client.fetch<{ success: boolean; data: any }>(
+      `/admin/chef-events/${id}/send-receipt`,
+      {
+        method: 'POST',
+        body: data,
+      }
+    )
     return response
   }
 
