@@ -4,8 +4,8 @@ import {
   Row,
   Section,
 } from "@react-email/components"
-import { ReceiptLayout } from "./receipt-layout"
-import { receiptStyles } from "./receipt-styles"
+import { TransactionalEmailLayout } from "./layout"
+import { layoutStyles } from "./layout-styles"
 
 export type ReceiptEmailProps = {
   customer: {
@@ -82,20 +82,20 @@ function ReceiptEmailComponent({
 
   const billToContent = (
     <>
-      <Text style={receiptStyles.billToLabel}>BILL TO</Text>
-      <Text style={receiptStyles.billToText}>
+      <Text style={layoutStyles.billToLabel}>BILL TO</Text>
+      <Text style={layoutStyles.billToText}>
         {customer.first_name} {customer.last_name}
       </Text>
-      <Text style={{ ...receiptStyles.metaText, margin: "0.25rem 0 0 0" }}>{customer.email}</Text>
-      <Text style={{ ...receiptStyles.metaText, margin: "0.25rem 0 0 0" }}>{customer.phone}</Text>
+      <Text style={{ ...layoutStyles.metaText, margin: "0.25rem 0 0 0" }}>{customer.email}</Text>
+      <Text style={{ ...layoutStyles.metaText, margin: "0.25rem 0 0 0" }}>{customer.phone}</Text>
     </>
   )
 
   const metaContent = (
     <>
-      <Text style={receiptStyles.metaText}>Receipt # {requestReference}</Text>
-      <Text style={receiptStyles.metaText}>Date: {receiptDateFormatted}</Text>
-      <Text style={{ ...receiptStyles.metaText, margin: 0 }}>
+      <Text style={layoutStyles.metaText}>Receipt # {requestReference}</Text>
+      <Text style={layoutStyles.metaText}>Date: {receiptDateFormatted}</Text>
+      <Text style={{ ...layoutStyles.metaText, margin: 0 }}>
         Status: {event.status?.toUpperCase() ?? "PAID"}
       </Text>
     </>
@@ -107,32 +107,32 @@ function ReceiptEmailComponent({
 
   const bodyContent = (
     <>
-      <Section style={receiptStyles.lineItemsSection}>
+      <Section style={layoutStyles.lineItemsSection}>
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>
+            <Text style={layoutStyles.lineItemDescription}>
               {product.title} — {booking.event_type}
             </Text>
-            <Text style={receiptStyles.lineItemSubtext}>
+            <Text style={layoutStyles.lineItemSubtext}>
               {booking.date} at {booking.time} · {booking.party_size}{" "}
               {booking.party_size === 1 ? "ticket" : "tickets"}
             </Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>
+            <Text style={layoutStyles.lineItemDescription}>
               {formatCurrency(totalPurchasedPrice)}
             </Text>
           </Column>
         </Row>
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>
+            <Text style={layoutStyles.lineItemDescription}>
               {purchasedTickets} {purchasedTickets === 1 ? "ticket" : "tickets"} @{" "}
               {event.price_per_person} per person
             </Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>
+            <Text style={layoutStyles.lineItemDescription}>
               {formatCurrency(totalPurchasedPrice)}
             </Text>
           </Column>
@@ -140,12 +140,12 @@ function ReceiptEmailComponent({
         {showGratuity && (
           <Row style={{ marginTop: "0.5rem" }}>
             <Column style={{ width: "70%" }}>
-              <Text style={receiptStyles.lineItemDescription}>
+              <Text style={layoutStyles.lineItemDescription}>
                 Gratuity {tipMethod ? `(${tipMethod})` : ""}
               </Text>
             </Column>
             <Column align="right" style={{ width: "30%" }}>
-              <Text style={receiptStyles.lineItemDescription}>
+              <Text style={layoutStyles.lineItemDescription}>
                 {formatCurrency(tipAmount!)}
               </Text>
             </Column>
@@ -153,13 +153,13 @@ function ReceiptEmailComponent({
         )}
       </Section>
 
-      <Section style={receiptStyles.totalsSection}>
+      <Section style={layoutStyles.totalsSection}>
         <Row>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.metaText}>Subtotal</Text>
+            <Text style={layoutStyles.metaText}>Subtotal</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>
+            <Text style={layoutStyles.lineItemDescription}>
               {formatCurrency(totalPurchasedPrice)}
             </Text>
           </Column>
@@ -167,21 +167,21 @@ function ReceiptEmailComponent({
         {showGratuity && (
           <Row style={{ marginTop: "0.25rem" }}>
             <Column style={{ width: "70%" }}>
-              <Text style={receiptStyles.metaText}>Gratuity</Text>
+              <Text style={layoutStyles.metaText}>Gratuity</Text>
             </Column>
             <Column align="right" style={{ width: "30%" }}>
-              <Text style={receiptStyles.lineItemDescription}>
+              <Text style={layoutStyles.lineItemDescription}>
                 {formatCurrency(tipAmount!)}
               </Text>
             </Column>
           </Row>
         )}
-        <Row style={receiptStyles.totalRow}>
+        <Row style={layoutStyles.totalRow}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.totalLabel}>Total</Text>
+            <Text style={layoutStyles.totalLabel}>Total</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.totalLabel}>
+            <Text style={layoutStyles.totalLabel}>
               {formatCurrency(totalWithTip)}
             </Text>
           </Column>
@@ -191,18 +191,18 @@ function ReceiptEmailComponent({
   )
 
   return (
-    <ReceiptLayout
+    <TransactionalEmailLayout
       preview={`Your receipt for ${product.title}`}
-      chefName={chef.name}
+      brandName={chef.name}
       headerLabel="RECEIPT"
       billToContent={billToContent}
       metaContent={metaContent}
       thankYouText="Thank you for your business."
       customNotes={customNotes}
-      chef={chef}
+      brandContact={chef}
     >
       {bodyContent}
-    </ReceiptLayout>
+    </TransactionalEmailLayout>
   )
 }
 
@@ -242,9 +242,9 @@ ReceiptEmailComponent.PreviewProps = {
   tipAmount: 150,
   tipMethod: "Cash",
   chef: {
-    name: "Chef Luis Velez",
-    email: "support@chefvelez.com",
-    phone: "(347) 695-4445",
+    name: "SDOA",
+    email: "support@sdoa.com",
+    phone: "",
   },
   requestReference: "CE-2025-001",
   receiptDate: "March 23, 2025",

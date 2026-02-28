@@ -1,7 +1,7 @@
 import { Text, Column, Row, Section, Img } from "@react-email/components"
 import { BigNumberValue, CustomerDTO, OrderDTO } from "@medusajs/framework/types"
-import { ReceiptLayout } from "./receipt-layout"
-import { receiptStyles } from "./receipt-styles"
+import { TransactionalEmailLayout } from "./layout"
+import { layoutStyles } from "./layout-styles"
 
 export type OrderPlacedEmailProps = {
   order: OrderDTO & {
@@ -14,10 +14,10 @@ export type OrderPlacedEmailProps = {
   }
 }
 
-const ORDER_FOOTER_CHEF = {
-  name: "Chef Luis Velez",
-  email: "support@chefvelez.com",
-  phone: "(347) 695-4445",
+const ORDER_FOOTER_BRAND = {
+  name: "SDOA",
+  email: "support@sdoa.com",
+  phone: "",
 }
 
 function OrderPlacedEmailComponent({ order }: OrderPlacedEmailProps) {
@@ -40,18 +40,18 @@ function OrderPlacedEmailComponent({ order }: OrderPlacedEmailProps) {
 
   const billToContent = (
     <>
-      <Text style={receiptStyles.billToLabel}>BILL TO</Text>
-      <Text style={receiptStyles.billToText}>{customerName}</Text>
+      <Text style={layoutStyles.billToLabel}>BILL TO</Text>
+      <Text style={layoutStyles.billToText}>{customerName}</Text>
       {customerEmail && (
-        <Text style={{ ...receiptStyles.metaText, margin: "0.25rem 0 0 0" }}>{customerEmail}</Text>
+        <Text style={{ ...layoutStyles.metaText, margin: "0.25rem 0 0 0" }}>{customerEmail}</Text>
       )}
     </>
   )
 
   const metaContent = (
     <>
-      <Text style={receiptStyles.metaText}>Order # {order.display_id}</Text>
-      <Text style={{ ...receiptStyles.metaText, margin: 0 }}>
+      <Text style={layoutStyles.metaText}>Order # {order.display_id}</Text>
+      <Text style={{ ...layoutStyles.metaText, margin: 0 }}>
         Status: CONFIRMED
       </Text>
     </>
@@ -59,17 +59,17 @@ function OrderPlacedEmailComponent({ order }: OrderPlacedEmailProps) {
 
   const bodyContent = (
     <>
-      <Section style={receiptStyles.lineItemsSection}>
+      <Section style={layoutStyles.lineItemsSection}>
         {order.items?.map((item) => (
           <Row key={item.id} style={{ marginBottom: "0.5rem" }}>
             <Column style={{ width: "70%" }}>
-              <Text style={receiptStyles.lineItemDescription}>
+              <Text style={layoutStyles.lineItemDescription}>
                 {item.product_title}
                 {item.variant_title ? ` — ${item.variant_title}` : ""}
               </Text>
             </Column>
             <Column align="right" style={{ width: "30%" }}>
-              <Text style={receiptStyles.lineItemDescription}>
+              <Text style={layoutStyles.lineItemDescription}>
                 {formatPrice(item.total)}
               </Text>
             </Column>
@@ -77,13 +77,13 @@ function OrderPlacedEmailComponent({ order }: OrderPlacedEmailProps) {
         ))}
       </Section>
 
-      <Section style={receiptStyles.totalsSection}>
+      <Section style={layoutStyles.totalsSection}>
         <Row>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.metaText}>Subtotal</Text>
+            <Text style={layoutStyles.metaText}>Subtotal</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>
+            <Text style={layoutStyles.lineItemDescription}>
               {formatPrice(order.item_total)}
             </Text>
           </Column>
@@ -91,10 +91,10 @@ function OrderPlacedEmailComponent({ order }: OrderPlacedEmailProps) {
         {order.shipping_methods?.map((method) => (
           <Row style={{ marginTop: "0.25rem" }} key={method.id}>
             <Column style={{ width: "70%" }}>
-              <Text style={receiptStyles.metaText}>{method.name}</Text>
+              <Text style={layoutStyles.metaText}>{method.name}</Text>
             </Column>
             <Column align="right" style={{ width: "30%" }}>
-              <Text style={receiptStyles.lineItemDescription}>
+              <Text style={layoutStyles.lineItemDescription}>
                 {formatPrice(method.total)}
               </Text>
             </Column>
@@ -102,20 +102,20 @@ function OrderPlacedEmailComponent({ order }: OrderPlacedEmailProps) {
         ))}
         <Row style={{ marginTop: "0.25rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.metaText}>Tax</Text>
+            <Text style={layoutStyles.metaText}>Tax</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>
+            <Text style={layoutStyles.lineItemDescription}>
               {formatPrice(order.tax_total || 0)}
             </Text>
           </Column>
         </Row>
-        <Row style={receiptStyles.totalRow}>
+        <Row style={layoutStyles.totalRow}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.totalLabel}>Total</Text>
+            <Text style={layoutStyles.totalLabel}>Total</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.totalLabel}>{formatPrice(order.total)}</Text>
+            <Text style={layoutStyles.totalLabel}>{formatPrice(order.total)}</Text>
           </Column>
         </Row>
       </Section>
@@ -123,17 +123,17 @@ function OrderPlacedEmailComponent({ order }: OrderPlacedEmailProps) {
   )
 
   return (
-    <ReceiptLayout
+    <TransactionalEmailLayout
       preview={`Thank you for your order #${order.display_id}`}
-      chefName={ORDER_FOOTER_CHEF.name}
+      brandName={ORDER_FOOTER_BRAND.name}
       headerLabel="ORDER CONFIRMATION"
       billToContent={billToContent}
       metaContent={metaContent}
       thankYouText="Thank you for your order. We're processing it and will notify you when it ships."
-      chef={ORDER_FOOTER_CHEF}
+      brandContact={ORDER_FOOTER_BRAND}
     >
       {bodyContent}
-    </ReceiptLayout>
+    </TransactionalEmailLayout>
   )
 }
 

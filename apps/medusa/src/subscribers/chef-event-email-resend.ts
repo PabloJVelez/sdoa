@@ -90,9 +90,9 @@ export default async function chefEventEmailResendHandler({
         purchase_url: `${process.env.STOREFRONT_URL || 'http://localhost:3000'}/products/${product.handle}`
       } : null,
       chef: {
-        name: "Chef Luis Velez",
-        email: "support@chefvelez.com",
-        phone: "(347) 695-4445"
+        name: "SDOA",
+        email: "support@sdoa.com",
+        phone: ""
       },
       requestReference: chefEvent.id.slice(0, 8).toUpperCase(),
       customNotes: data.notes,

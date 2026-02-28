@@ -113,9 +113,9 @@ export default async function chefEventAcceptedHandler({
         purchase_url: `${process.env.STOREFRONT_URL}/products/${product.handle}`
       },
       chef: {
-        name: "Chef Luis Velez",
-        email: "support@chefvelez.com",
-        phone: "(347) 695-4445"
+        name: "SDOA",
+        email: "support@sdoa.com",
+        phone: ""
       }
     }
 
