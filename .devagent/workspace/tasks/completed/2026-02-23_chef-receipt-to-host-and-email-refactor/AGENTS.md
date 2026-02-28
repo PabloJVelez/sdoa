@@ -1,9 +1,9 @@
 # Enable Chef to Send Receipts to Host and Refactor Event Emails Progress Tracker
 
 - Owner: PabloJVelez
-- Last Updated: 2026-02-25
-- Status: Draft
-- Task Hub: `.devagent/workspace/tasks/active/2026-02-23_chef-receipt-to-host-and-email-refactor/`
+- Last Updated: 2026-02-28
+- Status: Complete
+- Task Hub: `.devagent/workspace/tasks/completed/2026-02-23_chef-receipt-to-host-and-email-refactor/`
 
 ## Summary
 This project contains emails that get sent out during the event flow; the emails live in `apps/medusa/src/modules/resend/emails`. The project stems from another chef project (medusa2-chefV), where the ability for the chef to send receipts from the admin was implemented, including optional tip amount (e.g. when the customer tips by cash and the host needs an emailed receipt for expense reimbursement). This task adds that same capability here: enable chefs to send receipt emails to hosts for chef events (with optional tip amount), and refactor the existing event-flow emails to be displayed more like the receipt—i.e. a consistent, receipt-style layout across event emails. Reference materials from the other project include a full implementation plan (chef send receipt to host, tip fields, workflow, subscriber, receipt template, API route, SDK/hooks, admin UI, Resend registration), research packet (payment-reminder pattern, button enablement, event date validation, email history), and clarification packet (receipt contents, tip storage in chef event model, tip UI, multiple receipts with warning). Implementation in this codebase should follow the same architectural pattern (API route → workflow → subscriber → email template → admin UI) and the attached plan, adapted for this repo and with the additional goal of refactoring existing emails to a receipt-like display.
@@ -33,6 +33,7 @@ This project contains emails that get sent out during the event flow; the emails
 - [2026-02-23] Event: Task 11 completed: chef-event-accepted, chef-event-rejected, chef-event-requested, event-details-resend, order-placed refactored to ReceiptLayout and receipt-styles. `apps/medusa/src/modules/resend/emails/*.tsx`.
 - [2026-02-25] Event: Branding refactor: replaced all "Chef Luis Velez" / chefvelez references with SDOA in email templates (receipt, order-placed, chef-event-*), receipt-layout footer (optional phone), and subscribers (chef-event-receipt, chef-event-accepted, chef-event-rejected, chef-event-email-resend, chef-event-requested). Previews and sent emails now show SDOA and support@sdoa.com.
 - [2026-02-25] Event: Separation of concerns: renamed shared layout to transactional email layout. Added `layout.tsx` (TransactionalEmailLayout, props: brandName, headerLabel, billToContent, metaContent, thankYouText, customNotes, brandContact) and `layout-styles.ts` (layoutColors, layoutStyles). Removed receipt-specific `receipt-layout.tsx` and `receipt-styles.ts`. All six emails (receipt, order-placed, chef-event-accepted, chef-event-rejected, chef-event-requested, event-details-resend) now import from `./layout` and `./layout-styles`. Naming reflects that the layout is used by receipts, order confirmations, and event emails, not only receipts.
+- [2026-02-28] Event: Task moved to completed. Updated all status references and file paths from active/ to completed/ throughout task directory.
 
 ## Key Decisions
 - [2026-02-25] Decision: Use generic "transactional email" layout naming (TransactionalEmailLayout, layout-styles, brandName, brandContact) so receipt and non-receipt emails share the same structure without receipt-specific terminology. Keeps separation of concerns and makes the intent of the shared layout clear.

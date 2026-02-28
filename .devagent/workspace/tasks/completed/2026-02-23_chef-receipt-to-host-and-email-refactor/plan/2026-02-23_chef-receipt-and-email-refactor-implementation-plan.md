@@ -3,7 +3,7 @@
 - Owner: PabloJVelez
 - Last Updated: 2026-02-23
 - Status: Draft
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-02-23_chef-receipt-to-host-and-email-refactor/`
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-02-23_chef-receipt-to-host-and-email-refactor/`
 - Stakeholders: PabloJVelez (Owner/Decision Maker)
 - Notes: Receipt feature first (Tasks 1–9), then email refactor (Tasks 10–11). Reference: medusa2-chefV plan and clarification packet.
 
