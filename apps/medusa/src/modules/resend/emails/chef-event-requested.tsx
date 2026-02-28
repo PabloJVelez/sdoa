@@ -1,6 +1,6 @@
 import { Text, Column, Row, Section, Button } from "@react-email/components"
-import { ReceiptLayout } from "./receipt-layout"
-import { receiptStyles } from "./receipt-styles"
+import { TransactionalEmailLayout } from "./layout"
+import { layoutStyles } from "./layout-styles"
 
 export type ChefEventRequestedEmailProps = {
   customer: {
@@ -32,10 +32,10 @@ export type ChefEventRequestedEmailProps = {
   emailType: "customer_confirmation" | "chef_notification"
 }
 
-const CHEF_FOOTER = {
-  name: "Chef Luis Velez",
-  email: "support@chefvelez.com",
-  phone: "(347) 695-4445",
+const BRAND_FOOTER = {
+  name: "SDOA",
+  email: "support@sdoa.com",
+  phone: "",
 }
 
 function ChefEventRequestedEmailComponent({
@@ -50,65 +50,65 @@ function ChefEventRequestedEmailComponent({
 
   const billToContent = (
     <>
-      <Text style={receiptStyles.billToLabel}>BILL TO</Text>
-      <Text style={receiptStyles.billToText}>
+      <Text style={layoutStyles.billToLabel}>BILL TO</Text>
+      <Text style={layoutStyles.billToText}>
         {customer.first_name} {customer.last_name}
       </Text>
-      <Text style={{ ...receiptStyles.metaText, margin: "0.25rem 0 0 0" }}>{customer.email}</Text>
-      <Text style={{ ...receiptStyles.metaText, margin: "0.25rem 0 0 0" }}>{customer.phone}</Text>
+      <Text style={{ ...layoutStyles.metaText, margin: "0.25rem 0 0 0" }}>{customer.email}</Text>
+      <Text style={{ ...layoutStyles.metaText, margin: "0.25rem 0 0 0" }}>{customer.phone}</Text>
     </>
   )
 
   const metaContent = (
     <>
-      <Text style={receiptStyles.metaText}>Ref # {requestReference}</Text>
-      <Text style={{ ...receiptStyles.metaText, margin: 0 }}>Status: {event.status?.toUpperCase() ?? "PENDING"}</Text>
+      <Text style={layoutStyles.metaText}>Ref # {requestReference}</Text>
+      <Text style={{ ...layoutStyles.metaText, margin: 0 }}>Status: {event.status?.toUpperCase() ?? "PENDING"}</Text>
     </>
   )
 
   const bodyContent = (
     <>
-      <Section style={receiptStyles.lineItemsSection}>
+      <Section style={layoutStyles.lineItemsSection}>
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>
+            <Text style={layoutStyles.lineItemDescription}>
               {isCustomerEmail ? "Event request received" : "New event request"}
             </Text>
-            <Text style={receiptStyles.lineItemSubtext}>
+            <Text style={layoutStyles.lineItemSubtext}>
               {booking.date} at {booking.time} · {booking.event_type}
             </Text>
           </Column>
         </Row>
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>Date & time</Text>
+            <Text style={layoutStyles.lineItemDescription}>Date & time</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>{booking.date}, {booking.time}</Text>
+            <Text style={layoutStyles.lineItemDescription}>{booking.date}, {booking.time}</Text>
           </Column>
         </Row>
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>Event type</Text>
+            <Text style={layoutStyles.lineItemDescription}>Event type</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>{booking.event_type}</Text>
+            <Text style={layoutStyles.lineItemDescription}>{booking.event_type}</Text>
           </Column>
         </Row>
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>Party size</Text>
+            <Text style={layoutStyles.lineItemDescription}>Party size</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>{booking.party_size} guests</Text>
+            <Text style={layoutStyles.lineItemDescription}>{booking.party_size} guests</Text>
           </Column>
         </Row>
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>Address</Text>
+            <Text style={layoutStyles.lineItemDescription}>Address</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>
+            <Text style={layoutStyles.lineItemDescription}>
               {booking.location_address?.replace(/\s+/g, " ").trim() || "—"}
             </Text>
           </Column>
@@ -116,30 +116,30 @@ function ChefEventRequestedEmailComponent({
         {booking.menu && (
           <Row style={{ marginBottom: "0.5rem" }}>
             <Column style={{ width: "70%" }}>
-              <Text style={receiptStyles.lineItemDescription}>Menu</Text>
+              <Text style={layoutStyles.lineItemDescription}>Menu</Text>
             </Column>
             <Column align="right" style={{ width: "30%" }}>
-              <Text style={receiptStyles.lineItemDescription}>{booking.menu}</Text>
+              <Text style={layoutStyles.lineItemDescription}>{booking.menu}</Text>
             </Column>
           </Row>
         )}
         {booking.notes && (
           <Row style={{ marginBottom: "0.5rem" }}>
             <Column>
-              <Text style={receiptStyles.lineItemSubtext}>Notes: {booking.notes}</Text>
+              <Text style={layoutStyles.lineItemSubtext}>Notes: {booking.notes}</Text>
             </Column>
           </Row>
         )}
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>Total price</Text>
+            <Text style={layoutStyles.lineItemDescription}>Total price</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>${event.total_price}</Text>
+            <Text style={layoutStyles.lineItemDescription}>${event.total_price}</Text>
           </Column>
         </Row>
         {isCustomerEmail && (
-          <Text style={{ ...receiptStyles.lineItemSubtext, marginTop: "0.75rem" }}>
+          <Text style={{ ...layoutStyles.lineItemSubtext, marginTop: "0.75rem" }}>
             We'll review your request within 24-48 hours. You'll receive an email with our decision. If accepted, you'll get a secure payment link.
           </Text>
         )}
@@ -155,17 +155,17 @@ function ChefEventRequestedEmailComponent({
   )
 
   return (
-    <ReceiptLayout
+    <TransactionalEmailLayout
       preview={isCustomerEmail ? "Your chef event request has been received" : "New chef event request received"}
-      chefName={CHEF_FOOTER.name}
+      brandName={BRAND_FOOTER.name}
       headerLabel="EVENT REQUEST"
       billToContent={billToContent}
       metaContent={metaContent}
       thankYouText={isCustomerEmail ? "Thank you for your event request! We'll be in touch soon." : "New event request received. Please review in the admin."}
-      chef={{ ...CHEF_FOOTER, email: chefContact.email, phone: chefContact.phone }}
+      brandContact={{ ...BRAND_FOOTER, email: chefContact.email, phone: chefContact.phone }}
     >
       {bodyContent}
-    </ReceiptLayout>
+    </TransactionalEmailLayout>
   )
 }
 

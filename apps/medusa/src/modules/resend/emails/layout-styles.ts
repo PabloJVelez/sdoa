@@ -1,8 +1,8 @@
 /**
- * Shared receipt-style email colors and style objects.
- * Used by receipt template and refactored event emails for consistent look.
+ * Shared styles for transactional email layout (header, info block, body, thank-you, footer).
+ * Used by receipt, order confirmation, and event-flow emails for a consistent branded look.
  */
-export const receiptColors = {
+export const layoutColors = {
   accentGreen: "#16a34a",
   dark: "#1a1a1a",
   grayMuted: "#6b7280",
@@ -14,19 +14,19 @@ export const receiptColors = {
   bodyBg: "#f3f4f6",
 } as const
 
-export const receiptStyles = {
+export const layoutStyles = {
   main: {
     fontFamily: "sans-serif",
-    backgroundColor: receiptColors.bodyBg,
+    backgroundColor: layoutColors.bodyBg,
   },
   body: {
     margin: "2rem auto",
     maxWidth: "36rem",
-    backgroundColor: receiptColors.white,
+    backgroundColor: layoutColors.white,
   },
   headerSection: {
-    backgroundColor: receiptColors.dark,
-    color: receiptColors.white,
+    backgroundColor: layoutColors.dark,
+    color: layoutColors.white,
     padding: "1rem 1.5rem",
   },
   headerTitle: {
@@ -38,7 +38,7 @@ export const receiptStyles = {
     margin: 0,
     fontSize: "0.875rem",
     letterSpacing: "0.05em",
-    color: receiptColors.grayLight,
+    color: layoutColors.grayLight,
   },
   infoSection: {
     padding: "1.5rem 1.5rem 0",
@@ -46,58 +46,58 @@ export const receiptStyles = {
   billToLabel: {
     margin: "0 0 0.25rem 0",
     fontSize: "0.75rem",
-    color: receiptColors.accentGreen,
+    color: layoutColors.accentGreen,
     fontWeight: 600,
     letterSpacing: "0.05em",
   },
   billToText: {
     margin: 0,
     fontSize: "0.9375rem",
-    color: receiptColors.dark,
+    color: layoutColors.dark,
   },
   metaText: {
     margin: "0 0 0.25rem 0",
     fontSize: "0.75rem",
-    color: receiptColors.grayMuted,
+    color: layoutColors.grayMuted,
   },
   lineItemsSection: {
     padding: "1rem 1.5rem",
-    borderTop: `1px solid ${receiptColors.grayBorder}`,
+    borderTop: `1px solid ${layoutColors.grayBorder}`,
   },
   lineItemDescription: {
     margin: 0,
     fontSize: "0.875rem",
-    color: receiptColors.dark,
+    color: layoutColors.dark,
   },
   lineItemSubtext: {
     margin: "0.25rem 0 0 0",
     fontSize: "0.75rem",
-    color: receiptColors.grayMuted,
+    color: layoutColors.grayMuted,
   },
   totalsSection: {
     padding: "0 1.5rem 1rem",
-    borderTop: `1px solid ${receiptColors.grayBorder}`,
+    borderTop: `1px solid ${layoutColors.grayBorder}`,
   },
   totalRow: {
     marginTop: "0.75rem",
     paddingTop: "0.75rem",
-    borderTop: `2px solid ${receiptColors.grayBorder}`,
+    borderTop: `2px solid ${layoutColors.grayBorder}`,
   },
   totalLabel: {
     margin: 0,
     fontSize: "1rem",
     fontWeight: 700,
-    color: receiptColors.dark,
+    color: layoutColors.dark,
   },
   thankYouSection: {
-    backgroundColor: receiptColors.thankYouBg,
+    backgroundColor: layoutColors.thankYouBg,
     padding: "1.25rem 1.5rem",
     textAlign: "center" as const,
   },
   thankYouText: {
     margin: 0,
     fontSize: "0.9375rem",
-    color: receiptColors.dark,
+    color: layoutColors.dark,
   },
   thankYouNotes: {
     margin: "0.5rem 0 0 0",
@@ -106,18 +106,18 @@ export const receiptStyles = {
   },
   footerSection: {
     padding: "1rem 1.5rem",
-    backgroundColor: receiptColors.footerBg,
+    backgroundColor: layoutColors.footerBg,
   },
   footerText: {
     margin: 0,
     fontSize: "0.8125rem",
-    color: receiptColors.grayMuted,
+    color: layoutColors.grayMuted,
     textAlign: "center" as const,
   },
   footerCopyright: {
     margin: "0.5rem 0 0 0",
     fontSize: "0.75rem",
-    color: receiptColors.grayLight,
+    color: layoutColors.grayLight,
     textAlign: "center" as const,
   },
 } as const

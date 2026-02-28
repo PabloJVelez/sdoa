@@ -5,7 +5,7 @@
 - Date: 2026-02-23
 - Mode: Task Clarification
 - Status: Complete
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-02-23_chef-receipt-to-host-and-email-refactor/`
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-02-23_chef-receipt-to-host-and-email-refactor/`
 - Notes: Session 1 complete. All critical gaps addressed.
 
 ## Task Overview
@@ -171,7 +171,7 @@ None. All critical gaps addressed in clarification. Research (e.g. confirming pa
 
 **If plan-ready:**
 - [ ] Hand validated requirement packet to `devagent create-plan`.
-- [ ] Provide link: `.devagent/workspace/tasks/active/2026-02-23_chef-receipt-to-host-and-email-refactor/clarification/2026-02-23_initial-clarification.md`.
+- [ ] Provide link: `.devagent/workspace/tasks/completed/2026-02-23_chef-receipt-to-host-and-email-refactor/clarification/2026-02-23_initial-clarification.md`.
 - [ ] Highlight for plan: (1) Receipt feature first (reference plan + medusa2-chefV pattern), (2) Refactor all five emails to receipt-style using reference ReceiptEmailComponent structure/styles, (3) Assume parity with reference project; add alignment check in plan if desired.
 
 **Reference for plan:** The receipt-style layout and styles are defined by the ReceiptEmailComponent code provided in the clarification session (header, info section with Bill To + meta, line items, totals, thank-you, footer; green accent #16a34a, dark #1a1a1a; shared typography and spacing). Existing templates should be adapted to this structure while preserving their current content and behavior.

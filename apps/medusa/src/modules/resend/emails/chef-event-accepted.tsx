@@ -5,8 +5,8 @@ import {
   Section,
   Button,
 } from "@react-email/components"
-import { ReceiptLayout } from "./receipt-layout"
-import { receiptStyles } from "./receipt-styles"
+import { TransactionalEmailLayout } from "./layout"
+import { layoutStyles } from "./layout-styles"
 
 export type ChefEventAcceptedEmailProps = {
   customer: {
@@ -63,97 +63,97 @@ function ChefEventAcceptedEmailComponent({
 }: ChefEventAcceptedEmailProps) {
   const billToContent = (
     <>
-      <Text style={receiptStyles.billToLabel}>BILL TO</Text>
-      <Text style={receiptStyles.billToText}>
+      <Text style={layoutStyles.billToLabel}>BILL TO</Text>
+      <Text style={layoutStyles.billToText}>
         {customer.first_name} {customer.last_name}
       </Text>
-      <Text style={{ ...receiptStyles.metaText, margin: "0.25rem 0 0 0" }}>{customer.email}</Text>
-      <Text style={{ ...receiptStyles.metaText, margin: "0.25rem 0 0 0" }}>{customer.phone}</Text>
+      <Text style={{ ...layoutStyles.metaText, margin: "0.25rem 0 0 0" }}>{customer.email}</Text>
+      <Text style={{ ...layoutStyles.metaText, margin: "0.25rem 0 0 0" }}>{customer.phone}</Text>
     </>
   )
 
   const metaContent = (
     <>
-      <Text style={receiptStyles.metaText}>Ref # {requestReference}</Text>
-      <Text style={{ ...receiptStyles.metaText, margin: 0 }}>Accepted: {acceptanceDate}</Text>
+      <Text style={layoutStyles.metaText}>Ref # {requestReference}</Text>
+      <Text style={{ ...layoutStyles.metaText, margin: 0 }}>Accepted: {acceptanceDate}</Text>
     </>
   )
 
   const bodyContent = (
     <>
-      <Section style={receiptStyles.lineItemsSection}>
+      <Section style={layoutStyles.lineItemsSection}>
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>Booking confirmed</Text>
-            <Text style={receiptStyles.lineItemSubtext}>
+            <Text style={layoutStyles.lineItemDescription}>Booking confirmed</Text>
+            <Text style={layoutStyles.lineItemSubtext}>
               {booking.date} at {booking.time} · {booking.event_type}
             </Text>
           </Column>
         </Row>
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>Date & time</Text>
+            <Text style={layoutStyles.lineItemDescription}>Date & time</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>{booking.date}, {booking.time}</Text>
+            <Text style={layoutStyles.lineItemDescription}>{booking.date}, {booking.time}</Text>
           </Column>
         </Row>
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>Event type</Text>
+            <Text style={layoutStyles.lineItemDescription}>Event type</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>{booking.event_type}</Text>
+            <Text style={layoutStyles.lineItemDescription}>{booking.event_type}</Text>
           </Column>
         </Row>
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>Address</Text>
+            <Text style={layoutStyles.lineItemDescription}>Address</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>
+            <Text style={layoutStyles.lineItemDescription}>
               {booking.location_address?.replace(/\s+/g, " ").trim() || "—"}
             </Text>
           </Column>
         </Row>
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>Party size</Text>
+            <Text style={layoutStyles.lineItemDescription}>Party size</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>{booking.party_size} guests</Text>
+            <Text style={layoutStyles.lineItemDescription}>{booking.party_size} guests</Text>
           </Column>
         </Row>
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>Total price</Text>
+            <Text style={layoutStyles.lineItemDescription}>Total price</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>${event.total_price}</Text>
+            <Text style={layoutStyles.lineItemDescription}>${event.total_price}</Text>
           </Column>
         </Row>
         <Row style={{ marginBottom: "0.5rem" }}>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>
+            <Text style={layoutStyles.lineItemDescription}>
               {event.is_full_deposit ? "Full payment required" : "Minimum deposit"}
             </Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>${event.deposit_required}</Text>
+            <Text style={layoutStyles.lineItemDescription}>${event.deposit_required}</Text>
           </Column>
         </Row>
         <Row>
           <Column style={{ width: "70%" }}>
-            <Text style={receiptStyles.lineItemDescription}>Payment deadline</Text>
+            <Text style={layoutStyles.lineItemDescription}>Payment deadline</Text>
           </Column>
           <Column align="right" style={{ width: "30%" }}>
-            <Text style={receiptStyles.lineItemDescription}>{event.deposit_deadline}</Text>
+            <Text style={layoutStyles.lineItemDescription}>{event.deposit_deadline}</Text>
           </Column>
         </Row>
       </Section>
 
-      <Section style={{ ...receiptStyles.totalsSection, padding: "0 1.5rem 1rem" }}>
-        <Text style={{ ...receiptStyles.lineItemDescription, marginBottom: "0.75rem" }}>
+      <Section style={{ ...layoutStyles.totalsSection, padding: "0 1.5rem 1rem" }}>
+        <Text style={{ ...layoutStyles.lineItemDescription, marginBottom: "0.75rem" }}>
           {event.is_full_deposit
             ? `To secure your booking, please pay the full amount by ${event.deposit_deadline}.`
             : `To secure your booking, please purchase at least ${event.minimum_tickets} tickets by ${event.deposit_deadline}. Additional guests can purchase their tickets later.`}
@@ -163,7 +163,7 @@ function ChefEventAcceptedEmailComponent({
             {event.is_full_deposit ? "Pay Full Amount Now" : "Purchase Tickets Now"}
           </Button>
         </Section>
-        <Text style={{ ...receiptStyles.lineItemSubtext, marginTop: "1rem", textAlign: "center" }}>
+        <Text style={{ ...layoutStyles.lineItemSubtext, marginTop: "1rem", textAlign: "center" }}>
           1. Pay your deposit to secure the booking · 2. Our chef will contact you to discuss menu details · 3. We'll send a reminder 48 hours before the event
         </Text>
       </Section>
@@ -171,17 +171,17 @@ function ChefEventAcceptedEmailComponent({
   )
 
   return (
-    <ReceiptLayout
+    <TransactionalEmailLayout
       preview="Great news! Your chef event has been accepted"
-      chefName={chef.name}
+      brandName={chef.name}
       headerLabel="BOOKING CONFIRMED"
       billToContent={billToContent}
       metaContent={metaContent}
       thankYouText={`Great news! Your chef has confirmed your booking.${chefNotes ? ` ${chefNotes}` : ""}`}
-      chef={chef}
+      brandContact={chef}
     >
       {bodyContent}
-    </ReceiptLayout>
+    </TransactionalEmailLayout>
   )
 }
 
@@ -222,9 +222,9 @@ ChefEventAcceptedEmailComponent.PreviewProps = {
     purchase_url: "https://example.com/products/dinner-party-experience",
   },
   chef: {
-    name: "Chef Luis Velez",
-    email: "chef@example.com",
-    phone: "(555) 987-6543",
+    name: "SDOA",
+    email: "support@sdoa.com",
+    phone: "",
   },
   requestReference: "CE-2025-001",
   acceptanceDate: "March 1, 2025",

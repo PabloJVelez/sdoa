@@ -102,9 +102,9 @@ export default async function chefEventReceiptHandler({
       tipAmount: data.tipAmount,
       tipMethod: data.tipMethod,
       chef: {
-        name: "Chef Luis Velez",
-        email: "support@chefvelez.com",
-        phone: "(347) 695-4445",
+        name: "SDOA",
+        email: "support@sdoa.com",
+        phone: "",
       },
       requestReference: chefEvent.id.slice(0, 8).toUpperCase(),
       receiptDate: DateTime.now().toFormat("yyyy-MM-dd"),
