@@ -5,7 +5,7 @@
 - Date: 2026-03-02
 - Mode: Task Clarification
 - Status: Complete
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-03-02_stripe-connect/`
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-03-02_stripe-connect/`
 - Notes: Session 1 started; gap-driven questions in progress.
 
 ## Task Overview

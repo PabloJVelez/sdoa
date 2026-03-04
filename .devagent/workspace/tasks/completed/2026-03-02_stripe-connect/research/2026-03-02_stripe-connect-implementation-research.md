@@ -3,7 +3,7 @@
 - **Date**: 2026-03-02
 - **Classification**: Implementation design
 - **Scope**: Payment provider customization for Stripe Connect (platform fee, destination charges) in this codebase; alignment with reference implementation from sibling project.
-- **Task Hub**: `.devagent/workspace/tasks/active/2026-03-02_stripe-connect/`
+- **Task Hub**: `.devagent/workspace/tasks/completed/2026-03-02_stripe-connect/`
 
 ---
 

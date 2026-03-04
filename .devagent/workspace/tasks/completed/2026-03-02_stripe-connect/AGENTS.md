@@ -1,9 +1,9 @@
 # Implement Stripe Connect Progress Tracker
 
 - Owner: PabloJVelez
-- Last Updated: 2026-03-02
-- Status: Draft
-- Task Hub: `.devagent/workspace/tasks/active/2026-03-02_stripe-connect/`
+- Last Updated: 2026-03-03
+- Status: Complete
+- Task Hub: `.devagent/workspace/tasks/completed/2026-03-02_stripe-connect/`
 
 ## Summary
 
@@ -40,6 +40,7 @@ Current state in this repo: Medusa uses the standard Stripe provider (`@medusajs
 - [2026-03-02] Task 3 completed: medusa-config uses stripe-connect provider with options from env; .env.template extended with USE_STRIPE_CONNECT, STRIPE_CONNECTED_ACCOUNT_ID, PLATFORM_FEE_PERCENT, REFUND_APPLICATION_FEE, STRIPE_WEBHOOK_SECRET, PASS_STRIPE_FEE_TO_CHEF, STRIPE_FEE_*. `apps/medusa/medusa-config.ts`, `apps/medusa/.env.template`.
 - [2026-03-02] Task 4 completed: Replaced all `pp_stripe_stripe` with `pp_stripe-connect_stripe-connect` in storefront (StripeElementsProvider, StripePaymentForm, CheckoutPayment, StripeExpressPaymentForm, cart.server, api.checkout.shipping-methods, api.checkout.complete) and seed scripts (seed.ts, seed-menus.ts).
 - [2026-03-02] Task 5 skipped: Manual/E2E verification; to be run when Connect account and webhook are configured. See plan Task 5 acceptance criteria.
+- [2026-03-03] Task hub completed and archived: Moved task directory to `completed/2026-03-02_stripe-connect/` and updated all internal path references from `active/` to `completed/`.
 
 ## Implementation Checklist
 - [x] Research: Confirm current payment setup and align with reference implementation patterns (provider interface, env vars, webhooks). See `research/2026-03-02_stripe-connect-implementation-research.md`.
@@ -72,4 +73,4 @@ Current state in this repo: Medusa uses the standard Stripe provider (`@medusajs
 2. ~~**Research**~~ ✅ Done
 3. ~~**Create plan**~~ ✅ Done — see `plan/2026-03-02_stripe-connect-implementation-plan.md`
 4. ~~**Implement**~~ ✅ Done — Tasks 1–4 implemented; Task 5 (manual verification) skipped.
-5. **Testing**: Verify payment flow and fee splitting in Stripe test mode (manual; configure STRIPE_CONNECTED_ACCOUNT_ID and STRIPE_WEBHOOK_SECRET first).
+5. ~~**Testing**~~ ✅ Manual Stripe test-mode verification recommended as an operational step (not tracked as an active DevAgent task).

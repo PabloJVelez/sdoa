@@ -3,7 +3,7 @@
 - Owner: PabloJVelez
 - Last Updated: 2026-03-02
 - Status: Draft
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-03-02_stripe-connect/`
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-03-02_stripe-connect/`
 - Stakeholders: PabloJVelez (Owner, Decision Maker)
 - Notes: Single provider with USE_STRIPE_CONNECT toggle; provider id stripe-connect (pp_stripe-connect_stripe-connect).
 
@@ -196,7 +196,7 @@ Refer to the AGENTS.md file in the task directory (`.devagent/workspace/tasks/ac
 
 ## Appendices & References
 
-- **Task hub:** `.devagent/workspace/tasks/active/2026-03-02_stripe-connect/`
+- **Task hub:** `.devagent/workspace/tasks/completed/2026-03-02_stripe-connect/`
 - **Reference service (sibling project):** [`reference/service-reference.ts`](../reference/service-reference.ts) — full Stripe Connect provider service class to copy/adapt; implement matching `types.ts` and `utils/get-smallest-unit.ts` in the app.
 - **Research:** [`research/2026-03-02_stripe-connect-implementation-research.md`](../research/2026-03-02_stripe-connect-implementation-research.md)
 - **Clarification:** [`clarification/2026-03-02_initial-clarification.md`](../clarification/2026-03-02_initial-clarification.md)
