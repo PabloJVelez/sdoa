@@ -35,12 +35,22 @@ Current state in this repo: Medusa uses the standard Stripe provider (`@medusajs
 - [2026-03-02] Research completed: Validated current payment setup, frontend/backend coupling to `pp_stripe_stripe`, module layout, env template, and seed scripts. Recommendation: add custom stripe-connect provider, update config and all provider-id references to `pp_stripe-connect_stripe-connect`, extend env/docs. See `research/2026-03-02_stripe-connect-implementation-research.md`.
 - [2026-03-02] Clarification completed: Platform = developer's Stripe, connected = single vendor; 5% fee, do not refund platform fee (configurable via env); support `USE_STRIPE_CONNECT` toggle for standard Stripe vs Connect. See `clarification/2026-03-02_initial-clarification.md`.
 - [2026-03-02] Plan created: Five implementation tasks (provider service + types + currency util, module export, medusa-config + env + .env.template, storefront + seed provider-id updates, E2E verification). See `plan/2026-03-02_stripe-connect-implementation-plan.md`.
+- [2026-03-02] Task 1 completed: Created Stripe Connect provider types, service (AbstractPaymentProvider), and `get-smallest-unit` util. `apps/medusa/src/modules/stripe-connect/types.ts`, `service.ts`, `utils/get-smallest-unit.ts`.
+- [2026-03-02] Task 2 completed: Module index exports provider; payment module resolves `./src/modules/stripe-connect` with id `stripe-connect`. `apps/medusa/src/modules/stripe-connect/index.ts`.
+- [2026-03-02] Task 3 completed: medusa-config uses stripe-connect provider with options from env; .env.template extended with USE_STRIPE_CONNECT, STRIPE_CONNECTED_ACCOUNT_ID, PLATFORM_FEE_PERCENT, REFUND_APPLICATION_FEE, STRIPE_WEBHOOK_SECRET, PASS_STRIPE_FEE_TO_CHEF, STRIPE_FEE_*. `apps/medusa/medusa-config.ts`, `apps/medusa/.env.template`.
+- [2026-03-02] Task 4 completed: Replaced all `pp_stripe_stripe` with `pp_stripe-connect_stripe-connect` in storefront (StripeElementsProvider, StripePaymentForm, CheckoutPayment, StripeExpressPaymentForm, cart.server, api.checkout.shipping-methods, api.checkout.complete) and seed scripts (seed.ts, seed-menus.ts).
+- [2026-03-02] Task 5 skipped: Manual/E2E verification; to be run when Connect account and webhook are configured. See plan Task 5 acceptance criteria.
 
 ## Implementation Checklist
 - [x] Research: Confirm current payment setup and align with reference implementation patterns (provider interface, env vars, webhooks). See `research/2026-03-02_stripe-connect-implementation-research.md`.
 - [x] Clarification: Confirm platform vs connected account ownership and fee/refund behavior for this project if different from reference. See `clarification/2026-03-02_initial-clarification.md`.
 - [x] Plan: Create implementation plan (e.g. custom provider module, config update, env/docs, testing). See `plan/2026-03-02_stripe-connect-implementation-plan.md`.
-- [ ] Implementation: Execute plan (provider service, module definition, medusa-config, environment variables, docs).
+- [x] Task 1: Create Stripe Connect payment provider service and types (`apps/medusa/src/modules/stripe-connect/types.ts`, `service.ts`, `utils/get-smallest-unit.ts`).
+- [x] Task 2: Create module provider definition and wire payment module (`apps/medusa/src/modules/stripe-connect/index.ts`).
+- [x] Task 3: Update Medusa configuration and environment variables (`medusa-config.ts`, `.env.template`).
+- [x] Task 4: Update storefront and seed scripts to use new provider id (`pp_stripe-connect_stripe-connect`).
+- [~] Task 5: Verify payment flow and fee splitting (manual / E2E). Skipped—manual verification; run when STRIPE_CONNECTED_ACCOUNT_ID and webhook are configured.
+- [x] Implementation: Execute plan (provider service, module definition, medusa-config, environment variables, docs).
 - [ ] Testing: Verify payment flow and fee splitting in Stripe test mode.
 
 ## Open Questions
@@ -61,4 +71,5 @@ Current state in this repo: Medusa uses the standard Stripe provider (`@medusajs
 1. ~~**Clarify scope**~~ ✅ Done
 2. ~~**Research**~~ ✅ Done
 3. ~~**Create plan**~~ ✅ Done — see `plan/2026-03-02_stripe-connect-implementation-plan.md`
-4. **Implement**: Execute tasks 1–5 from the plan (e.g. `devagent implement-plan` or manual implementation).
+4. ~~**Implement**~~ ✅ Done — Tasks 1–4 implemented; Task 5 (manual verification) skipped.
+5. **Testing**: Verify payment flow and fee splitting in Stripe test mode (manual; configure STRIPE_CONNECTED_ACCOUNT_ID and STRIPE_WEBHOOK_SECRET first).

@@ -114,7 +114,7 @@ export const ensureStripePaymentSession = async (request: Request, cart: StoreCa
 
   if (!activeSession) {
     await initiatePaymentSession(request, cart, {
-      provider_id: 'pp_stripe_stripe',
+      provider_id: 'pp_stripe-connect_stripe-connect',
     });
 
     return (await retrieveCart(request))!;

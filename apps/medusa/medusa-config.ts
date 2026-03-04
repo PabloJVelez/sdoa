@@ -8,6 +8,22 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 
 const REDIS_URL = process.env.REDIS_URL;
 const STRIPE_API_KEY = process.env.STRIPE_API_KEY;
+const USE_STRIPE_CONNECT = process.env.USE_STRIPE_CONNECT === 'true';
+const STRIPE_CONNECTED_ACCOUNT_ID = process.env.STRIPE_CONNECTED_ACCOUNT_ID || '';
+const PLATFORM_FEE_PERCENT = parseInt(
+  process.env.PLATFORM_FEE_PERCENT || '5',
+  10,
+);
+const REFUND_APPLICATION_FEE = process.env.REFUND_APPLICATION_FEE === 'true';
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || undefined;
+const PASS_STRIPE_FEE_TO_CHEF = process.env.PASS_STRIPE_FEE_TO_CHEF === 'true';
+const STRIPE_FEE_PERCENT = parseFloat(
+  process.env.STRIPE_FEE_PERCENT || '2.9',
+);
+const STRIPE_FEE_FLAT_CENTS = parseInt(
+  process.env.STRIPE_FEE_FLAT_CENTS || '30',
+  10,
+);
 const SENTRY_DSN = process.env.SENTRY_DSN || '';
 // const SENTRY_API_TOKEN = process.env.SENTRY_API_TOKEN || ""; // Only needed for webhooks
 const IS_TEST = process.env.NODE_ENV === 'test';
@@ -143,10 +159,18 @@ module.exports = defineConfig({
       options: {
         providers: [
           {
-            resolve: '@medusajs/medusa/payment-stripe',
-            id: 'stripe',
+            resolve: './src/modules/stripe-connect',
+            id: 'stripe-connect',
             options: {
               apiKey: STRIPE_API_KEY,
+              useStripeConnect: USE_STRIPE_CONNECT,
+              connectedAccountId: STRIPE_CONNECTED_ACCOUNT_ID || undefined,
+              feePercent: PLATFORM_FEE_PERCENT,
+              refundApplicationFee: REFUND_APPLICATION_FEE,
+              webhookSecret: STRIPE_WEBHOOK_SECRET,
+              passStripeFeeToChef: PASS_STRIPE_FEE_TO_CHEF,
+              stripeFeePercent: STRIPE_FEE_PERCENT,
+              stripeFeeFlatCents: STRIPE_FEE_FLAT_CENTS,
             },
           },
         ],
