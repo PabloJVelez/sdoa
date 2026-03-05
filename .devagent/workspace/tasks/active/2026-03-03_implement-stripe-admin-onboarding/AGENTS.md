@@ -23,15 +23,16 @@ This task sets up and implements Stripe Connect onboarding through the Medusa ad
 - [2026-03-03] Research completed: Research packet created at `research/2026-03-03_stripe-admin-onboarding-research.md`.
 - [2026-03-03] Clarification completed: Requirement packet at `clarification/2026-03-03_initial-clarification.md`; rollout, error UX, admin UI richness, local dev, and acceptance criteria confirmed.
 - [2026-03-03] Plan created: Implementation plan at `plan/2026-03-03_stripe-admin-onboarding-implementation-plan.md` with seven ordered tasks (model → module → admin API → webhook → provider → admin UI → env cleanup).
+- [2026-03-03] Implementation completed: All seven tasks delivered. Model and migration in `apps/medusa/src/modules/stripe-connect-account/`; module service and registration in `medusa-config.ts`; admin API `apps/medusa/src/api/admin/stripe-connect/`; webhook `apps/medusa/src/api/webhooks/stripe-connect/`; payment provider updated in `apps/medusa/src/modules/stripe-connect/service.ts`; admin UI at `apps/medusa/src/admin/routes/stripe-connect/page.tsx`; `.env.template` and `medusa-config.ts` updated (STRIPE_CONNECTED_ACCOUNT_ID removed, STRIPE_CONNECT_WEBHOOK_SECRET and MEDUSA_ADMIN_URL added).
 
 ## Implementation Checklist
-- [ ] Task 1: Data model and migration for Stripe Connect account. See plan Task 1.
-- [ ] Task 2: Stripe Connect account module and registration. See plan Task 2.
-- [ ] Task 3: Admin API routes for Stripe Connect status and account link. See plan Task 3.
-- [ ] Task 4: Webhook route for Connect account.updated. See plan Task 4.
-- [ ] Task 5: Payment provider — resolve connected account from DB. See plan Task 5.
-- [ ] Task 6: Admin UI — Stripe Connect settings page. See plan Task 6.
-- [ ] Task 7: Environment and documentation cleanup. See plan Task 7.
+- [x] Task 1: Data model and migration for Stripe Connect account. See plan Task 1.
+- [x] Task 2: Stripe Connect account module and registration. See plan Task 2.
+- [x] Task 3: Admin API routes for Stripe Connect status and account link. See plan Task 3.
+- [x] Task 4: Webhook route for Connect account.updated. See plan Task 4.
+- [x] Task 5: Payment provider — resolve connected account from DB. See plan Task 5.
+- [x] Task 6: Admin UI — Stripe Connect settings page. See plan Task 6.
+- [x] Task 7: Environment and documentation cleanup. See plan Task 7.
 
 ## Open Questions
 - Raw body handling for Stripe Connect webhook signature verification (Medusa v2). See plan Risks.
@@ -44,4 +45,4 @@ This task sets up and implements Stripe Connect onboarding through the Medusa ad
 - [Prior] Completed Stripe Connect: `.devagent/workspace/tasks/completed/2026-03-02_stripe-connect/`.
 
 ## Next Steps
-- Execute implementation tasks in order from the plan (Task 1 through Task 7). Use `devagent implement-plan` or work through the Implementation Plan section of the plan artifact.
+- Run `medusa db:migrate` (from `apps/medusa`) to create the `stripe_connect_account` table. Configure `MEDUSA_ADMIN_URL` and optionally `STRIPE_CONNECT_WEBHOOK_SECRET` in `.env`. Add a second webhook endpoint in Stripe Dashboard for `account.updated` pointing to the backend `/webhooks/stripe-connect` URL. Use the admin UI at `/app/stripe-connect` to onboard the connected account.

@@ -29,6 +29,7 @@ export interface StripeConnectProviderOptions {
 export interface StripeConnectConfig {
   apiKey: string;
   useStripeConnect: boolean;
+  /** From env (legacy) or resolved from DB at runtime when useStripeConnect is true. */
   connectedAccountId: string;
   feePercent: number;
   refundApplicationFee: boolean;

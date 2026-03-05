@@ -41,9 +41,17 @@ import type {
 } from './types';
 import { getSmallestUnit } from './utils/get-smallest-unit';
 
+interface StripeConnectAccountService {
+  getConnectedAccountId(): Promise<string | null>;
+}
+
 type InjectedDependencies = {
   logger: Logger;
+  stripeConnectAccountModuleService?: StripeConnectAccountService;
 };
+
+const NO_ACCOUNT_MESSAGE =
+  'Stripe Connect is enabled but no account has been onboarded. Complete onboarding in the admin first.';
 
 class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnectProviderOptions> {
   static identifier = 'stripe-connect';
@@ -51,14 +59,14 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
   protected config_: StripeConnectConfig;
   protected logger_: Logger;
   protected stripe_: Stripe;
-
+  protected stripeConnectAccountService_?: StripeConnectAccountService;
   private static readonly LOG_PREFIX = '[stripe-connect]';
 
   constructor(
-    { logger }: InjectedDependencies,
+    { logger, stripeConnectAccountModuleService }: InjectedDependencies,
     options: StripeConnectProviderOptions,
   ) {
-    super({ logger }, options);
+    super({ logger, stripeConnectAccountModuleService }, options);
 
     if (!options.apiKey) {
       throw new MedusaError(
@@ -68,30 +76,18 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
     }
 
     const useStripeConnect = options.useStripeConnect === true;
-
-    let connectedAccountId = options.connectedAccountId || '';
-    if (connectedAccountId && !connectedAccountId.startsWith('acct_')) {
+    const envAccountId = options.connectedAccountId || '';
+    if (envAccountId && !envAccountId.startsWith('acct_')) {
       logger.warn(
-        `${StripeConnectProviderService.LOG_PREFIX} Invalid connected account ID format: "${connectedAccountId}". Must start with "acct_".`,
-      );
-      connectedAccountId = '';
-    }
-
-    if (useStripeConnect && !connectedAccountId) {
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
-        'STRIPE_CONNECTED_ACCOUNT_ID is required when USE_STRIPE_CONNECT is true.',
+        `${StripeConnectProviderService.LOG_PREFIX} Invalid connected account ID format (env). Must start with "acct_".`,
       );
     }
 
-    if (!useStripeConnect) {
-      connectedAccountId = '';
-    }
-
+    this.stripeConnectAccountService_ = stripeConnectAccountModuleService;
     this.config_ = {
       apiKey: options.apiKey,
-      useStripeConnect: useStripeConnect && !!connectedAccountId,
-      connectedAccountId,
+      useStripeConnect,
+      connectedAccountId: useStripeConnect && envAccountId.startsWith('acct_') ? envAccountId : '',
       feePercent: options.feePercent ?? 5,
       refundApplicationFee: options.refundApplicationFee ?? false,
       passStripeFeeToChef: options.passStripeFeeToChef ?? false,
@@ -107,7 +103,7 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
 
     if (this.config_.useStripeConnect) {
       this.logger_.info(
-        `${StripeConnectProviderService.LOG_PREFIX} Connect enabled: account ${this.config_.connectedAccountId}, fee ${this.config_.feePercent}%`,
+        `${StripeConnectProviderService.LOG_PREFIX} Connect enabled (account from DB or env), fee ${this.config_.feePercent}%`,
       );
     } else {
       this.logger_.info(
@@ -117,7 +113,28 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
   }
 
   private isConnectEnabled(): boolean {
-    return this.config_.useStripeConnect && !!this.config_.connectedAccountId;
+    return this.config_.useStripeConnect;
+  }
+
+  private async getConnectedAccountId(): Promise<string | null> {
+    if (!this.config_.useStripeConnect) return null;
+    if (this.config_.connectedAccountId) return this.config_.connectedAccountId;
+
+    if (!this.stripeConnectAccountService_) {
+      this.logger_.warn(
+        `${StripeConnectProviderService.LOG_PREFIX} stripeConnectAccountModuleService not available — add it to the payment module's dependencies in medusa-config.ts.`,
+      );
+      return null;
+    }
+
+    try {
+      return await this.stripeConnectAccountService_.getConnectedAccountId();
+    } catch (e) {
+      this.logger_.warn(
+        `${StripeConnectProviderService.LOG_PREFIX} Failed to resolve connected account: ${(e as Error).message}`,
+      );
+      return null;
+    }
   }
 
   private calculateApplicationFee(amount: number): number {
@@ -195,10 +212,21 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
         paymentIntentParams.automatic_payment_methods = { enabled: true };
       }
 
+      let connectedAccountId: string | null = null;
       if (this.isConnectEnabled()) {
-        paymentIntentParams.on_behalf_of = this.config_.connectedAccountId;
+        connectedAccountId = await this.getConnectedAccountId();
+        if (!connectedAccountId) {
+          this.logger_.error(
+            `${StripeConnectProviderService.LOG_PREFIX} ${NO_ACCOUNT_MESSAGE}`,
+          );
+          throw new MedusaError(
+            MedusaError.Types.NOT_ALLOWED,
+            NO_ACCOUNT_MESSAGE,
+          );
+        }
+        paymentIntentParams.on_behalf_of = connectedAccountId;
         paymentIntentParams.transfer_data = {
-          destination: this.config_.connectedAccountId,
+          destination: connectedAccountId,
         };
         if (applicationFeeAmount > 0) {
           paymentIntentParams.application_fee_amount = applicationFeeAmount;
@@ -221,9 +249,7 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
         status: paymentIntent.status,
         amount: amountInCents,
         currency: currency_code.toLowerCase(),
-        connected_account_id: this.isConnectEnabled()
-          ? this.config_.connectedAccountId
-          : undefined,
+        connected_account_id: connectedAccountId ?? undefined,
         application_fee_amount: this.isConnectEnabled()
           ? applicationFeeAmount
           : undefined,
@@ -584,6 +610,16 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
         updateParams.amount = amountInCents;
 
         if (this.isConnectEnabled()) {
+          const connectedAccountId = await this.getConnectedAccountId();
+          if (!connectedAccountId) {
+            this.logger_.error(
+              `${StripeConnectProviderService.LOG_PREFIX} ${NO_ACCOUNT_MESSAGE}`,
+            );
+            throw new MedusaError(
+              MedusaError.Types.NOT_ALLOWED,
+              NO_ACCOUNT_MESSAGE,
+            );
+          }
           const applicationFeeAmount =
             this.calculateApplicationFee(amountInCents);
           if (applicationFeeAmount > 0) {
@@ -605,15 +641,16 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
         `${StripeConnectProviderService.LOG_PREFIX} Updated PaymentIntent ${paymentIntentId}`,
       );
 
+      const connectedAccountIdForUpdate = this.isConnectEnabled()
+        ? await this.getConnectedAccountId()
+        : null;
       const paymentData: StripeConnectPaymentData = {
         id: paymentIntent.id,
         client_secret: paymentIntent.client_secret || undefined,
         status: paymentIntent.status,
         amount: paymentIntent.amount,
         currency: paymentIntent.currency,
-        connected_account_id: this.isConnectEnabled()
-          ? this.config_.connectedAccountId
-          : undefined,
+        connected_account_id: connectedAccountIdForUpdate ?? undefined,
         application_fee_amount: this.isConnectEnabled()
           ? (paymentIntent.application_fee_amount ?? undefined)
           : undefined,
