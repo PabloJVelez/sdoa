@@ -3,7 +3,7 @@
 - Owner: PabloJVelez
 - Last Updated: 2026-03-03
 - Status: Draft
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-03-03_implement-stripe-admin-onboarding/`
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-03-03_implement-stripe-admin-onboarding/`
 - Stakeholders: Pablo (Developer/Owner, Decision Maker)
 - Notes: Plan derived from research packet and clarification packet; no production env yet—greenfield migration.
 

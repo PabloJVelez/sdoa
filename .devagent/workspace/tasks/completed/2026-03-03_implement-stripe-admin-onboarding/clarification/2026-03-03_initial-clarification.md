@@ -5,7 +5,7 @@
 - Date: 2026-03-03
 - Mode: Task Clarification
 - Status: Complete
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-03-03_implement-stripe-admin-onboarding/`
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-03-03_implement-stripe-admin-onboarding/`
 - Notes: Initial clarification session for migrating Stripe Connect from env-based `STRIPE_CONNECTED_ACCOUNT_ID` to admin-driven onboarding with DB-backed connected account state.
 
 ## Task Overview

@@ -1,9 +1,9 @@
 # Implement Stripe Admin Onboarding Progress Tracker
 
 - Owner: PabloJVelez
-- Last Updated: 2026-03-03
-- Status: Draft
-- Task Hub: `.devagent/workspace/tasks/active/2026-03-03_implement-stripe-admin-onboarding/`
+- Last Updated: 2026-03-04
+- Status: Complete
+- Task Hub: `.devagent/workspace/tasks/completed/2026-03-03_implement-stripe-admin-onboarding/`
 
 ## Summary
 This task sets up and implements Stripe Connect onboarding through the Medusa admin UI so that connected accounts are created and managed via the admin rather than by manually configuring a `STRIPE_CONNECTED_ACCOUNT_ID` environment variable. The primary input is the user-provided document `stripe-connect-onboarding-migration.md` located at `/Users/pablo/Downloads/stripe-connect-onboarding-migration.md`, which outlines the desired onboarding flow and migration details; future agents should read and follow that document when researching and planning this work.
@@ -24,6 +24,7 @@ This task sets up and implements Stripe Connect onboarding through the Medusa ad
 - [2026-03-03] Clarification completed: Requirement packet at `clarification/2026-03-03_initial-clarification.md`; rollout, error UX, admin UI richness, local dev, and acceptance criteria confirmed.
 - [2026-03-03] Plan created: Implementation plan at `plan/2026-03-03_stripe-admin-onboarding-implementation-plan.md` with seven ordered tasks (model → module → admin API → webhook → provider → admin UI → env cleanup).
 - [2026-03-03] Implementation completed: All seven tasks delivered. Model and migration in `apps/medusa/src/modules/stripe-connect-account/`; module service and registration in `medusa-config.ts`; admin API `apps/medusa/src/api/admin/stripe-connect/`; webhook `apps/medusa/src/api/webhooks/stripe-connect/`; payment provider updated in `apps/medusa/src/modules/stripe-connect/service.ts`; admin UI at `apps/medusa/src/admin/routes/stripe-connect/page.tsx`; `.env.template` and `medusa-config.ts` updated (STRIPE_CONNECTED_ACCOUNT_ID removed, STRIPE_CONNECT_WEBHOOK_SECRET and MEDUSA_ADMIN_URL added).
+- [2026-03-04] Event: Task moved to completed. Updated all status references and file paths from active/ to completed/ throughout task directory.
 
 ## Implementation Checklist
 - [x] Task 1: Data model and migration for Stripe Connect account. See plan Task 1.
