@@ -68,7 +68,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
   const isNewPaymentMethod = data.paymentMethodId === 'new';
 
-  if (!isNewPaymentMethod && data.providerId === 'pp_stripe_stripe') {
+  if (!isNewPaymentMethod && data.providerId === 'pp_stripe-connect_stripe-connect') {
     await initiatePaymentSession(actionArgs.request, cart, {
       provider_id: data.providerId,
       data: { payment_method: data.paymentMethodId },

@@ -8,10 +8,19 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 
 const REDIS_URL = process.env.REDIS_URL;
 const STRIPE_API_KEY = process.env.STRIPE_API_KEY;
+const USE_STRIPE_CONNECT = process.env.USE_STRIPE_CONNECT === 'true';
+const PLATFORM_FEE_PERCENT = parseInt(process.env.PLATFORM_FEE_PERCENT || '5', 10);
+const REFUND_APPLICATION_FEE = process.env.REFUND_APPLICATION_FEE === 'true';
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || undefined;
+const PASS_STRIPE_FEE_TO_CHEF = process.env.PASS_STRIPE_FEE_TO_CHEF === 'true';
+const STRIPE_FEE_PERCENT = parseFloat(process.env.STRIPE_FEE_PERCENT || '2.9');
+const STRIPE_FEE_FLAT_CENTS = parseInt(process.env.STRIPE_FEE_FLAT_CENTS || '30', 10);
 const SENTRY_DSN = process.env.SENTRY_DSN || '';
 // const SENTRY_API_TOKEN = process.env.SENTRY_API_TOKEN || ""; // Only needed for webhooks
 const IS_TEST = process.env.NODE_ENV === 'test';
 const IS_DEV = process.env.NODE_ENV === 'development';
+
+const MEDUSA_ADMIN_URL = process.env.ADMIN_BACKEND_URL || '';
 
 const customModules = [
   {
@@ -25,6 +34,13 @@ const customModules = [
   {
     resolve: './src/modules/experience-type',
     options: {},
+  },
+  {
+    resolve: './src/modules/stripe-connect-account',
+    options: {
+      stripeApiKey: STRIPE_API_KEY,
+      adminUrl: MEDUSA_ADMIN_URL,
+    },
   },
 ];
 
@@ -140,13 +156,21 @@ module.exports = defineConfig({
     ...customModules,
     {
       resolve: '@medusajs/medusa/payment',
+      dependencies: ['stripeConnectAccountModuleService'],
       options: {
         providers: [
           {
-            resolve: '@medusajs/medusa/payment-stripe',
-            id: 'stripe',
+            resolve: './src/modules/stripe-connect',
+            id: 'stripe-connect',
             options: {
               apiKey: STRIPE_API_KEY,
+              useStripeConnect: USE_STRIPE_CONNECT,
+              feePercent: PLATFORM_FEE_PERCENT,
+              refundApplicationFee: REFUND_APPLICATION_FEE,
+              webhookSecret: STRIPE_WEBHOOK_SECRET,
+              passStripeFeeToChef: PASS_STRIPE_FEE_TO_CHEF,
+              stripeFeePercent: STRIPE_FEE_PERCENT,
+              stripeFeeFlatCents: STRIPE_FEE_FLAT_CENTS,
             },
           },
         ],
