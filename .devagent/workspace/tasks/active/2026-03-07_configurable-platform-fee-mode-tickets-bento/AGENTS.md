@@ -23,14 +23,20 @@ The project already supports Stripe Connect with commission amount driven by the
 - [2026-03-07] Event: Task hub created from new-task workflow; summary and references seeded.
 - [2026-03-07] Event: clarify-task session 1 completed; answers captured in `clarification/2026-03-07_initial-clarification.md` (SKU-based ticket/bento distinction, separate config per type, per-unit cents env vars; future note for tag/attribute; one research gap: payment provider line-item context).
 - [2026-03-07] Event: research completed; payment provider context and line-item access documented in `research/2026-03-07_payment-provider-context-line-items.md` (provider receives amount/context only; options: use context.resource_id if cart_id, custom context, or precompute fee in workflow).
+- [2026-03-07] Event: implementation plan created at `plan/2026-03-07_configurable-platform-fee-implementation-plan.md` (5 tasks: verify context/strategy, env/config, fee calculation, cart resolution or workflow step, tests and docs).
 
 ## Implementation Checklist
-- [ ] (To be populated by research / create-plan.)
+- [ ] Task 1: Verify payment context and choose strategy (A/B/C) — see plan.
+- [ ] Task 2: Add env vars and provider config shape (medusa-config, types, .env.example).
+- [ ] Task 3: Implement per-line fee calculation and wire into provider (or workflow).
+- [ ] Task 4: Resolve cart to line items (Option A) or add workflow step (Option B/C).
+- [ ] Task 5: Tests, env docs, and future-improvement note.
 
 ## Open Questions
 - (To be populated as needed.)
 
 ## References
+- `.devagent/workspace/tasks/active/2026-03-07_configurable-platform-fee-mode-tickets-bento/plan/2026-03-07_configurable-platform-fee-implementation-plan.md` — Implementation plan (5 tasks: verify context, env/config, fee logic, cart or workflow, tests/docs). 2026-03-07.
 - `.devagent/workspace/tasks/active/2026-03-07_configurable-platform-fee-mode-tickets-bento/clarification/2026-03-07_initial-clarification.md` — Clarification packet (scope, config model, SKU-based product type, seed-script note, research gap). 2026-03-07.
 - `.devagent/workspace/tasks/active/2026-03-07_configurable-platform-fee-mode-tickets-bento/research/2026-03-07_payment-provider-context-line-items.md` — Research: payment provider input (amount/context only; no line items in API); options to get line-level fee (context.cart_id, custom context, or precompute in workflow). 2026-03-07.
 - `.devagent/workspace/tasks/completed/2026-03-02_stripe-connect/research/2026-03-02_stripe-connect-implementation-research.md` — Stripe Connect implementation (platform fee, destination charges, env vars). 2026-03-07.
