@@ -113,7 +113,11 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
       this.logger_.info(
         `${StripeConnectProviderService.LOG_PREFIX} Connect enabled (account from DB or env), fee ${this.config_.feePercent}%`,
       );
-    } else {
+    }
+    this.logger_.info(
+      `${StripeConnectProviderService.LOG_PREFIX} [fee] config: feePerUnitBased=${this.config_.feePerUnitBased} feeModeTickets=${this.config_.feeModeTickets} feePerTicketCents=${this.config_.feePerTicketCents} feeModeBento=${this.config_.feeModeBento} feePerBoxCents=${this.config_.feePerBoxCents} feePercentTickets=${this.config_.feePercentTickets} feePercentBento=${this.config_.feePercentBento}`,
+    );
+    if (!this.config_.useStripeConnect) {
       this.logger_.info(
         `${StripeConnectProviderService.LOG_PREFIX} Standard Stripe mode (Connect not enabled).`,
       );
@@ -151,12 +155,18 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
    */
   private async getCartLines(cartId: string): Promise<PlatformFeeLineItem[]> {
     if (!this.cartModuleService_) {
+      this.logger_.warn(
+        `${StripeConnectProviderService.LOG_PREFIX} [fee] getCartLines: no cartModuleService, returning []`,
+      );
       return [];
     }
     try {
       const items = await this.cartModuleService_.listLineItems(
         { cart_id: cartId },
         { take: 500 },
+      );
+      this.logger_.info(
+        `${StripeConnectProviderService.LOG_PREFIX} [fee] getCartLines(cartId=${cartId}) raw items=${items.length}`,
       );
       return items.map((item) => ({
         sku: item.variant_sku ?? '',
@@ -233,17 +243,32 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
     let applicationFeeAmount: number;
     if (!this.config_.feePerUnitBased) {
       applicationFeeAmount = this.calculateApplicationFee(amountInCents);
+      this.logger_.info(
+        `${StripeConnectProviderService.LOG_PREFIX} [fee] mode=per_cart amount=${amountInCents} cents → application_fee=${applicationFeeAmount} (${this.config_.feePercent}% of cart)`,
+      );
     } else {
+      this.logger_.info(
+        `${StripeConnectProviderService.LOG_PREFIX} [fee] mode=per_unit cart_id=${cartId ?? 'none'} (from data=${!!cartIdFromData} context_keys=${ctx ? Object.keys(ctx).join(',') : 'none'})`,
+      );
       if (cartId && typeof cartId === 'string') {
         try {
           const lines = await this.getCartLines(cartId);
+          this.logger_.info(
+            `${StripeConnectProviderService.LOG_PREFIX} [fee] cart lines count=${lines.length} items=${JSON.stringify(lines.map((l) => ({ sku: l.sku, qty: l.quantity, unit_cents: l.unit_price_cents })))}`,
+          );
           if (lines.length > 0) {
             applicationFeeAmount = calculatePlatformFeeFromLines(
               lines,
               this.config_,
             );
+            this.logger_.info(
+              `${StripeConnectProviderService.LOG_PREFIX} [fee] platform fee from lines=${applicationFeeAmount} cents`,
+            );
           } else {
             applicationFeeAmount = this.calculateApplicationFee(amountInCents);
+            this.logger_.info(
+              `${StripeConnectProviderService.LOG_PREFIX} [fee] no cart lines, fallback to cart % → application_fee=${applicationFeeAmount}`,
+            );
           }
         } catch (e) {
           this.logger_.warn(
@@ -253,6 +278,9 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
         }
       } else {
         applicationFeeAmount = this.calculateApplicationFee(amountInCents);
+        this.logger_.info(
+          `${StripeConnectProviderService.LOG_PREFIX} [fee] no cart_id in context/data, fallback to cart % → application_fee=${applicationFeeAmount}`,
+        );
       }
     }
 
