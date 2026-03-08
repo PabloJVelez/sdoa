@@ -9,7 +9,6 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 const REDIS_URL = process.env.REDIS_URL;
 const STRIPE_API_KEY = process.env.STRIPE_API_KEY;
 const USE_STRIPE_CONNECT = process.env.USE_STRIPE_CONNECT === 'true';
-const PLATFORM_FEE_PERCENT = parseInt(process.env.PLATFORM_FEE_PERCENT || '5', 10);
 const REFUND_APPLICATION_FEE = process.env.REFUND_APPLICATION_FEE === 'true';
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || undefined;
 const PASS_STRIPE_FEE_TO_CHEF = process.env.PASS_STRIPE_FEE_TO_CHEF === 'true';
@@ -156,7 +155,7 @@ module.exports = defineConfig({
     ...customModules,
     {
       resolve: '@medusajs/medusa/payment',
-      dependencies: ['stripeConnectAccountModuleService'],
+      dependencies: ['stripeConnectAccountModuleService', 'cart'],
       options: {
         providers: [
           {
@@ -165,7 +164,6 @@ module.exports = defineConfig({
             options: {
               apiKey: STRIPE_API_KEY,
               useStripeConnect: USE_STRIPE_CONNECT,
-              feePercent: PLATFORM_FEE_PERCENT,
               refundApplicationFee: REFUND_APPLICATION_FEE,
               webhookSecret: STRIPE_WEBHOOK_SECRET,
               passStripeFeeToChef: PASS_STRIPE_FEE_TO_CHEF,

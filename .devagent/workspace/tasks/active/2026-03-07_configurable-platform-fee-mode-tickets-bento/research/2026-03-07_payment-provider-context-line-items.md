@@ -97,6 +97,20 @@
 
 ---
 
+## Implementation Decision (Task 1 — 2026-03-07)
+
+**Verification:** In this repository, the code that builds `InitiatePaymentInput` and calls the provider's `initiatePayment` lives inside Medusa framework packages (not in `apps/medusa/src`). A search for `initiatePayment` in `node_modules` did not locate the caller. The storefront calls `sdk.store.payment.initiatePaymentSession(cart, data)`; the backend that creates the session is framework code. There is no custom store API route or workflow in this repo that creates the payment session, so we could not inspect what the framework passes in `context`. The documented `PaymentProviderContext` does not include `cart_id` or line items.
+
+**Decision: Option A with fallback.** Implement the provider so that:
+1. It looks for an optional **`context.cart_id`** (or `context.resource_id` if the framework sets it to the cart id when creating a session from a cart). Context is a flexible object in practice; we document that for per-line fee calculation we use `context.cart_id` or `context.resource_id` as the cart identifier when present.
+2. When `cart_id` (or equivalent) is present, the provider resolves the cart to line items to variant SKU via the container (cart module / Query), computes per-line platform fee (EVENT-* = ticket, else bento), and sets `application_fee_amount` to the sum.
+3. When `cart_id` is absent or resolution fails, the provider falls back to the current behavior: `calculateApplicationFee(amount)` (percentage of total amount). No change to current production behavior until context is populated.
+4. If in a future Medusa version or a custom workflow we can set `context.cart_id` when creating the session from a cart, per-line fees will apply without further provider changes.
+
+**Rationale:** Keeps all fee logic in the provider; avoids custom workflow/step in this repo until we have a need to inject `cart_id`. Backward compatible and testable (unit tests for fee calculation; integration test can mock or provide context with cart_id).
+
+---
+
 ## Risks & Open Questions
 
 - **Risk:** Reliance on undocumented or implementation-specific `context` fields (e.g. `resource_id`) may break on Medusa upgrades. Prefer documenting the contract (e.g. “we require context.cart_id”) and, if needed, a small custom step that sets it.

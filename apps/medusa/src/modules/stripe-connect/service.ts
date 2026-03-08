@@ -13,6 +13,7 @@ import {
 } from '@medusajs/framework/utils';
 import type {
   Logger,
+  ICartModuleService,
   InitiatePaymentInput,
   InitiatePaymentOutput,
   AuthorizePaymentInput,
@@ -38,8 +39,11 @@ import type {
   StripeConnectProviderOptions,
   StripeConnectConfig,
   StripeConnectPaymentData,
+  PlatformFeeLineItem,
 } from './types';
 import { getSmallestUnit } from './utils/get-smallest-unit';
+import { getPlatformFeeConfigFromEnv } from './utils/get-fee-config';
+import { calculatePlatformFeeFromLines } from './utils/platform-fee';
 
 interface StripeConnectAccountService {
   getConnectedAccountId(): Promise<string | null>;
@@ -48,6 +52,7 @@ interface StripeConnectAccountService {
 type InjectedDependencies = {
   logger: Logger;
   stripeConnectAccountModuleService?: StripeConnectAccountService;
+  cart?: ICartModuleService;
 };
 
 const NO_ACCOUNT_MESSAGE =
@@ -60,13 +65,15 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
   protected logger_: Logger;
   protected stripe_: Stripe;
   protected stripeConnectAccountService_?: StripeConnectAccountService;
+  private cartModuleService_?: ICartModuleService;
   private static readonly LOG_PREFIX = '[stripe-connect]';
 
   constructor(
-    { logger, stripeConnectAccountModuleService }: InjectedDependencies,
+    { logger, stripeConnectAccountModuleService, cart }: InjectedDependencies,
     options: StripeConnectProviderOptions,
   ) {
-    super({ logger, stripeConnectAccountModuleService }, options);
+    super({ logger, stripeConnectAccountModuleService, cart }, options);
+    this.cartModuleService_ = cart;
 
     if (!options.apiKey) {
       throw new MedusaError(
@@ -84,11 +91,11 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
     }
 
     this.stripeConnectAccountService_ = stripeConnectAccountModuleService;
+    const feeConfig = getPlatformFeeConfigFromEnv();
     this.config_ = {
       apiKey: options.apiKey,
       useStripeConnect,
       connectedAccountId: useStripeConnect && envAccountId.startsWith('acct_') ? envAccountId : '',
-      feePercent: options.feePercent ?? 5,
       refundApplicationFee: options.refundApplicationFee ?? false,
       passStripeFeeToChef: options.passStripeFeeToChef ?? false,
       stripeFeePercent: options.stripeFeePercent ?? 2.9,
@@ -96,6 +103,7 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
       webhookSecret: options.webhookSecret,
       automaticPaymentMethods: options.automaticPaymentMethods ?? true,
       captureMethod: options.captureMethod ?? 'automatic',
+      ...feeConfig,
     };
 
     this.logger_ = logger;
@@ -134,6 +142,32 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
         `${StripeConnectProviderService.LOG_PREFIX} Failed to resolve connected account: ${(e as Error).message}`,
       );
       return null;
+    }
+  }
+
+  /**
+   * Resolves cart to line items with sku, quantity, unit_price_cents via cart module.
+   * Returns [] if cart module is unavailable or cart has no items. Used for per-line platform fee.
+   */
+  private async getCartLines(cartId: string): Promise<PlatformFeeLineItem[]> {
+    if (!this.cartModuleService_) {
+      return [];
+    }
+    try {
+      const items = await this.cartModuleService_.listLineItems(
+        { cart_id: cartId },
+        { take: 500 },
+      );
+      return items.map((item) => ({
+        sku: item.variant_sku ?? '',
+        quantity: Number(item.quantity) || 0,
+        unit_price_cents: Math.round(Number(item.unit_price) || 0),
+      }));
+    } catch (e) {
+      this.logger_.warn(
+        `${StripeConnectProviderService.LOG_PREFIX} getCartLines failed: ${(e as Error).message}`,
+      );
+      throw e;
     }
   }
 
@@ -184,12 +218,43 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
   async initiatePayment(
     input: InitiatePaymentInput,
   ): Promise<InitiatePaymentOutput> {
-    const { amount, currency_code, context } = input;
+    const { amount, currency_code, context, data: inputData } = input;
     const amountInCents = getSmallestUnit(
       amount as unknown as number,
       currency_code,
     );
-    const applicationFeeAmount = this.calculateApplicationFee(amountInCents);
+
+    const dataObj = inputData as Record<string, unknown> | undefined;
+    const ctx = context as Record<string, unknown> | undefined;
+    const cartIdFromData = typeof dataObj?.cart_id === 'string' ? dataObj.cart_id : undefined;
+    const cartIdFromContext = (ctx?.cart_id ?? ctx?.resource_id) as string | undefined;
+    const cartId = cartIdFromData ?? cartIdFromContext;
+
+    let applicationFeeAmount: number;
+    if (!this.config_.feePerUnitBased) {
+      applicationFeeAmount = this.calculateApplicationFee(amountInCents);
+    } else {
+      if (cartId && typeof cartId === 'string') {
+        try {
+          const lines = await this.getCartLines(cartId);
+          if (lines.length > 0) {
+            applicationFeeAmount = calculatePlatformFeeFromLines(
+              lines,
+              this.config_,
+            );
+          } else {
+            applicationFeeAmount = this.calculateApplicationFee(amountInCents);
+          }
+        } catch (e) {
+          this.logger_.warn(
+            `${StripeConnectProviderService.LOG_PREFIX} Could not resolve cart lines for per-line fee, using percentage of total: ${(e as Error).message}`,
+          );
+          applicationFeeAmount = this.calculateApplicationFee(amountInCents);
+        }
+      } else {
+        applicationFeeAmount = this.calculateApplicationFee(amountInCents);
+      }
+    }
 
     try {
       const paymentIntentParams: Stripe.PaymentIntentCreateParams = {
@@ -237,9 +302,9 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
         await this.stripe_.paymentIntents.create(paymentIntentParams);
 
       this.logger_.info(
-        `${StripeConnectProviderService.LOG_PREFIX} Created PaymentIntent ${paymentIntent.id}: ${amountInCents} ${currency_code}` +
+        `${StripeConnectProviderService.LOG_PREFIX} Created PaymentIntent ${paymentIntent.id}: amount=${amountInCents} ${currency_code}` +
           (this.isConnectEnabled()
-            ? `, fee: ${applicationFeeAmount} (${this.config_.feePercent}%)`
+            ? ` application_fee_amount=${applicationFeeAmount}`
             : ''),
       );
 
@@ -586,6 +651,10 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
     }
   }
 
+  /**
+   * Updates payment (e.g. cart amount changed). Fee is recalculated as percentage of new amount;
+   * no cart/line context is available on update, so per-line fee is not applied here.
+   */
   async updatePayment(
     input: UpdatePaymentInput,
   ): Promise<UpdatePaymentOutput> {

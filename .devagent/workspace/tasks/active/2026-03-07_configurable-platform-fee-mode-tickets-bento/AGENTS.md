@@ -24,13 +24,18 @@ The project already supports Stripe Connect with commission amount driven by the
 - [2026-03-07] Event: clarify-task session 1 completed; answers captured in `clarification/2026-03-07_initial-clarification.md` (SKU-based ticket/bento distinction, separate config per type, per-unit cents env vars; future note for tag/attribute; one research gap: payment provider line-item context).
 - [2026-03-07] Event: research completed; payment provider context and line-item access documented in `research/2026-03-07_payment-provider-context-line-items.md` (provider receives amount/context only; options: use context.resource_id if cart_id, custom context, or precompute fee in workflow).
 - [2026-03-07] Event: implementation plan created at `plan/2026-03-07_configurable-platform-fee-implementation-plan.md` (5 tasks: verify context/strategy, env/config, fee calculation, cart resolution or workflow step, tests and docs).
+- [2026-03-07] Event: Task 1 completed: verified context not inspectable in-repo; decision Option A with fallback documented in `research/2026-03-07_payment-provider-context-line-items.md` (use context.cart_id when present, else percentage-of-total).
+- [2026-03-07] Event: Task 2 completed: env vars and provider config added (PLATFORM_FEE_MODE_TICKETS/BENTO, PLATFORM_FEE_PER_TICKET_CENTS, PLATFORM_FEE_PER_BOX_CENTS, feePercentTickets/Bento); types.ts, medusa-config.ts, service constructor, .env.template updated.
+- [2026-03-07] Event: Task 3 completed: per-line fee calculation in utils/platform-fee.ts; initiatePayment uses context.cart_id/resource_id and getCartLines; fallback to percentage-of-total when no lines.
+- [2026-03-07] Event: Task 4 completed: getCartLines implemented via cartModuleService.listLineItems; payment module dependency on cartModuleService added in medusa-config.
+- [2026-03-07] Event: Task 5 completed: unit tests for platform-fee (isTicket, calculatePlatformFeeFromLines); future-improvement note in platform-fee.ts; .env.template updated in Task 2.
 
 ## Implementation Checklist
-- [ ] Task 1: Verify payment context and choose strategy (A/B/C) — see plan.
-- [ ] Task 2: Add env vars and provider config shape (medusa-config, types, .env.example).
-- [ ] Task 3: Implement per-line fee calculation and wire into provider (or workflow).
-- [ ] Task 4: Resolve cart to line items (Option A) or add workflow step (Option B/C).
-- [ ] Task 5: Tests, env docs, and future-improvement note.
+- [x] Task 1: Verify payment context and choose strategy (A/B/C) — see plan.
+- [x] Task 2: Add env vars and provider config shape (medusa-config, types, .env.example).
+- [x] Task 3: Implement per-line fee calculation and wire into provider (or workflow).
+- [x] Task 4: Resolve cart to line items (Option A) or add workflow step (Option B/C).
+- [x] Task 5: Tests, env docs, and future-improvement note.
 
 ## Open Questions
 - (To be populated as needed.)
