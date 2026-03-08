@@ -3,7 +3,7 @@
 - Owner: PabloJVelez
 - Last Updated: 2026-03-07
 - Status: Draft
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-03-07_configurable-platform-fee-mode-tickets-bento/`
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-03-07_configurable-platform-fee-mode-tickets-bento/`
 - Stakeholders: PabloJVelez (Owner, Decision Maker)
 - Notes: Plan assumes research and clarification are done; first implementation task verifies payment context and locks strategy (provider vs workflow).
 

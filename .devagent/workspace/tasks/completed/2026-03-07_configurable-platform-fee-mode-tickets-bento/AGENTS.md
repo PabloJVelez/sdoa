@@ -2,8 +2,8 @@
 
 - Owner: PabloJVelez
 - Last Updated: 2026-03-07
-- Status: Draft
-- Task Hub: `.devagent/workspace/tasks/active/2026-03-07_configurable-platform-fee-mode-tickets-bento/`
+- Status: Complete
+- Task Hub: `.devagent/workspace/tasks/completed/2026-03-07_configurable-platform-fee-mode-tickets-bento/`
 
 ## Summary
 The project already supports Stripe Connect with commission amount driven by the env var `PLATFORM_FEE_PERCENT`. This task introduces configuration to control *how* commission is accounted for. The storefront sells both chef event tickets and delivered bento boxes. Commission for chef event tickets should be configurable as either a dollar amount per ticket or a percentage of the ticket; similarly, for bento boxes it should be either a percentage of the boxes’ value or a set dollar amount. The behavior should be config-driven—e.g. a flag like `CHARGE_PER_TICKET` set to `true` would make the platform fee be charged per ticket; when set to `false`, a percentage or dollar amount of the cart is taken for the platform fee as it behaves today.
@@ -29,6 +29,7 @@ The project already supports Stripe Connect with commission amount driven by the
 - [2026-03-07] Event: Task 3 completed: per-line fee calculation in utils/platform-fee.ts; initiatePayment uses context.cart_id/resource_id and getCartLines; fallback to percentage-of-total when no lines.
 - [2026-03-07] Event: Task 4 completed: getCartLines implemented via cartModuleService.listLineItems; payment module dependency on cartModuleService added in medusa-config.
 - [2026-03-07] Event: Task 5 completed: unit tests for platform-fee (isTicket, calculatePlatformFeeFromLines); future-improvement note in platform-fee.ts; .env.template updated in Task 2.
+- [2026-03-07] Event: Task moved to completed. Updated all status references and file paths from active/ to completed/ throughout task directory.
 
 ## Implementation Checklist
 - [x] Task 1: Verify payment context and choose strategy (A/B/C) — see plan.
@@ -41,9 +42,9 @@ The project already supports Stripe Connect with commission amount driven by the
 - (To be populated as needed.)
 
 ## References
-- `.devagent/workspace/tasks/active/2026-03-07_configurable-platform-fee-mode-tickets-bento/plan/2026-03-07_configurable-platform-fee-implementation-plan.md` — Implementation plan (5 tasks: verify context, env/config, fee logic, cart or workflow, tests/docs). 2026-03-07.
-- `.devagent/workspace/tasks/active/2026-03-07_configurable-platform-fee-mode-tickets-bento/clarification/2026-03-07_initial-clarification.md` — Clarification packet (scope, config model, SKU-based product type, seed-script note, research gap). 2026-03-07.
-- `.devagent/workspace/tasks/active/2026-03-07_configurable-platform-fee-mode-tickets-bento/research/2026-03-07_payment-provider-context-line-items.md` — Research: payment provider input (amount/context only; no line items in API); options to get line-level fee (context.cart_id, custom context, or precompute in workflow). 2026-03-07.
+- `.devagent/workspace/tasks/completed/2026-03-07_configurable-platform-fee-mode-tickets-bento/plan/2026-03-07_configurable-platform-fee-implementation-plan.md` — Implementation plan (5 tasks: verify context, env/config, fee logic, cart or workflow, tests/docs). 2026-03-07.
+- `.devagent/workspace/tasks/completed/2026-03-07_configurable-platform-fee-mode-tickets-bento/clarification/2026-03-07_initial-clarification.md` — Clarification packet (scope, config model, SKU-based product type, seed-script note, research gap). 2026-03-07.
+- `.devagent/workspace/tasks/completed/2026-03-07_configurable-platform-fee-mode-tickets-bento/research/2026-03-07_payment-provider-context-line-items.md` — Research: payment provider input (amount/context only; no line items in API); options to get line-level fee (context.cart_id, custom context, or precompute in workflow). 2026-03-07.
 - `.devagent/workspace/tasks/completed/2026-03-02_stripe-connect/research/2026-03-02_stripe-connect-implementation-research.md` — Stripe Connect implementation (platform fee, destination charges, env vars). 2026-03-07.
 - `.devagent/workspace/tasks/completed/2026-03-02_stripe-connect/` — Task hub for Stripe Connect; custom provider, `PLATFORM_FEE_PERCENT`, `application_fee_amount`. 2026-03-07.
 - `.devagent/workspace/tasks/completed/2026-03-03_implement-stripe-admin-onboarding/plan/` — Admin onboarding plan; preserves `USE_STRIPE_CONNECT` and fee/refund semantics. 2026-03-07.

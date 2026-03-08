@@ -5,7 +5,7 @@
 - Date: 2026-03-07
 - Mode: Task Clarification
 - Status: In Progress
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-03-07_configurable-platform-fee-mode-tickets-bento/`
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-03-07_configurable-platform-fee-mode-tickets-bento/`
 - Notes: First session; capturing answers incrementally.
 
 ## Task Overview

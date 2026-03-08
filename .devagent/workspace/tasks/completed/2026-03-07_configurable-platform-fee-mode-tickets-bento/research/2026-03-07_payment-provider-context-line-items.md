@@ -1,7 +1,7 @@
 # Payment Provider Context: Line Items and Variant SKU Access
 
 - **Date:** 2026-03-07
-- **Task Hub:** `.devagent/workspace/tasks/active/2026-03-07_configurable-platform-fee-mode-tickets-bento/`
+- **Task Hub:** `.devagent/workspace/tasks/completed/2026-03-07_configurable-platform-fee-mode-tickets-bento/`
 - **Related clarification:** `clarification/2026-03-07_initial-clarification.md` (Gaps Requiring Research)
 
 ---
@@ -31,7 +31,7 @@
 - **Internal**
   - `apps/medusa/src/modules/stripe-connect/service.ts` — current use of `input.amount`, `input.currency_code`, `input.context` (session_id, resource_id only). 2026-03-07.
   - `apps/storefront/libs/util/server/data/cart.server.ts` — `sdk.store.payment.initiatePaymentSession(cart, data, ...)`; full cart passed to API. 2026-03-07.
-  - `.devagent/workspace/tasks/active/2026-03-07_configurable-platform-fee-mode-tickets-bento/clarification/2026-03-07_initial-clarification.md` — requirement: per-line fee by SKU (EVENT-* = ticket, else bento). 2026-03-07.
+  - `.devagent/workspace/tasks/completed/2026-03-07_configurable-platform-fee-mode-tickets-bento/clarification/2026-03-07_initial-clarification.md` — requirement: per-line fee by SKU (EVENT-* = ticket, else bento). 2026-03-07.
 - **External**
   - [IPaymentProvider – initiatePayment](https://docs.medusajs.com/resources/references/types/interfaces/types.IPaymentProvider) — parameters: idempotency_key, customer, account_holder, **context** (PaymentProviderContext), data, currency_code, amount. No line items or cart_id in the documented signature. 2026-03-07.
   - [PaymentProviderContext](https://docs.medusajs.com/resources/references/types/interfaces/types.PaymentProviderContext) — properties: idempotency_key, customer, account_holder. No cart_id or line items. 2026-03-07.
