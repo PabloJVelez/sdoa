@@ -62,7 +62,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
   if (activePaymentSession?.provider_id !== data.providerId || !cart.payment_collection?.payment_sessions?.length) {
     await initiatePaymentSession(actionArgs.request, cart, {
       provider_id: data.providerId,
-      data: { payment_method: data.paymentMethodId },
+      data: { payment_method: data.paymentMethodId, cart_id: cart.id },
     });
   }
 
@@ -71,7 +71,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
   if (!isNewPaymentMethod && data.providerId === 'pp_stripe-connect_stripe-connect') {
     await initiatePaymentSession(actionArgs.request, cart, {
       provider_id: data.providerId,
-      data: { payment_method: data.paymentMethodId },
+      data: { payment_method: data.paymentMethodId, cart_id: cart.id },
     });
   }
 
