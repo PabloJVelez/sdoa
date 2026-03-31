@@ -5,12 +5,24 @@
  * - Three-decimal (e.g. BHD, KWD): amount * 1000.
  */
 const ZERO_DECIMAL_CURRENCIES = new Set([
-  'bif', 'clp', 'djf', 'gnf', 'jpy', 'kmf', 'krw', 'mga', 'pyg', 'rwf', 'ugx', 'vnd', 'vuv', 'xaf', 'xof',
+  'bif',
+  'clp',
+  'djf',
+  'gnf',
+  'jpy',
+  'kmf',
+  'krw',
+  'mga',
+  'pyg',
+  'rwf',
+  'ugx',
+  'vnd',
+  'vuv',
+  'xaf',
+  'xof',
 ]);
 
-const THREE_DECIMAL_CURRENCIES = new Set([
-  'bhd', 'jod', 'kwd', 'omr', 'tnd',
-]);
+const THREE_DECIMAL_CURRENCIES = new Set(['bhd', 'jod', 'kwd', 'omr', 'tnd']);
 
 export function getSmallestUnit(amount: number, currencyCode: string): number {
   const currency = (currencyCode || 'usd').toLowerCase();
@@ -23,4 +35,19 @@ export function getSmallestUnit(amount: number, currencyCode: string): number {
   }
   // Default: two decimal (cents)
   return Math.round(amount * 100);
+}
+
+/** Display Stripe / Medusa smallest-unit amounts (e.g. admin widgets). */
+export function formatFromSmallestUnit(amountSmallest: number, currencyCode: string): string {
+  const currency = (currencyCode || 'usd').toLowerCase();
+  const major = ZERO_DECIMAL_CURRENCIES.has(currency)
+    ? amountSmallest
+    : THREE_DECIMAL_CURRENCIES.has(currency)
+      ? amountSmallest / 1000
+      : amountSmallest / 100;
+
+  return new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: currency.toUpperCase(),
+  }).format(major);
 }
