@@ -56,7 +56,7 @@ const ExperienceTypesPage = () => {
 };
 
 export const config = defineRouteConfig({
-  label: 'Experience Types',
+  label: 'Experiences',
 });
 
 export default ExperienceTypesPage;

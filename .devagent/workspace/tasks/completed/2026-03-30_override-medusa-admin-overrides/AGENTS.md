@@ -1,0 +1,64 @@
+# Override Medusa Admin Base Page Progress Tracker
+
+- Owner: PabloJVelez
+- Last Updated: 2026-03-31
+- Status: Complete
+- Task Hub: `.devagent/workspace/tasks/completed/2026-03-30_override-medusa-admin-overrides/`
+
+## Summary
+
+Add a way to override some parts of the base Medusa admin page in this repo. This has already been implemented in a parent project, and the goal is to bring those changes into `sdoa` using the parent project’s approach and artifacts as the primary reference.
+
+Primary reference artifacts provided from the parent project:
+- `private-chef-template/.devagent/workspace/tasks/completed/2026-03-29_override-medusa-admin-overrides/clarification/2026-03-29_initial-clarification.md`
+- `private-chef-template/.devagent/workspace/tasks/completed/2026-03-29_override-medusa-admin-overrides/plan/2026-03-29_medusa-admin-vite-unlock-overrides.md`
+- `private-chef-template/.devagent/workspace/tasks/completed/2026-03-29_override-medusa-admin-overrides/research/2026-03-29_medusa-admin-overrides-with-vite-plugin-unlock.md`
+- `private-chef-template/.devagent/workspace/tasks/completed/2026-03-29_override-medusa-admin-overrides/AGENTS.md`
+- `private-chef-template/docs/medusa-admin-unlock-overrides.md`
+
+## Agent Update Instructions
+- Always update "Last Updated" to today's date (ISO: YYYY-MM-DD) when editing this file. **Get the current date by explicitly running `date +%Y-%m-%d` first, then use the output for the "Last Updated" field.**
+- Progress Log: Append a new entry at the end in the form `- [YYYY-MM-DD] Event: concise update, links to files`. Do not rewrite or delete prior entries. **Use the date retrieved from `date +%Y-%m-%d` for the date portion.**
+- Implementation Checklist: Mark items as `[x]` when complete, `[~]` for partial with a short note. Add new items if discovered; avoid removing items—strike through only when obsolete.
+- Key Decisions: Record important decisions as `- [YYYY-MM-DD] Decision: rationale, links`. **Use the date retrieved from `date +%Y-%m-%d` for the date portion.**
+- References: Keep links current to latest spec, research, and tasks. Add additional references as they are created.
+- Scope: Edits here should reflect coordination/progress only; do not include application code changes. Preserve history.
+
+## Key Decisions
+- [2026-03-30] Decision: Task hub created to port Medusa admin override mechanism from parent project; details to be captured in clarification/research artifacts.
+
+## Progress Log
+- [2026-03-30] Event: Task hub scaffolded via `devagent new-task`; ready for clarification, research, and planning.
+- [2026-03-30] Event: Research packet created — `research/2026-03-30_medusa-admin-overrides-vite-plugin-unlock.md`.
+- [2026-03-30] Event: Clarification complete — `clarification/2026-03-30_initial-clarification.md` (parity with parent, `/chef-events`, verbatim branding, force-match parent versions).
+- [2026-03-30] Event: Plan created — `plan/2026-03-30_medusa-admin-unlock-overrides-parity.md`.
+- [2026-03-30] Event: Task 1 completed — wired unlock plugin in `apps/medusa/medusa-config.ts` and added dependency `@unlockable/vite-plugin-unlock` to `apps/medusa/package.json`.
+- [2026-03-30] Event: Tasks 2–7 completed — added admin overrides (`src/admin/overrides/*`), payout lib/UI (`src/lib/order-stripe-payout.ts`, `src/admin/components/order-stripe-payout-breakdown.tsx`), TS/IDE shims (`src/admin/dashboard-imports.d.ts`, `src/admin/ambient.d.ts`, `tsconfig` exclude), and doc `docs/medusa-admin-unlock-overrides.md`. `yarn workspace medusa typecheck` + `yarn workspace medusa build` passed and unlock debug logs confirmed active overrides.
+- [2026-03-31] Event: Task moved to completed. Updated all status references and file paths from `active/` to `completed/` throughout task directory. Follow-up work (order summary performance, duplicate payout widget removal, sidebar menu order, image import typings) landed in app code after initial implementation.
+
+## Implementation Checklist
+- [x] Capture requirements for which admin page parts must be overrideable (and how the overrides are selected/loaded). (See `clarification/2026-03-30_initial-clarification.md`)
+- [x] Identify the exact approach used in the parent project (Vite plugin unlock + overrides structure) and map it to this repo’s Medusa admin build/setup. (See `research/2026-03-30_medusa-admin-overrides-vite-plugin-unlock.md`)
+- [x] Implement override wiring + parity inventory per plan. (See `plan/2026-03-30_medusa-admin-unlock-overrides-parity.md`)
+- [x] Port/author repo documentation for unlock overrides per plan.
+
+## Open Questions
+- Which specific “base Medusa admin page” areas must be overridable (layout header, sidebar/nav, specific route/page, widgets, branding, etc.)?
+- Should overrides be environment-driven (e.g. per deployment) or source-controlled only?
+
+**Resolution (2026-03-31):** Both items were answered in `clarification/2026-03-30_initial-clarification.md` (full parity with parent inventory; source-controlled overrides with manual smoke verification). Left above for historical traceability.
+
+## References
+- [2026-03-30] Parent task clarification — `@/Users/pablo/Personal/development/private-chef-template/private-chef-template/.devagent/workspace/tasks/completed/2026-03-29_override-medusa-admin-overrides/clarification/2026-03-29_initial-clarification.md`
+- [2026-03-30] Parent task plan — `@/Users/pablo/Personal/development/private-chef-template/private-chef-template/.devagent/workspace/tasks/completed/2026-03-29_override-medusa-admin-overrides/plan/2026-03-29_medusa-admin-vite-unlock-overrides.md`
+- [2026-03-30] Parent task research — `@/Users/pablo/Personal/development/private-chef-template/private-chef-template/.devagent/workspace/tasks/completed/2026-03-29_override-medusa-admin-overrides/research/2026-03-29_medusa-admin-overrides-with-vite-plugin-unlock.md`
+- [2026-03-30] Parent task hub — `@/Users/pablo/Personal/development/private-chef-template/private-chef-template/.devagent/workspace/tasks/completed/2026-03-29_override-medusa-admin-overrides/AGENTS.md`
+- [2026-03-30] Parent docs — `@/Users/pablo/Personal/development/private-chef-template/private-chef-template/docs/medusa-admin-unlock-overrides.md`
+- [2026-03-30] Local new-task workflow — `.devagent/core/workflows/new-task.md`
+- [2026-03-30] Local clarification — `clarification/2026-03-30_initial-clarification.md`
+- [2026-03-30] Local research — `research/2026-03-30_medusa-admin-overrides-vite-plugin-unlock.md`
+- [2026-03-30] Local plan — `plan/2026-03-30_medusa-admin-unlock-overrides-parity.md`
+
+## Next Steps
+
+Task archived under `completed/`. For new work, open a new task hub in `active/`.
