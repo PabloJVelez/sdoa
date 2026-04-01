@@ -3,8 +3,8 @@
 - Mode: Task
 - Requested By: PabloJVelez
 - Last Updated: 2026-03-30
-- Related Plan: `.devagent/workspace/tasks/active/2026-03-30_override-medusa-admin-overrides/plan/<file>.md` (not yet created)
-- Storage Path: `.devagent/workspace/tasks/active/2026-03-30_override-medusa-admin-overrides/research/2026-03-30_medusa-admin-overrides-vite-plugin-unlock.md`
+- Related Plan: `.devagent/workspace/tasks/completed/2026-03-30_override-medusa-admin-overrides/plan/2026-03-30_medusa-admin-unlock-overrides-parity.md`
+- Storage Path: `.devagent/workspace/tasks/completed/2026-03-30_override-medusa-admin-overrides/research/2026-03-30_medusa-admin-overrides-vite-plugin-unlock.md`
 - Stakeholders: PabloJVelez (DRI)
 
 ## Request Overview

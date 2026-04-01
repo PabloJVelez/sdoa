@@ -5,7 +5,7 @@
 - Date: 2026-03-30
 - Mode: Task Clarification
 - Status: Complete
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-03-30_override-medusa-admin-overrides/`
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-03-30_override-medusa-admin-overrides/`
 - Notes: Incremental packet; updated after each Q&A turn. Parent reference implementation exists in `private-chef-template` and is the starting point for decisions here.
 
 ## Task Overview
@@ -15,7 +15,7 @@
 - **Business context:** Enable targeted admin UI customization while staying on upstream `@medusajs/dashboard` (no fork), using the proven parent-project pattern.
 - **Stakeholders:** PabloJVelez (Requestor/Decision Maker)
 - **Prior work:**
-  - Research (this repo): `.devagent/workspace/tasks/active/2026-03-30_override-medusa-admin-overrides/research/2026-03-30_medusa-admin-overrides-vite-plugin-unlock.md`
+  - Research (this repo): `.devagent/workspace/tasks/completed/2026-03-30_override-medusa-admin-overrides/research/2026-03-30_medusa-admin-overrides-vite-plugin-unlock.md`
   - Parent implementation docs: `@/Users/pablo/Personal/development/private-chef-template/private-chef-template/docs/medusa-admin-unlock-overrides.md`
   - Parent plan: `@/Users/pablo/Personal/development/private-chef-template/private-chef-template/.devagent/workspace/tasks/completed/2026-03-29_override-medusa-admin-overrides/plan/2026-03-29_medusa-admin-vite-unlock-overrides.md`
 

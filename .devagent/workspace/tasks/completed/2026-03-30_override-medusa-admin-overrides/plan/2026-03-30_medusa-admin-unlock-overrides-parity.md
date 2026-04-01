@@ -3,9 +3,9 @@
 - Owner: PabloJVelez
 - Last Updated: 2026-03-30
 - Status: Draft
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-03-30_override-medusa-admin-overrides/`
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-03-30_override-medusa-admin-overrides/`
 - Stakeholders: PabloJVelez (DRI)
-- Notes: Source of truth for behavior and file inventory is the parent repo doc `@/Users/pablo/Personal/development/private-chef-template/private-chef-template/docs/medusa-admin-unlock-overrides.md`. Requirements locked in `.devagent/workspace/tasks/active/2026-03-30_override-medusa-admin-overrides/clarification/2026-03-30_initial-clarification.md`.
+- Notes: Source of truth for behavior and file inventory is the parent repo doc `@/Users/pablo/Personal/development/private-chef-template/private-chef-template/docs/medusa-admin-unlock-overrides.md`. Requirements locked in `.devagent/workspace/tasks/completed/2026-03-30_override-medusa-admin-overrides/clarification/2026-03-30_initial-clarification.md`.
 
 ---
 
@@ -19,8 +19,8 @@ Port the parent project’s Medusa admin override mechanism and override invento
 
 We need branded/admin-tailored UX (navigation, orders UX, payout summary) while staying on the upstream dashboard upgrade path. The parent repo has a known-good implementation and operational guidance; this task ports it into `sdoa` with parity. Primary references:
 
-- Clarification: `.devagent/workspace/tasks/active/2026-03-30_override-medusa-admin-overrides/clarification/2026-03-30_initial-clarification.md`
-- Research: `.devagent/workspace/tasks/active/2026-03-30_override-medusa-admin-overrides/research/2026-03-30_medusa-admin-overrides-vite-plugin-unlock.md`
+- Clarification: `.devagent/workspace/tasks/completed/2026-03-30_override-medusa-admin-overrides/clarification/2026-03-30_initial-clarification.md`
+- Research: `.devagent/workspace/tasks/completed/2026-03-30_override-medusa-admin-overrides/research/2026-03-30_medusa-admin-overrides-vite-plugin-unlock.md`
 - Parent operational guide: `@/Users/pablo/Personal/development/private-chef-template/private-chef-template/docs/medusa-admin-unlock-overrides.md`
 - Parent plan (inventory): `@/Users/pablo/Personal/development/private-chef-template/private-chef-template/.devagent/workspace/tasks/completed/2026-03-29_override-medusa-admin-overrides/plan/2026-03-29_medusa-admin-vite-unlock-overrides.md`
 
@@ -192,7 +192,7 @@ We need branded/admin-tailored UX (navigation, orders UX, payout summary) while 
 
 ### Implementation Guidance (Optional)
 
-- **From `.devagent/workspace/tasks/active/2026-03-30_override-medusa-admin-overrides/clarification/2026-03-30_initial-clarification.md`:**
+- **From `.devagent/workspace/tasks/completed/2026-03-30_override-medusa-admin-overrides/clarification/2026-03-30_initial-clarification.md`:**
   - Parity requirement, `/chef-events` default landing, verbatim branding, and force-match parent versions.
 - **From parent operational guide `@/Users/pablo/Personal/development/private-chef-template/private-chef-template/docs/medusa-admin-unlock-overrides.md`:**
   - Basename matching, `~dashboard` alias, relative-import pitfall, TS shim patterns.
@@ -211,5 +211,5 @@ We need branded/admin-tailored UX (navigation, orders UX, payout summary) while 
 
 ## Progress Tracking
 
-Refer to `.devagent/workspace/tasks/active/2026-03-30_override-medusa-admin-overrides/AGENTS.md` for progress logging instructions.
+Refer to `.devagent/workspace/tasks/completed/2026-03-30_override-medusa-admin-overrides/AGENTS.md` for progress logging instructions.
 

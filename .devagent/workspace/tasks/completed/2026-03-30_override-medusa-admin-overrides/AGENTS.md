@@ -1,9 +1,9 @@
 # Override Medusa Admin Base Page Progress Tracker
 
 - Owner: PabloJVelez
-- Last Updated: 2026-03-30
-- Status: Draft
-- Task Hub: `.devagent/workspace/tasks/active/2026-03-30_override-medusa-admin-overrides/`
+- Last Updated: 2026-03-31
+- Status: Complete
+- Task Hub: `.devagent/workspace/tasks/completed/2026-03-30_override-medusa-admin-overrides/`
 
 ## Summary
 
@@ -34,6 +34,7 @@ Primary reference artifacts provided from the parent project:
 - [2026-03-30] Event: Plan created — `plan/2026-03-30_medusa-admin-unlock-overrides-parity.md`.
 - [2026-03-30] Event: Task 1 completed — wired unlock plugin in `apps/medusa/medusa-config.ts` and added dependency `@unlockable/vite-plugin-unlock` to `apps/medusa/package.json`.
 - [2026-03-30] Event: Tasks 2–7 completed — added admin overrides (`src/admin/overrides/*`), payout lib/UI (`src/lib/order-stripe-payout.ts`, `src/admin/components/order-stripe-payout-breakdown.tsx`), TS/IDE shims (`src/admin/dashboard-imports.d.ts`, `src/admin/ambient.d.ts`, `tsconfig` exclude), and doc `docs/medusa-admin-unlock-overrides.md`. `yarn workspace medusa typecheck` + `yarn workspace medusa build` passed and unlock debug logs confirmed active overrides.
+- [2026-03-31] Event: Task moved to completed. Updated all status references and file paths from `active/` to `completed/` throughout task directory. Follow-up work (order summary performance, duplicate payout widget removal, sidebar menu order, image import typings) landed in app code after initial implementation.
 
 ## Implementation Checklist
 - [x] Capture requirements for which admin page parts must be overrideable (and how the overrides are selected/loaded). (See `clarification/2026-03-30_initial-clarification.md`)
@@ -44,6 +45,8 @@ Primary reference artifacts provided from the parent project:
 ## Open Questions
 - Which specific “base Medusa admin page” areas must be overridable (layout header, sidebar/nav, specific route/page, widgets, branding, etc.)?
 - Should overrides be environment-driven (e.g. per deployment) or source-controlled only?
+
+**Resolution (2026-03-31):** Both items were answered in `clarification/2026-03-30_initial-clarification.md` (full parity with parent inventory; source-controlled overrides with manual smoke verification). Left above for historical traceability.
 
 ## References
 - [2026-03-30] Parent task clarification — `@/Users/pablo/Personal/development/private-chef-template/private-chef-template/.devagent/workspace/tasks/completed/2026-03-29_override-medusa-admin-overrides/clarification/2026-03-29_initial-clarification.md`
@@ -58,7 +61,4 @@ Primary reference artifacts provided from the parent project:
 
 ## Next Steps
 
-Recommended follow-up workflow:
-
-- `devagent implement-plan`
-
+Task archived under `completed/`. For new work, open a new task hub in `active/`.
