@@ -101,7 +101,7 @@ export const ChefEventForm = ({
   }, [initialData, reset])
 
   const watchedStatus = watch("status")
-  const watchedEventType = watch("eventType")
+  const watchedEventType = watch("eventType") as unknown as string | undefined
   const currentStatus = initialData?.status
   const isPickup = watchedEventType === 'pickup' || initialData?.eventType === 'pickup'
 

@@ -32,12 +32,14 @@ Primary reference artifacts provided from the parent project:
 - [2026-03-30] Event: Research packet created — `research/2026-03-30_medusa-admin-overrides-vite-plugin-unlock.md`.
 - [2026-03-30] Event: Clarification complete — `clarification/2026-03-30_initial-clarification.md` (parity with parent, `/chef-events`, verbatim branding, force-match parent versions).
 - [2026-03-30] Event: Plan created — `plan/2026-03-30_medusa-admin-unlock-overrides-parity.md`.
+- [2026-03-30] Event: Task 1 completed — wired unlock plugin in `apps/medusa/medusa-config.ts` and added dependency `@unlockable/vite-plugin-unlock` to `apps/medusa/package.json`.
+- [2026-03-30] Event: Tasks 2–7 completed — added admin overrides (`src/admin/overrides/*`), payout lib/UI (`src/lib/order-stripe-payout.ts`, `src/admin/components/order-stripe-payout-breakdown.tsx`), TS/IDE shims (`src/admin/dashboard-imports.d.ts`, `src/admin/ambient.d.ts`, `tsconfig` exclude), and doc `docs/medusa-admin-unlock-overrides.md`. `yarn workspace medusa typecheck` + `yarn workspace medusa build` passed and unlock debug logs confirmed active overrides.
 
 ## Implementation Checklist
 - [x] Capture requirements for which admin page parts must be overrideable (and how the overrides are selected/loaded). (See `clarification/2026-03-30_initial-clarification.md`)
 - [x] Identify the exact approach used in the parent project (Vite plugin unlock + overrides structure) and map it to this repo’s Medusa admin build/setup. (See `research/2026-03-30_medusa-admin-overrides-vite-plugin-unlock.md`)
-- [ ] Implement override wiring + parity inventory per plan. (See `plan/2026-03-30_medusa-admin-unlock-overrides-parity.md`)
-- [ ] Port/author repo documentation for unlock overrides per plan.
+- [x] Implement override wiring + parity inventory per plan. (See `plan/2026-03-30_medusa-admin-unlock-overrides-parity.md`)
+- [x] Port/author repo documentation for unlock overrides per plan.
 
 ## Open Questions
 - Which specific “base Medusa admin page” areas must be overridable (layout header, sidebar/nav, specific route/page, widgets, branding, etc.)?
