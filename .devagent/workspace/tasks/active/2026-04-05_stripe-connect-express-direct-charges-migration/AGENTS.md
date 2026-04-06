@@ -11,7 +11,7 @@ Refactor Stripe Connect so new chef onboarding creates **Express** connected acc
 
 The desired end state aligns with Connect guidance for SaaS-style storefronts: **Express + direct charges** so fees/refunds/disputes primarily hit the connected account, reducing platform cash-flow exposure. **Clarified (2026-04-05):** one legacy Custom account will be **manually deleted**—no production dual-path for destination vs direct. Billing follows **Stripe handles pricing** (drop **`PASS_STRIPE_FEE_TO_CHEF` gross-up**); **Connect webhooks** match the **parent template** implementation. See References for parent paths and `clarification/2026-04-05_initial-clarification.md`.
 
-**Verification (2026-04-05):** This codebase still implements Custom account creation and destination charges (e.g. `apps/medusa/src/modules/stripe-connect-account/service.ts`, `apps/medusa/src/modules/stripe-connect/service.ts`). No `[ALREADY IMPLEMENTED]` tag applies.
+**Implementation (2026-04-06):** Express accounts, direct charges with `{ stripeAccount }` on PI lifecycle, removed fee gross-up and `estimate-stripe-processing-fee.ts`, updated admin payout UI, storefront `loadStripe(..., { stripeAccount })`, `.env.template` webhook guidance. `yarn workspace medusa build` passed.
 
 ## Agent Update Instructions
 
@@ -36,13 +36,14 @@ The desired end state aligns with Connect guidance for SaaS-style storefronts: *
 - [2026-04-05] Event: Clarify-task **complete** — Q1–Q3 answered (manual Custom removal; Stripe-handles-pricing, drop fee gross-up; Connect webhooks = parent parity). Packet status Complete. See `clarification/2026-04-05_initial-clarification.md`.
 - [2026-04-05] Event: Linked parent **porting checklist** — `private-chef-template/docs/porting-express-direct-charges-sibling-project.md` (prompt output: webhooks, fees, removed env/UI, `loadStripe`, Connect pricing). Primary parity doc for `create-plan`.
 - [2026-04-06] Event: **`devagent create-plan`** — implementation plan with five tasks (Express account, provider direct charges + gross-up removal, config/env/docs, storefront `stripeAccount`, admin payout UI). See `plan/2026-04-06_express-direct-charges-implementation-plan.md`.
+- [2026-04-06] Event: **`devagent implement-plan`** — all five plan tasks coded in apps/medusa + apps/storefront; `yarn workspace medusa build` OK. Ops: Stripe Dashboard Connect webhook + Connect pricing still required.
 
 ## Implementation Checklist
 
 - [x] Clarify product and Stripe Connect billing posture (merchant of record, reporting needs, migration for existing Custom accounts) — `clarification/2026-04-05_initial-clarification.md`.
 - [x] Research: Express account creation params, direct charge PaymentIntent flow, Medusa payment provider changes, webhooks and admin reporting — see `research/2026-04-05_stripe-connect-express-direct-charges-migration.md`.
 - [x] Plan: implementation tasks, env/webhook docs, validation — [`plan/2026-04-06_express-direct-charges-implementation-plan.md`](./plan/2026-04-06_express-direct-charges-implementation-plan.md).
-- [ ] Implement: (tracked in plan artifact after `devagent create-plan`).
+- [x] Implement: Express + direct charges, env/docs, storefront + admin — see Progress Log 2026-04-06.
 
 ## Open Questions
 
@@ -62,7 +63,7 @@ The desired end state aligns with Connect guidance for SaaS-style storefronts: *
 - **Admin Connect onboarding task:** `.devagent/workspace/tasks/completed/2026-03-03_implement-stripe-admin-onboarding/` — onboarding UI/API alignment; freshness 2026-04-05.
 - **Platform fee modes:** `.devagent/workspace/tasks/completed/2026-03-07_configurable-platform-fee-mode-tickets-bento/` — line-based vs cart fees; freshness 2026-04-05.
 - **Admin order / Stripe payout UI:** `.devagent/workspace/tasks/completed/2026-03-30_override-medusa-admin-overrides/` — references `order-stripe-payout` and Connect payment data; freshness 2026-04-05.
-- **Application code (verification):** `apps/medusa/src/modules/stripe-connect-account/service.ts` — `type: 'custom'` account creation; `apps/medusa/src/modules/stripe-connect/service.ts` — destination charge `transfer_data`; freshness 2026-04-05.
+- **Application code:** `stripe-connect-account` (Express), `stripe-connect` provider (direct charges), `order-stripe-payout` / `order-stripe-payout-breakdown`, storefront `StripeElementsProvider` + `MedusaStripeAddress`; freshness 2026-04-06.
 - **Product / memory hubs:** `.devagent/workspace/product/` and `.devagent/workspace/memory/` — not present in this repository as of 2026-04-05; no mission/constitution citations seeded.
 
 **External / sibling template (user-provided paths, outside this repo):**

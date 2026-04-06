@@ -4,8 +4,8 @@ import { useRegion } from '@app/hooks/useRegion';
 import { Address } from '@libs/types';
 import { BaseCartAddress } from '@medusajs/types/dist/http/cart/common';
 import { AddressElement, Elements } from '@stripe/react-stripe-js';
-import { type AddressMode, StripeAddressElementChangeEvent, loadStripe } from '@stripe/stripe-js';
-import { type Dispatch, type FC, type SetStateAction, useMemo } from 'react';
+import { type AddressMode, StripeAddressElementChangeEvent, loadStripe, type StripeConstructorOptions } from '@stripe/stripe-js';
+import { type FC, useMemo } from 'react';
 
 export interface StripeAddress {
   address: Address;
@@ -84,9 +84,22 @@ export const MedusaStripeAddress: FC<MedusaStripeAddressProps> = ({
     });
   };
 
+  const connectSession = cart?.payment_collection?.payment_sessions?.find(
+    (s) => s.provider_id === 'pp_stripe-connect_stripe-connect',
+  ) as { data?: { connected_account_id?: string } } | undefined;
+  const connectedAccountId =
+    typeof connectSession?.data?.connected_account_id === 'string' &&
+    connectSession.data.connected_account_id.startsWith('acct_')
+      ? connectSession.data.connected_account_id
+      : undefined;
+  const stripeConstructorOptions: StripeConstructorOptions | undefined = connectedAccountId
+    ? { stripeAccount: connectedAccountId }
+    : undefined;
+
   const stripePromise = useMemo(() => {
-    return env.STRIPE_PUBLIC_KEY ? loadStripe(env.STRIPE_PUBLIC_KEY) : null;
-  }, [env.STRIPE_PUBLIC_KEY]);
+    if (!env.STRIPE_PUBLIC_KEY) return null;
+    return loadStripe(env.STRIPE_PUBLIC_KEY, stripeConstructorOptions);
+  }, [env.STRIPE_PUBLIC_KEY, connectedAccountId]);
 
   if (!cart) return null;
 

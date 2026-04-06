@@ -34,3 +34,9 @@ export function useStripeConnectDeleteMutation() {
     },
   });
 }
+
+export function useStripeConnectExpressLoginMutation() {
+  return useMutation({
+    mutationFn: () => sdk.admin.stripeConnect.createExpressLoginLink(),
+  });
+}

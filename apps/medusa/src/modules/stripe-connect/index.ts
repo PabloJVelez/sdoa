@@ -2,14 +2,12 @@
  * Stripe Connect Payment Provider Module
  *
  * Registers the Stripe Connect payment provider with Medusa's payment module.
- * This enables platform fee collection via Stripe Connect destination charges.
+ * Direct charges on the connected Express account plus application_fee_amount.
  *
  * Configuration:
  * - apiKey: Platform's Stripe secret key
- * - connectedAccountId: SDOA's connected account ID
- * - feePercent: Platform fee percentage (default: 5)
- * - refundApplicationFee: Whether to refund platform fee on refunds (default: false)
- * - webhookSecret: Stripe webhook secret for signature verification
+ * - refundApplicationFee: Whether to refund application fee on refunds (default: false)
+ * - webhookSecret: Signing secret for /hooks/payment/stripe-connect (Connect webhook, connected-account events)
  */
 
 import { ModuleProvider, Modules } from '@medusajs/framework/utils';
