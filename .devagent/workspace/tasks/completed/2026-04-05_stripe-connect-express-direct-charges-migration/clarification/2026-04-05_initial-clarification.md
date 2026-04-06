@@ -5,7 +5,7 @@
 - Date: 2026-04-05
 - Mode: Task Clarification
 - Status: Complete
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-04-05_stripe-connect-express-direct-charges-migration/`
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-04-05_stripe-connect-express-direct-charges-migration/`
 - **Plan readiness:** Ready for `devagent create-plan` — align implementation details with parent template repo where noted below.
 
 ## Inferred task concept

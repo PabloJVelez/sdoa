@@ -1,8 +1,8 @@
 # Research — Stripe Connect Express + direct charges (sdoa repo)
 
 - **Classification:** Implementation design — migrate from Custom + destination charges to Express + direct charges; chef as merchant of record where applicable.
-- **Task hub:** `.devagent/workspace/tasks/active/2026-04-05_stripe-connect-express-direct-charges-migration/`
-- **Storage path:** `.devagent/workspace/tasks/active/2026-04-05_stripe-connect-express-direct-charges-migration/research/2026-04-05_stripe-connect-express-direct-charges-migration.md`
+- **Task hub:** `.devagent/workspace/tasks/completed/2026-04-05_stripe-connect-express-direct-charges-migration/`
+- **Storage path:** `.devagent/workspace/tasks/completed/2026-04-05_stripe-connect-express-direct-charges-migration/research/2026-04-05_stripe-connect-express-direct-charges-migration.md`
 - **Date:** 2026-04-05
 
 ## Inferred problem statement

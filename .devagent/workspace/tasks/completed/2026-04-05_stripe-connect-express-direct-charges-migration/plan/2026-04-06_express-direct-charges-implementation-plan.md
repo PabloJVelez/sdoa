@@ -2,8 +2,8 @@
 
 - Owner: PabloJVelez
 - Last Updated: 2026-04-06
-- Status: Draft
-- Related Task Hub: `.devagent/workspace/tasks/active/2026-04-05_stripe-connect-express-direct-charges-migration/`
+- Status: Complete
+- Related Task Hub: `.devagent/workspace/tasks/completed/2026-04-05_stripe-connect-express-direct-charges-migration/`
 - Stakeholders: PabloJVelez (DRI)
 
 **Upstream artifacts:** [`clarification/2026-04-05_initial-clarification.md`](../clarification/2026-04-05_initial-clarification.md), [`research/2026-04-05_stripe-connect-express-direct-charges-migration.md`](../research/2026-04-05_stripe-connect-express-direct-charges-migration.md), parent checklist `/Users/pablo/Personal/development/private-chef-template/private-chef-template/docs/porting-express-direct-charges-sibling-project.md`.
@@ -176,7 +176,7 @@
 
 ## Progress Tracking
 
-Update `.devagent/workspace/tasks/active/2026-04-05_stripe-connect-express-direct-charges-migration/AGENTS.md` Implementation Checklist and Progress Log as tasks complete.
+Update `.devagent/workspace/tasks/completed/2026-04-05_stripe-connect-express-direct-charges-migration/AGENTS.md` Implementation Checklist and Progress Log as tasks complete.
 
 ---
 

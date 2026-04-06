@@ -2,8 +2,8 @@
 
 - Owner: PabloJVelez
 - Last Updated: 2026-04-06
-- Status: Draft
-- Task Hub: `.devagent/workspace/tasks/active/2026-04-05_stripe-connect-express-direct-charges-migration/`
+- Status: Complete
+- Task Hub: `.devagent/workspace/tasks/completed/2026-04-05_stripe-connect-express-direct-charges-migration/`
 
 ## Summary
 
@@ -37,6 +37,7 @@ The desired end state aligns with Connect guidance for SaaS-style storefronts: *
 - [2026-04-05] Event: Linked parent **porting checklist** — `private-chef-template/docs/porting-express-direct-charges-sibling-project.md` (prompt output: webhooks, fees, removed env/UI, `loadStripe`, Connect pricing). Primary parity doc for `create-plan`.
 - [2026-04-06] Event: **`devagent create-plan`** — implementation plan with five tasks (Express account, provider direct charges + gross-up removal, config/env/docs, storefront `stripeAccount`, admin payout UI). See `plan/2026-04-06_express-direct-charges-implementation-plan.md`.
 - [2026-04-06] Event: **`devagent implement-plan`** — all five plan tasks coded in apps/medusa + apps/storefront; `yarn workspace medusa build` OK. Ops: Stripe Dashboard Connect webhook + Connect pricing still required.
+- [2026-04-06] Event: Task moved to completed. Updated all status references and file paths from active/ to completed/ throughout task directory.
 
 ## Implementation Checklist
 
@@ -74,5 +75,4 @@ The desired end state aligns with Connect guidance for SaaS-style storefronts: *
 
 ## Next Steps
 
-1. **`devagent implement-plan`** (or execute tasks from the plan) — [`plan/2026-04-06_express-direct-charges-implementation-plan.md`](./plan/2026-04-06_express-direct-charges-implementation-plan.md).
-2. Configure Stripe Dashboard (Connect webhooks, Connect pricing) per plan Task 3 and parent porting doc.
+1. Configure Stripe Dashboard (Connect webhooks, Connect pricing) per the plan Task 3 and the parent porting doc.
