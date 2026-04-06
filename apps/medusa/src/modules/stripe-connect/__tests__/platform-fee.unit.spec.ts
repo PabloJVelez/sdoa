@@ -3,13 +3,9 @@ import type { PlatformFeeLineItem, PlatformFeeMode, StripeConnectConfig } from '
 
 const baseConfig: StripeConnectConfig = {
   apiKey: 'sk_test',
-  useStripeConnect: true,
   connectedAccountId: '',
   feePercent: 5,
   refundApplicationFee: false,
-  passStripeFeeToChef: false,
-  stripeFeePercent: 2.9,
-  stripeFeeFlatCents: 30,
   automaticPaymentMethods: true,
   captureMethod: 'automatic',
   feePerUnitBased: true,

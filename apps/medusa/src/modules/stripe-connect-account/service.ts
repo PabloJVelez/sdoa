@@ -1,6 +1,6 @@
 /**
  * Stripe Connect Account Module Service
- * Manages the single connected Stripe account (Custom) and Account Link flow.
+ * Manages the single connected Stripe account (Express) and Account Link flow.
  */
 import Stripe from 'stripe';
 import { MedusaService } from '@medusajs/framework/utils';
@@ -46,7 +46,7 @@ class StripeConnectAccountModuleService extends MedusaService({
   }
 
   /**
-   * Creates a Stripe Custom account (or reuses existing DB row) and returns the DB record.
+   * Creates a Stripe Express account (or reuses existing DB row) and returns the DB record.
    */
   async getOrCreateStripeAccount(
     businessName?: string,
@@ -63,7 +63,7 @@ class StripeConnectAccountModuleService extends MedusaService({
     }
 
     const accountParams: Stripe.AccountCreateParams = {
-      type: 'custom',
+      type: 'express',
       country: country || 'US',
       capabilities: {
         card_payments: { requested: true },
@@ -159,6 +159,18 @@ class StripeConnectAccountModuleService extends MedusaService({
       { take: 1 },
     );
     return record ? record.stripe_account_id : null;
+  }
+
+  /**
+   * Single-use Express Dashboard login link for the connected account.
+   * Requires charges_enabled (same guard as the admin express-login route).
+   */
+  async createExpressDashboardLink(
+    stripeAccountId: string,
+  ): Promise<{ url: string }> {
+    const stripe = this.getStripe();
+    const loginLink = await stripe.accounts.createLoginLink(stripeAccountId);
+    return { url: loginLink.url };
   }
 }
 

@@ -34,14 +34,6 @@ function extractPrimitiveFromJsonString(
   json: string,
   key: string,
 ): string | number | boolean | null | undefined {
-  // Fast path: avoid full JSON.parse for very large strings.
-  // Handles primitives only (number/string/boolean/null).
-  //
-  // Examples matched:
-  //  "application_fee_amount":123
-  //  "application_fee_amount":"123"
-  //  "pass_stripe_fee_to_chef":true
-  //  "stripe_processing_fee_estimate":null
   const re = new RegExp(
     `"${key}"\\s*:\\s*(null|true|false|-?\\d+(?:\\.\\d+)?|"[^"\\\\]*(?:\\\\.[^"\\\\]*)*")`,
     'i',
@@ -56,7 +48,6 @@ function extractPrimitiveFromJsonString(
 
   if (raw.startsWith('"') && raw.endsWith('"')) {
     const inner = raw.slice(1, -1);
-    // Best-effort unescape for numeric strings; for our uses, we only need numbers/booleans.
     return inner.replace(/\\"/g, '"');
   }
 
@@ -67,14 +58,9 @@ function extractPrimitiveFromJsonString(
 function paymentDataAsRecord(data: unknown): Record<string, unknown> | undefined {
   if (data == null) return undefined;
   if (typeof data === 'string') {
-    // If payment data is large (e.g. full Stripe PaymentIntent payload),
-    // parsing it repeatedly can freeze the Order detail UI.
-    // Extract only the fields we need for payout rows.
     if (data.length > 50_000) {
       return {
         application_fee_amount: extractPrimitiveFromJsonString(data, 'application_fee_amount'),
-        pass_stripe_fee_to_chef: extractPrimitiveFromJsonString(data, 'pass_stripe_fee_to_chef'),
-        stripe_processing_fee_estimate: extractPrimitiveFromJsonString(data, 'stripe_processing_fee_estimate'),
         amount: extractPrimitiveFromJsonString(data, 'amount'),
       };
     }
@@ -82,11 +68,8 @@ function paymentDataAsRecord(data: unknown): Record<string, unknown> | undefined
       const parsed: unknown = JSON.parse(data);
       if (typeof parsed === 'object' && parsed !== null) return parsed as Record<string, unknown>;
     } catch {
-      // Fallback: best-effort primitive extraction even when JSON parsing fails.
       return {
         application_fee_amount: extractPrimitiveFromJsonString(data, 'application_fee_amount'),
-        pass_stripe_fee_to_chef: extractPrimitiveFromJsonString(data, 'pass_stripe_fee_to_chef'),
-        stripe_processing_fee_estimate: extractPrimitiveFromJsonString(data, 'stripe_processing_fee_estimate'),
         amount: extractPrimitiveFromJsonString(data, 'amount'),
       };
     }
@@ -114,8 +97,6 @@ export function extractPlatformCommission(
   show: boolean;
   feeSmallest: number | null;
   grossSmallest: number | null;
-  passStripeFeeToChef: boolean;
-  stripeProcessingEstimateSmallest: number | null;
 } {
   const payments = flattenOrderPayments(order);
   if (!payments.length) {
@@ -123,8 +104,6 @@ export function extractPlatformCommission(
       show: false,
       feeSmallest: null,
       grossSmallest: null,
-      passStripeFeeToChef: false,
-      stripeProcessingEstimateSmallest: null,
     };
   }
 
@@ -133,8 +112,6 @@ export function extractPlatformCommission(
 
     const data = paymentDataAsRecord(payment.data);
     const feeSmallest = parseNumericSmallest(data?.application_fee_amount);
-    const passStripeFeeToChef = data?.pass_stripe_fee_to_chef === true;
-    const stripeProcessingEstimateSmallest = parseNumericSmallest(data?.stripe_processing_fee_estimate);
 
     const fromStripePi = parseNumericSmallest(data?.amount);
     const orderTotalMajor = parseNumericSmallest(order?.total as unknown);
@@ -148,8 +125,6 @@ export function extractPlatformCommission(
       show: true,
       feeSmallest,
       grossSmallest,
-      passStripeFeeToChef,
-      stripeProcessingEstimateSmallest,
     };
   }
 
@@ -157,8 +132,5 @@ export function extractPlatformCommission(
     show: false,
     feeSmallest: null,
     grossSmallest: null,
-    passStripeFeeToChef: false,
-    stripeProcessingEstimateSmallest: null,
   };
 }
-
