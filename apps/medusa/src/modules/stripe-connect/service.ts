@@ -139,7 +139,7 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
    * Resolves cart to line items with sku, quantity, unit_price_cents via cart module.
    * Returns [] if cart module is unavailable or cart has no items. Used for per-line platform fee.
    */
-  private async getCartLines(cartId: string): Promise<PlatformFeeLineItem[]> {
+  private async getCartLines(cartId: string, currencyCode: string): Promise<PlatformFeeLineItem[]> {
     if (!this.cartModuleService_) {
       this.logger_.warn(
         `${StripeConnectProviderService.LOG_PREFIX} [fee] getCartLines: no cartModuleService, returning []`,
@@ -151,11 +151,15 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
       this.logger_.info(
         `${StripeConnectProviderService.LOG_PREFIX} [fee] getCartLines(cartId=${cartId}) raw items=${items.length}`,
       );
-      return items.map((item) => ({
-        sku: item.variant_sku ?? '',
-        quantity: Number(item.quantity) || 0,
-        unit_price_cents: Math.round(Number(item.unit_price) || 0),
-      }));
+      return items.map((item) => {
+        const raw = Number(item.unit_price) || 0;
+
+        return {
+          sku: item.variant_sku ?? '',
+          quantity: Number(item.quantity) || 0,
+          unit_price_cents: Number.isInteger(raw) ? raw : getSmallestUnit(raw, currencyCode),
+        };
+      });
     } catch (e) {
       this.logger_.warn(`${StripeConnectProviderService.LOG_PREFIX} getCartLines failed: ${(e as Error).message}`);
       throw e;
@@ -258,7 +262,7 @@ class StripeConnectProviderService extends AbstractPaymentProvider<StripeConnect
       );
       if (cartId && typeof cartId === 'string') {
         try {
-          const lines = await this.getCartLines(cartId);
+          const lines = await this.getCartLines(cartId, currency_code);
           this.logger_.info(
             `${StripeConnectProviderService.LOG_PREFIX} [fee] cart lines count=${lines.length} items=${JSON.stringify(lines.map((l) => ({ sku: l.sku, qty: l.quantity, unit_cents: l.unit_price_cents })))}`,
           );
