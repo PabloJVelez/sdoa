@@ -130,7 +130,7 @@ export const MedusaStripeAddress: FC<MedusaStripeAddressProps> = ({
                 boxShadow: 'inset 0 0 0 1px rgba(210, 213, 218, 1)',
               },
               '.Label': {
-                FontWeight: '700',
+                fontWeight: '700',
               },
             },
           },

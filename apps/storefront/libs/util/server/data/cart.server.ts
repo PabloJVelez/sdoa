@@ -110,9 +110,15 @@ export const addToCart = withAuthHeaders(
 export const ensureStripePaymentSession = async (request: Request, cart: StoreCart): Promise<StoreCart> => {
   if (!cart) throw new Error('Cart was not provided.');
 
-  let activeSession = cart.payment_collection?.payment_sessions?.find((session) => session.status === 'pending');
+  const activeSession = cart.payment_collection?.payment_sessions?.find((session) => session.status === 'pending');
 
-  if (!activeSession) {
+  const sessionData = activeSession?.data as Record<string, unknown> | undefined;
+  const isStale =
+    activeSession?.provider_id === 'pp_stripe-connect_stripe-connect' &&
+    sessionData?.client_secret &&
+    (typeof sessionData?.connected_account_id !== 'string' || !sessionData.connected_account_id.startsWith('acct_'));
+
+  if (!activeSession || isStale) {
     await initiatePaymentSession(request, cart, {
       provider_id: 'pp_stripe-connect_stripe-connect',
       data: { cart_id: cart.id },

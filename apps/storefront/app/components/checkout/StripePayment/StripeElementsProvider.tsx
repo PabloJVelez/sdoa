@@ -16,23 +16,31 @@ export const StripeElementsProvider: FC<StripeElementsProviderProps> = ({ option
     () => cart?.payment_collection?.payment_sessions?.find((s) => s.provider_id === 'pp_stripe-connect_stripe-connect'),
     [cart?.payment_collection?.payment_sessions],
   ) as unknown as {
-    data: { client_secret: string; connected_account_id?: string };
-  };
+    data: Record<string, unknown> | undefined;
+  } | undefined;
 
-  const clientSecret = stripeSession?.data?.client_secret as string;
+  const sessionData = stripeSession?.data;
+  const clientSecret = typeof sessionData?.client_secret === 'string' ? sessionData.client_secret : undefined;
   const connectedAccountId =
-    typeof stripeSession?.data?.connected_account_id === 'string' &&
-    stripeSession.data.connected_account_id.startsWith('acct_')
-      ? stripeSession.data.connected_account_id
+    typeof sessionData?.connected_account_id === 'string' && sessionData.connected_account_id.startsWith('acct_')
+      ? sessionData.connected_account_id
       : undefined;
 
-  const stripeOptions: StripeConstructorOptions | undefined = connectedAccountId
-    ? { stripeAccount: connectedAccountId }
-    : undefined;
+  if (sessionData && clientSecret && !connectedAccountId) {
+    console.warn(
+      '[StripeElementsProvider] Payment session has client_secret but no connected_account_id. ' +
+        'This will cause a 400 error if the PaymentIntent was created as a direct charge on a connected account. ' +
+        'Session data keys:',
+      Object.keys(sessionData),
+    );
+  }
 
   const stripePromise = useMemo(() => {
     if (!env.STRIPE_PUBLIC_KEY) return null;
-    return loadStripe(env.STRIPE_PUBLIC_KEY, stripeOptions);
+    const opts: StripeConstructorOptions | undefined = connectedAccountId
+      ? { stripeAccount: connectedAccountId }
+      : undefined;
+    return loadStripe(env.STRIPE_PUBLIC_KEY, opts);
   }, [env.STRIPE_PUBLIC_KEY, connectedAccountId]);
 
   if (!stripeSession || !stripePromise || !clientSecret) return null;
@@ -43,7 +51,7 @@ export const StripeElementsProvider: FC<StripeElementsProviderProps> = ({ option
       key={`${clientSecret}:${connectedAccountId ?? ''}`}
       options={
         options ?? {
-          clientSecret: clientSecret,
+          clientSecret,
         }
       }
     >

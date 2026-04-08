@@ -58,12 +58,21 @@ const ensureSelectedCartShippingMethod = async (request: Request, cart: StoreCar
   }
 };
 
+const isStaleStripeConnectSession = (session: BasePaymentSession): boolean => {
+  const data = session.data as Record<string, unknown> | undefined;
+  if (session.provider_id !== 'pp_stripe-connect_stripe-connect') return false;
+  if (!data?.client_secret) return false;
+  return typeof data?.connected_account_id !== 'string' || !data.connected_account_id.startsWith('acct_');
+};
+
 const ensureCartPaymentSessions = async (request: Request, cart: StoreCart) => {
   if (!cart) throw new Error('Cart was not provided.');
 
   let activeSession = cart.payment_collection?.payment_sessions?.find((session) => session.status === 'pending');
 
-  if (!activeSession) {
+  const needsNewSession = !activeSession || isStaleStripeConnectSession(activeSession as BasePaymentSession);
+
+  if (needsNewSession) {
     const paymentProviders = await listCartPaymentProviders(cart.region_id!);
     if (!paymentProviders.length) return activeSession;
 
